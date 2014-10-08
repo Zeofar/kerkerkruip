@@ -1024,6 +1024,49 @@ The blood magic maximum of the gown of the red court is 5.
 The minimum blood timeout of the gown of the red court is 2.
 The maximum blood timeout of the gown of the red court is 8.
 
+
+Section - Armour of thorns (major)
+
+[Armour of thorns, nails, spikes, spears.]
+
+The armour of thorns is a major shirt. The armour of thorns is civilised and iron.
+Understand "thorns" and "nails" and "spikes" and "spears" as the armour of thorns.
+The indefinite article of the armour of thorns is "the".
+
+The description of the armour of thorns is "This leather shirts is covered with [if blood magic level of armour of thorns is 1]tiny thorns[otherwise if blood magic level of armour of thorns is 2]small nails[otherwise if blood magic level of armour of thorns is 3]large spikes[otherwise]huge spears[end if]. Anyone who successfully attacks you in melee will suffer [blood magic level of the armour of thorns] damage[unless blood magic level of the armour of thorns is blood magic maximum of the armour of thorns]. Feeding the armour will increase this by 1[end if]."
+
+Before printing the name of the armour of thorns:
+	if blood magic level of the armour of thorns is 1:
+		now printed name of armour of thorns is "armour of thorns";
+	if blood magic level of the armour of thorns is 2:
+		now printed name of armour of thorns is "armour of nails";
+	if blood magic level of the armour of thorns is 3:
+		now printed name of armour of thorns is "armour of spikes";
+	if blood magic level of the armour of thorns is 4:
+		now printed name of armour of thorns is "armour of spears".
+
+The blood magic cost of the armour of thorns is 6.
+The blood magic level of the armour of thorns is 1.
+The blood magic maximum of the armour of thorns is 4.
+
+An aftereffects rule (this is the armour of thorns rule):
+	if the global defender wears the armour of thorns:
+		if total damage is greater than 0:
+			unless global attacker weapon is ranged:
+				let n be blood magic level of the armour of thorns;
+				if n is greater than 0:
+					say "The [armour of thorns] [if blood magic level of armour of thorns is 1]scratches[otherwise if blood magic level of armour of thorns is 2]pricks[otherwise if blood magic level of armour of thorns is 3]hurts[otherwise]impales[end if] [the global attacker] for[run paragraph on]";
+					deal n points of physical damage;
+					have armour of thorns inflict damage on global attacker;
+					say "[if the global attacker is dead], killing [regarding the global attacker][them][end if].";
+
+A dungeon interest rule (this is the sometimes feed armour of thorns rule):
+	if a random chance of 1 in 10 succeeds:
+		increase blood magic level of the armour of thorns by 1;
+	if a random chance of 1 in 10 succeeds:
+		increase blood magic level of the armour of thorns by 1.
+
+
 Chapter - Cloaks
 
 Section - Fuligin cloak (epic)
@@ -3579,13 +3622,11 @@ A spirit bonus rule (this is the spirit bonus of the was sceptre rule):
 	if the test subject carries the readied was sceptre:
 		increase faculty bonus score by 4.
 
-Section - Caduceus  (Herm gift)
+Section - Caduceus  (epic)
 
-The caduceus is a weapon. The indefinite article of the caduceus is "the".
+The caduceus is an epic wood magical weapon. The indefinite article of the caduceus is "the".
 
 The description of the caduceus is "A short staff entwined by two serpents and surmounted by wings. [italic type]Anyone hit by the caduceus has a chance equal to (attacker's mind * 2)% to fall asleep.[roman type]".
-
-The caduceus is wood.
 
 The damage die of the caduceus is 4.
 The weapon attack bonus of the caduceus is 2.
@@ -3750,7 +3791,8 @@ First aftereffects rule (this is the Malleus reset tension rule):
 		now tension is malleus-tension-dummy.
 
 Aftereffects rule (this is the Malleus blood spent rule):
-	now the blood magic level of Malleus Maleficarum is 0.
+	if global attacker weapon is Malleus Maleficarum:
+		now the blood magic level of Malleus Maleficarum is 0.
 	
 A dread rule (this is the malleus dread rule):
 	if test subject carries Malleus Maleficarum and Malleus Maleficarum is readied:
@@ -3769,6 +3811,68 @@ An add specific damage rule (this is the Malleus blood damage bonus rule):
 			let bonus be the blood magic level of Malleus Maleficarum;
 			if the bonus is greater than 0:
 				add bonus points of physical damage with reason "Malleus Maleficarum blood bonus".
+
+
+Chapter - Crossbows
+
+A crossbow is a kind of weapon. 
+A crossbow is usually wood.
+A crossbow is always ranged.
+
+Understand "crossbow" as a crossbow.
+
+The damage die of a crossbow is usually 4.
+The weapon attack bonus of a crossbow is usually 0.
+The dodge bonus of a crossbow is usually 1.
+The parry-with bonus of a crossbow is usually -2.
+The parry-against bonus of a crossbow is usually -2.
+The weapon damage bonus of a crossbow is usually 0.
+
+Chance to win rule when the chosen weapon is a crossbow (this is the CTW crossbow concentration bonus rule):
+	let n be the tension divided by 3;
+	increase the chance-to-win by n.
+		
+An add general damage rule (this is the crossbow extra tension damage bonus rule):
+	if damage-by-hitting is true:
+		if the damage-source is a crossbow:
+			let n be the tension divided by 2;
+			if n is not 0:
+				add n points of general damage with reason "crossbow benefits from tension".
+
+The special weapon info of a crossbow is usually "; damage benefits strongly from tension[run paragraph on]".
+
+The maximum shots of a crossbow is usually 1.
+The current shots of a crossbow is usually 1.
+The maximum load time of a crossbow is usually 2.
+
+Section - Yahvinnian crossbow
+
+The Yahvinnian crossbow is a minor civilised crossbow.
+
+The description of the Yahvinnian crossbow is "The typical Yahvinnian taste for combining life's two great transgressive pleasures--sex and death--is evident from the erotic carvings on this crossbow.".
+
+The erotic carvings are part of the Yahvinnian crossbow. The description of the erotic carvings is "Wait... is [italic type]that[roman type] physically possible? You simply must try that some day, which adds another reason to escape from this barren dungeon."
+
+
+Section - Snipe (Herm gift)
+
+Snipe is a crossbow. Snipe is proper-named.
+
+The damage die of Snipe is 6.
+The weapon attack bonus of Snipe is 1.
+The maximum load time of Snipe is 4.
+
+The description of Snipe is "This small crossbow is made from very dark wood. It carries the blessing of Herm: when you hit someone with it, they'll have a chance to be teleported away equal to 10% times your favour with the hidden god.".
+
+An aftereffects rule (this is the Snipe rule):
+	if the global attacker weapon is Snipe:
+		if the global attacker worships Herm:
+			if total damage is greater than 0:
+				if a random chance of the favour of the global attacker in 10 succeeds:
+					let n be teleport amount of the global defender;
+					try the global defender teleporting;
+					now teleport amount of global defender is n.
+
 		
 Chapter - Other weapons
 
