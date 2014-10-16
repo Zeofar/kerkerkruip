@@ -574,12 +574,6 @@ Scenario when testing Sleeping Fallen:
 	now Entrance to the Arena is testobject;
 	now a random scroll of death is testobject;
 	
-To assert that (guy - a person) is asleep:
-	assert "[The guy] should be asleep" based on whether or not the guy is asleep;
-	
-To assert that (guy - a person) is awake:
-	assert "[The guy] should be awake" based on whether or not the guy is not asleep;
-	
 Test play when testing Sleeping Fallen:
 	now the blood ape is asleep;
 	extract the player to the location of the blood ape;
@@ -683,12 +677,6 @@ initial scheduling for Player-cowering:
 	now the player is insane;
 	assert truth of whether or not the target cower percentage of the player is at least 1 with message "the insane player's target cower percentage should be at least 1"; 
 		
-first standard ai rule:
-	log "starting standard AI for [the main actor]";
-	
-last standard ai rule:
-	log "done standard AI for [the main actor]";
-	
 Section - Controlling pipes
 
 Controlling pipes is a test set.

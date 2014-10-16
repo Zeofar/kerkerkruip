@@ -72,7 +72,7 @@ with 100 blank rows
 To queue (T - a test set):
 	choose a blank row in Table of Test Set Queue;
 	Now test set entry is T;
-	Now the random-seed entry is 26. [TODO: set this manually if desired]
+	Now the random-seed entry is 28. [TODO: set this manually if desired]
 	
 To queue all test sets:
 	Repeat with T running through enabled test sets:
@@ -640,6 +640,8 @@ Include (-
 	
 Chapter - Helpful phrases
 
+Section - Common tasks
+
 To extract (guy - a person) to (place - a room):
 	transcribe "moving [guy] to [place]";
 	extract guy from combat;
@@ -664,6 +666,9 @@ To have the player sacrifice (stuff - a power):
 	let the previous favour be the favour of the player with divinity;
 	follow the sacrifice rule;
 	assert that the favour of the player with divinity is the previous favour + the power-level;
+
+
+Section - Common assertions
 
 To assert that (message - an indexed text) includes (pattern - an indexed text):
 	record a test attempt;
@@ -697,6 +702,13 @@ To pause and assert that the event description does not include (pattern - an in
 	assert that the event description does not include pattern;
 	transcribe and restart capturing because "done checking output of".
 
+
+To assert that (guy - a person) is asleep:
+	assert "[The guy] should be asleep" based on whether or not the guy is asleep;
+	
+To assert that (guy - a person) is awake:
+	assert "[The guy] should be awake" based on whether or not the guy is not asleep;
+	
 Section - hiding-check, hidden-traveling and hiding-reveal
 
 Traveling sneakily is a truth state that varies.

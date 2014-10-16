@@ -633,7 +633,7 @@ Chapter - Selecting an action
 
 Include (-
 [ CheckTableEntryIsBlank tab col row i at oldv flags;
-	print "CheckTableEntryBlank tab ", tab, " col ", col, " row ", row, "^";
+	! print "CheckTableEntryBlank tab ", tab, " col ", col, " row ", row, "^";
 	if (col >= 100) col = TableFindCol(tab, col);
 	if (col == 0) rtrue;
 	if ((tab-->col)-->(row+COL_HSIZE) ~= TABLE_NOVALUE) {
@@ -649,21 +649,21 @@ Include (-
 
 Include (-
 [ ForceTableEntryBlank tab col row i at oldv flags;
-	print "ForceTableEntryBlank ";
-	PrintTableName(tab);
-	print "(", tab, ") col ", col, " row ", row, "^"; 
+	! print "ForceTableEntryBlank ";
+	! PrintTableName(tab);
+	! print "(", tab, ") col ", col, " row ", row, "^"; 
 	if (col >= 100) col = TableFindCol(tab, col);
 	if (col == 0) rtrue;
 	flags = (tab-->col)-->1;
 	oldv = (tab-->col)-->(row+COL_HSIZE);
-	print "flags=",flags, " (TB_COLUMN_ALLOCATED=", TB_COLUMN_ALLOCATED, ") oldv=", oldv, "(TABLE_NOVALUE=",TABLE_NOVALUE,")^";
+	! print "flags=",flags, " (TB_COLUMN_ALLOCATED=", TB_COLUMN_ALLOCATED, ") oldv=", oldv, "(TABLE_NOVALUE=",TABLE_NOVALUE,")^";
 	if ((flags & TB_COLUMN_ALLOCATED) && (oldv ~= 0 or TABLE_NOVALUE))
 		FlexFree(oldv);
-	print "freed oldv, now setting entry to TABLE_NOVALUE^";
+	! print "freed oldv, now setting entry to TABLE_NOVALUE^";
 	(tab-->col)-->(row+COL_HSIZE) = TABLE_NOVALUE;
-	print "Forcing blank at ";
-	PrintTableName(tab);
-	print "(", tab, ") col ", col, " row ", row, "^"; 
+	! print "Forcing blank at ";
+	! PrintTableName(tab);
+	! print "(", tab, ") col ", col, " row ", row, "^"; 
 	if (flags & TB_COLUMN_NOBLANKBITS) return;
 	row--;
 	at = DT_FindBlankBits(tab, col) + (row/8);
@@ -675,9 +675,9 @@ Include (-
 [ ForceTableEntryNonBlank tab col row i at oldv flags tc kov j;
 	if (col >= 100) col=TableFindCol(tab, col);
 	if (col == 0) rtrue;
-	print "Forcing non blank at ";
-	PrintTableName(tab);
-	print "(", tab, ") col ", col, " row ", row, "^"; 
+	! print "Forcing non blank at ";
+	! PrintTableName(tab);
+	! print "(", tab, ") col ", col, " row ", row, "^"; 
 	if (((tab-->col)-->1) & TB_COLUMN_NOBLANKBITS) return;
 	flags = (tab-->col)-->1;
 	oldv = (tab-->col)-->(row+COL_HSIZE);
@@ -699,7 +699,7 @@ Include (-
 
 Include (-
 [ TableSwapBlankBits tab row1 row2 col at1 at2 bit1 bit2;
-	print "TableSwapBlankBits tab ", tab, " row1 ", row1, " row2 ", row2, " col ", col, "^";
+	! print "TableSwapBlankBits tab ", tab, " row1 ", row1, " row2 ", row2, " col ", col, "^";
 	if (col >= 100) col=TableFindCol(tab, col);
 	if (col == 0) rtrue;
 	if (((tab-->col)-->1) & TB_COLUMN_NOBLANKBITS) return;
@@ -728,7 +728,7 @@ Include (-
 
 Include (-
 [ TableMoveBlankBitsDown tab row1 row2 col at atp1 bit rx bba;
-	print "TableMoveBlankBitsDown tab ", tab, " row1 ", row1, " row2 ", row2, " col ", col, "^";
+	! print "TableMoveBlankBitsDown tab ", tab, " row1 ", row1, " row2 ", row2, " col ", col, "^";
 	if (col >= 100) col=TableFindCol(tab, col);
 	if (col == 0) rtrue;
 	if (((tab-->col)-->1) & TB_COLUMN_NOBLANKBITS) return;
@@ -781,37 +781,36 @@ Constant BLK_DATA_MULTI_OFFSET = BLK_DATA_OFFSET + 2*WORDSIZE;
 Constant BLK_NEXT 3;
 Constant BLK_PREV 4;
 
-Constant BLKVALUE_TRACE = 1; ! Uncomment this for debugging purposes
+! Constant BLKVALUE_TRACE = 1; ! Uncomment this for debugging purposes
 
 -) instead of "Multiple Blocks" in "Flex.i6t";
 
 include (-
 [ FlexFree block fromtxb ptxb memsize;
 	@getmemsize memsize;
-	print "FlexFree ", block, " flags=", (BlkPrintHexadecimal) block->BLK_HEADER_FLAGS, " header_n=", (BlkPrintHexadecimal) block->BLK_HEADER_N, " memsize=", memsize, "^";
-	print "^";
 	if (block == 0) return;
 	if ((block->BLK_HEADER_FLAGS) & BLK_FLAG_RESIDENT) return;
 	if ((block->BLK_HEADER_N) & $80) return; ! not a flexible block at all
 	if ((block->BLK_HEADER_FLAGS) & BLK_FLAG_MULTIPLE) {
-		print "Block is multiple^";
 		if (block-->BLK_PREV ~= NULL) {
+			print "FlexFree ", block, " flags=", (BlkPrintHexadecimal) block->BLK_HEADER_FLAGS, " header_n=", (BlkPrintHexadecimal) block->BLK_HEADER_N, " memsize=", memsize, "^";
 			if ((block-->BLK_PREV)-->BLK_NEXT ~= block) {
 				print "Block ", block, " with previous block ", block-->BLK_PREV, " does not match previous block's next block: ", (block-->BLK_PREV)-->BLK_NEXT, "^";
 				FlexError("contains bad links");
+			}
+			else {
+				print "main block ", block, " has next=", block-->BLK_NEXT, ", previous=", block-->BLK_PREV, "(NULL=", NULL, ")^";
 			}
 			(block-->BLK_PREV)-->BLK_NEXT = NULL;
 		}
 		fromtxb = block;
 		for (:(block-->BLK_NEXT)~=NULL:block = block-->BLK_NEXT) {
-			print "current block is ", block, ", next=", block-->BLK_NEXT, ", previous=", block-->BLK_PREV, "(NULL=", NULL, ")^";
 		}
 		while (block ~= fromtxb) {
-			print "Freeing component block ", block, "^";
 			ptxb = block-->BLK_PREV; FlexFreeSingleBlockInternal(block); block = ptxb;
 		}
 	}
-	print "Freeing original block ", block, "^";
+	! print "Freeing original block ", block, "^";
 	FlexFreeSingleBlockInternal(block);
 ];
 
@@ -842,7 +841,7 @@ include (-
 
 include (-
 [ STORED_ACTION_TY_Support task arg1 arg2 arg3;
-	print "Stored action support task=", task, " arg1=", arg1, " arg2=", arg2, "^";
+	! print "Stored action support task=", task, " arg1=", arg1, " arg2=", arg2, "^";
 	switch(task) {
 		CREATE_KOVS:      return STORED_ACTION_TY_Create(arg2);
 		DESTROY_KOVS:     STORED_ACTION_TY_Destroy(arg1);
@@ -863,7 +862,7 @@ include (-
 
 include (-
 [ TEXT_TY_Support task arg1 arg2 arg3;
-	print "Text support task=", task, " arg1=", arg1, " arg2=", arg2, " arg3=", arg3, "^";
+	! print "Text support task=", task, " arg1=", arg1, " arg2=", arg2, " arg3=", arg3, "^";
 	switch(task) {
 		CREATE_KOVS:      return TEXT_TY_Create(arg2);
 		CAST_KOVS:        TEXT_TY_Cast(arg1, arg2, arg3);
@@ -905,7 +904,7 @@ include (-
 
 [ TEXT_TY_Untransmute txt pk cp x;
 	if ((pk) && (txt-->0 == UNPACKED_TEXT_STORAGE)) {
-		print "Untransmuting unpacked txt=", txt, " pk=", pk, " cp=", cp, "^";
+		! print "Untransmuting unpacked txt=", txt, " pk=", pk, " cp=", cp, "^";
 		x = txt-->1; ! The old value was an unpacked string
 		FlexFree(x);
 		txt-->0 = cp;
@@ -939,9 +938,9 @@ To say sanity check action options:
 A last Standard AI rule for a person (called P) (this is the select an action and do it rule):
 	log "select an action and do it for [P] - [sanity check action options]";
 	cautiously blank out Table of AI Action Options;
-	log "blanked out table of AI Action Options";
+	[log "blanked out table of AI Action Options";]
 	follow the AI action selection rules for P;
-	log "Now there are [number of filled rows in table of ai action options] action selections";
+	[log "Now there are [number of filled rows in table of ai action options] action selections";]
 	sort the Table of AI Action Options in random order;
 	sort the Table of AI Action Options in reverse Action Weight order;
 	#if debug and showing weightings;
