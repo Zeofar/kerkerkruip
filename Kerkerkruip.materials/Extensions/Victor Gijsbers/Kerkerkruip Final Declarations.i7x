@@ -44,7 +44,6 @@ Throwing is ethereal-forbidden.
 Applying something to is ethereal-forbidden.
 Spraying is ethereal-forbidden.
 Snorting is ethereal-forbidden.
-Stunning is ethereal-forbidden.
 
 Locking something with is ethereal-forbidden-second.
 Unlocking something with is ethereal-forbidden-second.

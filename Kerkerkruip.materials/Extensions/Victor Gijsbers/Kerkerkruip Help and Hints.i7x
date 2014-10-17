@@ -63,30 +63,7 @@ title	text
 "Body, mind, and spirit"	"Your character has three basic faculties: body, mind, and spirit. They influence your performance in two ways. First, each of the faculties has its own individual effect. Second, all powers in the game depend upon one or more of the faculties for their effect.[paragraph break][bold type]Body[roman type] is a measure of your physical strength and agility. Whenever you are attacked, you have a body * 2% chance of receiving a +3 defence bonus.[paragraph break][bold type]Mind[roman type] is a measure of your intelligence and willpower. Whenever damage is dealt to you, each point of mind increases your chance of remaining concentrated by 2%.[paragraph break][bold type]Spirit[roman type] measures how attuned you are to magic and the souls of others. Every point of spirit gives you a 2.5% chance of receiving an intiative bonus on any combat turn.[paragraph break]Truly exceptional feats are only possible for those who [bold type]balance[roman type] body, mind and spirit. Whenever a random number is rolled for an attack or a faculty check, your chance of rolling 20 is a percentage equal to the [italic type]lowest[roman type] of your three faculties."
 ""	--
 "[bold type]Level 1"	--
-"Swarm of daggers (body & spirit)"	"Level: 1[paragraph break][description of the power of the daggers]"
-"Blood ape (body)"	"Level: 1[paragraph break][description of the power of the ape]"
-"Ravenous armadillo (body & spirit)"	"Level: 1[paragraph break][description of the power of the armadillo]"
-"Miranda (mind)"	"Level: 1[paragraph break][description of the power of miranda]"
-"Wisps of pain (spirit)"	"Level: 1[paragraph break][description of the power of the wisps]"
-""	--
-"[bold type]Level 2"	--
-"Chain golem (spirit)"	"Level: 2[paragraph break][description of the power of the chains]"
-"Jumping bomb (body)"	"Level: 2[paragraph break][description of the power of the bomb]"
-"Reaper (spirit)"	"Level: 2[paragraph break][description of the power of the reaper]"
-"Demon of rage (mind)"	"Level: 2[paragraph break][description of the power of rage]"
-"Hound (mind)"	"Level: 2[paragraph break][description of the power of the hound]"
-"Angel of compassion (spirit)"	"Level 2:[paragraph break][description of the power of compassion]"
-""	--
-"[bold type]Level 3"	--
-"Mindslug (mind & spirit)"	"Level: 3[paragraph break][description of the power of the mindslug]"
-"Giant tentacle (mind)"	"Level: 3[paragraph break][description of the power of the tentacle]"
-"Minotaur (body)"	"Level: 3[paragraph break][description of the power of the minotaur]"
-""	--
-"[bold type]Level 4"	--
-"Fanatics of Aite (spirit)"	"Level: 4[paragraph break][description of the power of the fanatics]"
-"Bodmall (body)"	"Level: 4[paragraph break][description of the power of Bodmall]"
-"Overmind (mind)"	"Level: 4[paragraph break][description of the power of the overmind]"
-"Israfel (spirit)"	"Level: 4[paragraph break][description of the power of Israfel]"
+
 
 
 To say total credits:
