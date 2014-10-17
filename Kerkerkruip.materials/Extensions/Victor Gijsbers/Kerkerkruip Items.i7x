@@ -3301,15 +3301,6 @@ An attack modifier rule:
 	
 The special weapon info of the minotaur's axe is "; when damage is dealt and the wielder has the power of the minotaur, casts attacker and defender in a magical maze[run paragraph on]".
 
-Last aftereffects rule (this is the minotaur's axe maze rule):
-	if the global attacker weapon is the minotaur's axe:
-		if the global attacker is the minotaur or (the global attacker is the player and the power of the minotaur is granted):
-			if the total damage is greater than 0:
-				if the location of the player is not the maze:
-					maze the global attacker and the global defender.
-					
-
-
 
 Chapter - Scythe
 
