@@ -468,8 +468,6 @@ Carry out remembering:
 			say ". With your powers of psycholocation, you might be able to SENSE it.";
 		otherwise:
 			say " now.";
-	Let the tip text be the next tip text;
-	say "[line break][italic type]Tip[roman type]: [tip text][paragraph break]".
 
 Definition: a person (called guy) is memorable:
 	if the guy is the player, no;
@@ -936,70 +934,6 @@ Carry out awaking:
 	
 Report awaking:
 	say "With a swift kick, you wake up [the noun]. Not very subtle, perhaps, but it is certainly effective.".
-
-
-
-
-Chapter - Options menu
-
-Optionsmenuing is an action out of world. Optionsmenuing is in-game menu-checking.
-
-Understand "options" and "settings" as Optionsmenuing.
-
-Carry out optionsmenuing:
-	display the (Table of Options Menu) menu with title "Options";
-	say "Ok.";
-
-Chapter - Achievements Menu
-
-Achievemenuing is an action out of world. Achievemenuing is in-game menu-checking.
-
-Understand "achieve" and "achievements" as achievemenuing.
-
-Carry out achievemenuing:
-	display the (Table of Achievement Menu) menu with title "Achievements";
-	say "Ok.";
-
-Chapter - Enemies and Powers Menu
-
-Powermenuing is an action out of world. Powermenuing is in-game menu-checking.
-
-Understand "enemies" and "powers" as powermenuing.
-
-Carry out powermenuing:
-	display the Table of Power Help menu with title "Enemies and powers";
-	say "Ok.";
-
-Chapter - The asking for help action (for use without Basic Help Menu by Emily Short)
-
-Asking for help is an action out of world. Asking for help is in-game menu-checking.
-Understand "help" or "hint" or "hints" or "about" or "info" as asking for help.
-Carry out asking for help (this is the help request rule): do nothing.
-
-Chapter - Help Menu
-
-Understand "menu" as asking for help.
-
-The help request rule is not listed in any rulebook.
-
-Carry out asking for help:
-	display the Table of Kerkerkruip Help menu with title "Kerkerkruip";
-	say "Ok.";
-
-Chapter - Credits menu
-
-Understand "credit" or "credits" or "copyright" or "copyrights" or "licence" or "license" as requesting the story file version.
-
-Requesting the story file version is in-game menu-checking.
-
-The announce the story file version rule is not listed in any rulebook.
-
-Carry out requesting the story file version:
-	show menu page "[total credits]" with title "Credits, Copyright & Afterword";
-	say "Ok.";
-
-
-
 
 
 Chapter - Replacing "You can see" is not a joke

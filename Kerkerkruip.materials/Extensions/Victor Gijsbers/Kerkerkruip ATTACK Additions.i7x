@@ -30,14 +30,6 @@ First check reading (this is the do not read things on the ground rule):
 			take no time;
 			say "[We] will [have] to get [the noun] first." instead.
 		
-Section - No snorting what you don't have
-
-First check snorting (this is the do not snort things on the ground rule):
-	unless the player encloses the noun:
-		take no time;
-		say "[We] will [have] to get [the noun] first." instead.
-						
-
 Section - Losing concentration only for worldsharers
 
 To relax is a verb.

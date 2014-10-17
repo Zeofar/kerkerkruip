@@ -14,7 +14,6 @@ Dreadful-Presence-Test is a test set.
 
 Scenario when testing Dreadful-Presence-Test:
 	now the blood ape is testobject;
-	now the zombie toad is testobject;
 	
 A person has a number called the cower count;
 
@@ -28,8 +27,8 @@ Test play when testing Dreadful-Presence-Test:
 	try readying the malleus;
 	now the blood ape is not asleep;
 	now the zombie toad is not asleep;
-  	extract the player to the location of the blood ape;
-	extract the zombie toad to the location;
+	extract the player to the location of the blood ape;
+	extract the zombie toad to the location of the player;
 	assert that the dreadful presence of the player is 2;
 	[Can't depend on the blood ape's mind being constant - there could be room effects, for example
 	assert that the final mind of the blood ape is 5;]
@@ -101,6 +100,6 @@ Chapter - Wasted Space
 
 Table of Wasted Space
 space (number)
-with 20000 blank rows
+with 26038 blank rows
 
 Kerkerkruip Test Sets ends here.
