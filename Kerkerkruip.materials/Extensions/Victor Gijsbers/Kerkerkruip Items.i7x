@@ -1189,8 +1189,6 @@ The suit of plate mail is a major suit.
 Suit of plate mail is alchemical.
 Suit of plate mail is iron.
 
-Constriction prevention of suit of plate mail is 3.
-
 The description of the suit of plate mail is "Functional rather than beautiful, this suit has been made for a true warrior. It will protect you from harm, although it also slows you down. [italic type](-2 physical damage, -1 attack, -2 body.)[roman type]".
 			
 A remove specific damage rule (this is the plate mail physical damage reduction rule):

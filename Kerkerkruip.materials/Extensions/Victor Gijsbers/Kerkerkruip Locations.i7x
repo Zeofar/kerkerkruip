@@ -70,63 +70,6 @@ Section - Entrance Hall label for the map (for use with Kerkerkruip Glimmr Addit
 The map-label of Entrance Hall is Figure of map_label_Entrance.
 
 
-Chapter - Hall of Mirrors
-
-The hall of mirrors is a room. "Mirrors surround you on all sides in an impossible geometry[run paragraph on][unless the player is blind]. Myriad reflections follow your every movement -- though some, always in the corner of your eyes, seem to behave differently[end if]."
-
-Hall of Mirrors is habitable.
-Hall of Mirrors is connectable.
-Hall of Mirrors is not connection-inviting.
-Hall of Mirrors is placeable.
-Hall of Mirrors is vp-agnostic.
-Hall of Mirrors is treasurable.
-Hall of Mirrors is extra-accepting.
-Hall of Mirrors is magical.
-
-
-A thing called the mirrors is in Hall of Mirrors. The mirrors are scenery and plural-named. The description of the mirrors is "You look into infinity.". Understand "mirror" as mirrors.
-
-Before attacking the mirrors:
-	say "You smash one of the mirrors -- but there are only further mirrors behind it. After a few seconds, the shards of glass start moving up and reform the mirror. Not a crack can be seen." instead.
-
-The reflections are scenery in Hall of Mirrors. Before attacking the reflections: try attacking the mirrors instead. The description of the reflections is "Something seems to be wrong, but you cannot find positive evidence.". 
-
-Fragmentation rule (this is the hall of mirrors fragmentation rule):
-	if fragmentation-place is Hall of Mirrors:
-		if player is in Hall of Mirrors:
-			say "All the mirrors are blown to pieces and fall down like a rain of ice and light. But after a few seconds,  the shards of glass start moving up and reform the mirrors. Not a crack can be seen.";
-			rule succeeds.
-
-After printing the name of something while looking when the location is the Hall of Mirrors:
-	say "[run paragraph on]";
-	unless the player is blind:
-		say " [one of](reflected thousandfold)[or](mirrored all around you)[or](copied and copied by mirrors)[or](multiplied ad infinitum)[at random]".
-
-Check an actor hitting when the location is Hall of Mirrors (this is the sometimes attack a mirror image in Hall of Mirrors rule):
-	unless the global attacker is blind:
-		unless the global attacker grapples the global defender:
-			unless the global defender grapples the global attacker:
-				unless reflection-attack is true:
-					test the mind of global attacker against (14 - tension);
-					if test result is false:
-						say " Confused by the mirrors, [if global attacker is the player]you start[otherwise][the global attacker] starts[end if] attacking a reflection before realising [if global attacker is the player]your[otherwise]its[end if] mistake.";
-						if the concentration of the global attacker is greater than 1:
-							now the concentration of the global attacker is 1; 
-						follow the special dagger of double strike rule;
-						rule fails;
-		[				consider the take away until attack circumstances rules;]
-					otherwise:
-						say " Seeing through the illusion created by the mirrors, [if global attacker is the player]you attack[otherwise][the global attacker] attacks[end if] the real [if global defender is not the player][global defender][otherwise]you[end if].".
-
-An AI action selection rule for a person (called P) when the location is Hall of Mirrors (this is the concentration is more important in the Hall of Mirrors rule):
-	choose row with an Option of the action of P concentrating in the Table of AI Action Options;
-	increase the Action Weight entry by 1.
-
-
-Section - Hall of Mirrors label for the map (for use with Kerkerkruip Glimmr Additions by Erik Temple)
-
-The map-label of Hall of Mirrors is Figure of map_label_Mirrors.
-
 
 Chapter - Phantasmagoria
 
