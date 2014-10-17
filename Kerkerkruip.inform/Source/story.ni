@@ -279,3 +279,9 @@ Last when play begins (this is the switch story transcript on rule):
 	try switching the story transcript on;
 	try asking status;
 	try taking inventory;
+	
+Chapter - Wasted Space
+
+Table of Wasted Space
+space (number)
+with 26038 blank rows

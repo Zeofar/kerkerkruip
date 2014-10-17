@@ -96,10 +96,5 @@ initial scheduling for Player-cowering:
 	now the player is insane;
 	assert truth of whether or not the target cower percentage of the player is at least 1 with message "the insane player's target cower percentage should be at least 1"; 
 
-Chapter - Wasted Space
-
-Table of Wasted Space
-space (number)
-with 26038 blank rows
 
 Kerkerkruip Test Sets ends here.
