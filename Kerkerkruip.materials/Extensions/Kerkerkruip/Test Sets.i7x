@@ -1194,7 +1194,6 @@ testing effects of reaction-ape-killing:
 	assert that the event description includes "Bored by a lack of tension";
 	assert that the living banshees boolean is false;
 
-[
 Section - Remembering Text
 
 remembering-text is a test set.
@@ -1339,32 +1338,32 @@ testing effects of partial-explored-sensing:
 	assert that the event description includes "the soul of the swarm of daggers here with you, like an aura like sharpened steel[line break]";
 	assert that the event description includes "[soul description of the faraway enemy], [best route from on-the-way place to location of the faraway enemy] from [the on-the-way place] \(which lies [best route from the location to on-the-way place] from here\)[line break]"
 
-meeting-malygris is a repeatable hidden-traveling test step. The location-target of meeting-malygris is Malygris.
+meeting-malygris is a hidden-traveling test step. The location-target of meeting-malygris is Malygris.
 
-To say doesn't see you pattern:
-	say "(does not (detect|notice)|remains unaware of) you(r presence)?[run paragraph on]";
+malygris not seeing is a randomized outcome.
+
+Initial scheduling of meeting-malygris:
+	make malygris not seeing possible.
 	
-testing effects of meeting-malygris:
-	if the act count of Malygris is at least 1:
-		assert that the event description includes "Malygris [doesn't see you pattern]";
-		now meeting-malygris is not repeatable;
+Testing combat round of Malygris when testing meeting-malygris:
+	stop and save event description because "checking if Malygris can't see you";
+	achieve malygris not seeing on result "(does not (detect|notice)|remains unaware of) you(r presence)?[run paragraph on]";
+	transcribe and restart capturing because "checked if Malygris can't see you";
 	
-psycholocation-expiring is a repeatable hidden-traveling test step.
+psycholocation-expiring is a hidden-traveling test step.
 
 testing effects of psycholocation-expiring:
-	if psycholocation is inactive:
-		record success of psycholocation-expiring;
+	succeed based on whether or not psycholocation is inactive.
 		
-moving-malygris is a repeatable hiding-reveal test step. The maximum repeats of moving-malygris is 20.
+moving-malygris is a hiding-reveal test step. 
 
 Initial scheduling for moving-malygris:
 	Compel the action of Malygris teleporting.
 	
 testing effects of moving-malygris:
-	if the location of Malygris is the location:
+	if waiting for compelled action:
 		make no decision;
 	assert that the event description includes "Malygris suddenly teleports away";
-	now moving-malygris is not repeatable.
 	
 First choosing a player action when testing moving-malygris:
 	if the location of Malygris is not the location:
@@ -1425,20 +1424,20 @@ Initial scheduling of slow-sensing:
 testing effects of slow-sensing:
 	assert "sensing without psycholocation should take time" based on whether or not previously-fast is false;
 	
-exploring-everywhere is a repeatable extracting hidden-traveling test step. 
+exploring-everywhere is an extracting hidden-traveling test step. 
 
 Initial scheduling for exploring-everywhere:
 	Now the location-target of exploring-everywhere is a random unvisited reachable room.
 	
 testing effects of exploring-everywhere:
 	Now the location-target of exploring-everywhere is a random unvisited reachable room;
-	if the location-target of exploring-everywhere is nothing:
-		assert that the number of unvisited reachable rooms is 0;
-		assert "Arcane Vault should be secretly placed" based on whether or not the arcane vault is secretly placed;
-		assert "Arcane Vault should be denizen" based on whether or not the arcane vault is denizen;
-		assert "Arcane Vault should not be reachable" based on whether or not the arcane vault is not reachable;
-		assert "There should be at least 1 unvisited secret room" based on whether or not the number of unvisited denizen rooms is at least 1;
-		now exploring-everywhere is not repeatable;
+	succeed based on whether or not the location-target of exploring-everywhere is nothing;
+	if waiting for resolution, make no decision;
+	assert that the number of unvisited reachable rooms is 0;
+	assert "Arcane Vault should be secretly placed" based on whether or not the arcane vault is secretly placed;
+	assert "Arcane Vault should be denizen" based on whether or not the arcane vault is denizen;
+	assert "Arcane Vault should not be reachable" based on whether or not the arcane vault is not reachable;
+	assert "There should be at least 1 unvisited secret room" based on whether or not the number of unvisited denizen rooms is at least 1;
 	
 remembering-everything-reachable is a test step.   
 
@@ -1505,15 +1504,14 @@ Initial scheduling of getting-close-to-vault:
 			now the closest place is the place;
 	now the location-target of getting-close-to-vault is the closest place.
 			
-digging-to-vault is a repeatable hidden-traveling test step. The maximum repeats of digging-to-vault is 20.
+digging-to-vault is a hidden-traveling test step. 
 
 Choosing a player action when testing digging-to-vault:
 	Generate the action of digging a single general direction from the location to Arcane Vault.
 		
 testing effects of digging-to-vault:
-	if the location is a secretly placed room:
-		[it doesn't actually have to be the vault - if we hit another secret room on the way we should stop]
-		record success of digging-to-vault;
+	succeed based on whether or not the location is a secretly placed room within 20 attempts.
+	[it doesn't actually have to be the vault - if we hit another secret room on the way we should stop]
 	
 secret-room-remembering is a test step.   
 
@@ -1528,6 +1526,7 @@ testing effects of secret-room-remembering:
 
 [psycholocation + sense]
 
+[
 Section - Blessed Grenade - bug #261
 
 blessed-grenade-test is a test set.
