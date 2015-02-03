@@ -27,6 +27,7 @@ A test play when testing Aite champions vs bat:
 	[TODO: Why doesn't this interrupt text capture when doing it from the killing rules does?]
 	update the monster statistics;
 	assert "should be capturing text" based on whether or not text capturing is active;
+	[Answer? This line doesn't get captured, but it does get transcribed. Capturing gets interrupted by recording a test attempt]
 	say "This should be captured.";
 	now the player carries Drakul's lifeblood;
 	extract the player to the location of Bodmall;

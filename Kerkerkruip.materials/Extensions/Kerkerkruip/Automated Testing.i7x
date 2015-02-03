@@ -39,14 +39,18 @@ To transcribe and stop capturing text/--:
 	
 To transcribe and stop capturing text/-- because (reason - a text):
 	stop capturing text;
-	[if "[the captured text]" matches the regular expression ".":]
-	transcribe "[reason] [current test description]";
-	append "[the captured text]" to file of test transcript;
-	 
+	if "[the captured text]" matches the regular expression ".":
+		transcribe "[reason] [current test description]";
+		now the event description is the substituted form of "[the event description][the captured text]";
+		append "[the captured text]" to file of test transcript;
+		start capturing text; [clear the captured text]
+		stop capturing text;	 
+	
 To transcribe and restart capturing text/--:
 	transcribe and restart capturing because "transcribe and restart capturing";
 	
 To transcribe and restart capturing text/-- because (reason - a text):
+	[not sure if this should be different from stop and save]
 	if text capturing is active, transcribe and stop capturing text because reason;
 	start capturing text;
 	
@@ -54,10 +58,8 @@ To stop and save event description:
 	stop and save event description because "stop and save";
 	
 To stop and save event description because (reason - a text):
+	now the event description is "";
 	transcribe and stop capturing text because reason;
-	now the event description is the substituted form of "[the captured text]";
-	start capturing text; [clear the captured text]
-	stop capturing text;
 	
 The file of test results is called "testresults".
 
@@ -79,7 +81,7 @@ To queue (T - a test set):
 To queue all test sets:
 	Repeat with T running through enabled test sets:
 		queue T.
-		
+			
 To record a test attempt:
 	increment the test assertion count;
 	increment the total assertion count;
