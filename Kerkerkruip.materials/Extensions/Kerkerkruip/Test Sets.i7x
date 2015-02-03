@@ -148,7 +148,7 @@ testing effects of Arena-defender-re-enslaving:
 	assert that the location is Hall of Gods;
 	assert that the event description includes "receives the soul";
 	assert that the health of the player is 100;
-	assert truth of whether or not defender of Aite is off-stage with message "the defender of Aite should be off-stage"
+	assert "the defender of Aite should be off-stage" based on whether or not defender of Aite is off-stage. 
 
 Section - Chton Champion vs Bat
 
@@ -190,8 +190,8 @@ testing effects for arena-vampire-joining:
 	assert that the combat status is combat;
 	try reading a random scroll of summoning enclosed by the player;
 	now the summoned creature is a random visible undead not super-undead person who is not the player;
-	assert truth of whether or not the summoned creature does not oppose the player with message "summoned creature shouldn't oppose undead player";
-	assert truth of whether or not the summoned creature opposes drakul with message "summoned creature should oppose drakul (unless Remko says this test is wrong)";
+	assert "summoned creature shouldn't oppose undead player" based on whether or not the summoned creature does not oppose the player;
+	assert "summoned creature should oppose drakul (unless Remko says this test is wrong)" based on whether or not the summoned creature opposes drakul;
 
 chton-arena-cheating is a test step. The next move of arena-vampire-joining is chton-arena-cheating.   
 
@@ -526,7 +526,7 @@ Test play when testing Sleeping Fallen:
 	now the health of the blood ape is 1;
 	try reading the snuffer;
 	assert that the blood ape is asleep;;
-	assert truth of whether or not the blood ape is dead with message "the blood ape should be dead";
+	assert "the blood ape should be dead" based on whether or not the blood ape is dead;
 	have the player and the blood ape fight in Arena of the Fallen;
 	assert that the blood ape is awake;
 	
@@ -566,7 +566,7 @@ Test play when testing Dreadful-Presence-Test:
 	assert that the dreadful presence of the player is 2;
 	[Can't depend on the blood ape's mind being constant - there could be room effects, for example
 	assert that the final mind of the blood ape is 5;]
-	assert truth of whether or not the target cower percentage of the blood ape is at least 1 with message "the blood ape should have a nonzero target cower percentage";
+	assert "the blood ape should have a nonzero target cower percentage" based on whether or not the target cower percentage of the blood ape is at least 1;
   	assert that the target cower percentage of the player is 0;
 	assert that the target cower percentage of the zombie toad is 0;
 	
@@ -611,7 +611,7 @@ Player-cowering is a cower-counting test step. The next move of Ape-cowering is 
 
 initial scheduling for Player-cowering:
 	now the player is insane;
-	assert truth of whether or not the target cower percentage of the player is at least 1 with message "the insane player's target cower percentage should be at least 1"; 
+	assert "the insane player's target cower percentage should be at least 1" based on whether or not the target cower percentage of the player is at least 1; 
 	
 Section - Controlling pipes
 
@@ -678,9 +678,9 @@ A test play when testing bug-210:
 	now the health of the mindslug is 1;
 	now the weapon damage bonus of the claymore is 100;
 	now the melee of fafhrd is 100;
-	assert truth of whether or not fafhrd carries the claymore with message "fafhrd should carry the claymore";
-	assert truth of whether or not the claymore is readied with message "the claymore should be readied";
-	assert truth of whether or not the number of readied weapons enclosed by fafhrd is 1 with message "fafhrd should only have one weapon readied";
+	assert "fafhrd should carry the claymore" based on whether or not fafhrd carries the claymore;
+	assert "the claymore should be readied" based on whether or not the claymore is readied;
+	assert "fafhrd should only have one weapon readied" based on whether or not the number of readied weapons enclosed by fafhrd is 1;
 	
 Initial scheduling of reaction-mindslug-killing:
 	compel the action of fafhrd attacking the player;
@@ -688,7 +688,7 @@ Initial scheduling of reaction-mindslug-killing:
 reaction-mindslug-killing is a test step. The first move of bug-210 is reaction-mindslug-killing.
 
 Choosing a player reaction when reaction-mindslug-killing is the scheduled event:
-	assert truth of whether or not the mindslug is alive with message "the mindslug should be alive";
+	assert "the mindslug should be alive" based on whether or not the mindslug is alive;
 	generate the action of reading the reusable item;
 	rule succeeds;
 
@@ -721,7 +721,7 @@ testing effects of sleeping-dream-waking:
 	assert that the event description includes "Malygris standing over you";
 	assert that Malygris is awake;
 	assert that the concentration of Malygris is 2;
-	assert truth of whether or not the player is just-woken with message "the player should be just-woken";
+	assert "the player should be just-woken" based on whether or not the player is just-woken;
 	
 Waiting-for-Malygris-attack is a test step. The next move of sleeping-dream-waking is waiting-for-Malygris-attack. 
 
@@ -732,7 +732,7 @@ Initial scheduling of waiting-for-Malygris-attack:
 testing effects of waiting-for-Malygris-attack:
 	if waiting for player reaction, make no decision;
 	assert that the event description includes "defender was asleep";
-	assert truth of whether or not the player is not just-woken with message "the player should not be just-woken anymore";
+	assert "the player should not be just-woken anymore" based on whether or not the player is not just-woken;
 		
 	
 Section - Healer of Aite Healing
@@ -835,9 +835,9 @@ testing effects of a test step (called the current move) when testing divine rew
 	assert "Nomos bonus should be false on [the current move]" based on whether or not the nomos bonus is false;
 
 testing effects of isra-only-killing:
-	assert truth of whether or not Isra is dead with message "Isra should be dead";
-	assert truth of whether or not Fell is not dead with message "Fell should be alive";
-	assert truth of whether or not the health of the player is less than the permanent health of the player with message "The player should not be healed";
+	assert "Isra should be dead" based on whether or not Isra is dead;
+	assert "Fell should be alive" based on whether or not Fell is not dead;
+	assert "The player should not be healed" based on whether or not the health of the player is less than the permanent health of the player;
 	assert that the event description does not include "Nomos receives .* and fully heals you";
 
 fell-also-killing is a test step. The next move of isra-only-killing is fell-also-killing.   
@@ -850,8 +850,8 @@ testing effects of fell-also-killing:
 	assert that the event description includes "receives the soul";
 	assert that the event description does not include "receives the soul.* receives the soul";
 	assert that the health of the player is the permanent health of the player;
-	assert truth of whether or not the player carries the glass cannon with message "the glass cannon should still be carried";
-	assert truth of whether or not the glass cannon is readied with message "the glass cannon should still be readied";
+	assert "the glass cannon should still be carried" based on whether or not the player carries the glass cannon;
+	assert "the glass cannon should still be readied" based on whether or not the glass cannon is readied;
 	
 Section - Temporary Blood Magic from Nomos
 
@@ -891,8 +891,8 @@ Test play when testing temporary Nomos blood magic:
 	extract the swarm of daggers to the temple of nomos;
 	have the player sacrifice a random granted power;
 	assert that the holder of the gown of the red court is the player;
-	assert truth of whether or not the player carries the gown of the red court with message "the gown of the red court should be carried";
-	assert truth of whether or not the player carries the inquisitor's hood with message "the inquisitor's hood should be carried";
+	assert "the gown of the red court should be carried" based on whether or not the player carries the gown of the red court;
+	assert "the inquisitor's hood should be carried" based on whether or not the player carries the inquisitor's hood;
 	transcribe and restart capturing;
 	try examining the inquisitor's hood;
 	pause and assert that the event description includes "This particular one gives you a \+15% chance of remaining concentrated when damaged\. It also increases your dreadful presence by 1\. Feeding 5 blood to the hood will temporarily add 10% to the chance of remaining concentrated";
@@ -963,9 +963,9 @@ malleus-earning is a extracting test step. The location-target of malleus-earnin
 Testing effects of malleus-earning:
 	have the player defeat the jumping bomb;
 	have the player sacrifice a random granted power;
-	assert truth of whether or not the player carries the malleus maleficarum with message "the malleus should be carried";
+	assert "the malleus should be carried" based on whether or not the player carries the malleus maleficarum;
 	try readying the malleus maleficarum;
-	assert truth of whether or not the malleus maleficarum is readied with message "the malleus maleficarum should be readied";
+	assert "the malleus maleficarum should be readied" based on whether or not the malleus maleficarum is readied;
 	try examining the malleus maleficarum;
 	pause and assert that the event description includes "Feeding 1 blood to the Malleus Maleficarum will give it a bonus of \+1 attack and \+1 damage on your next attack.* dreadful presence\.";
 	
@@ -2246,10 +2246,10 @@ Choosing a player action when testing healer-first-killing:
 	generate the action of smiting the healer of aite.
 	
 Testing effects of healer-first-killing:
-	assert truth of whether or not the healer of Aite is dead with message "The healer should be dead";
-	assert truth of whether or not the tormentor of Aite is alive with message "The tormentor of Aite should be alive";
-	assert truth of whether or not the defender of Aite is alive with message "The defender should be alive";
-	assert truth of whether or not the health of the player is less than the permanent health of the player with message "The player should not be healed";
+	assert "The healer should be dead" based on whether or not the healer of Aite is dead;
+	assert "The tormentor of Aite should be alive" based on whether or not the tormentor of Aite is alive;
+	assert "The defender should be alive" based on whether or not the defender of Aite is alive;
+	assert "The player should not be healed" based on whether or not the health of the player is less than the permanent health of the player;
 	assert that the event description does not include "Sul receives .* and fully heals you";
 	
 other-fanatics-killing is an item-throwing test step.
@@ -2259,12 +2259,12 @@ Initial scheduling of other-fanatics-killing:
 	now the health of the defender of Aite is 1;
 
 testing effects of other-fanatics-killing:
-	assert truth of whether or not the tormentor of Aite is dead with message "The tormentor should be dead";
-	assert truth of whether or not the defender of Aite is dead with message "The defender should be dead";
-	assert that the location is Hall of Gods;
+	assert "The tormentor should be dead" based on whether or not the tormentor of Aite is dead;
+	assert "The defender should be dead" based on whether or not the defender of Aite is dead;
+	assert that the location is Hall of Gods with label "current location";
 	assert that the event description includes "receives the soul";
 	assert that the event description does not include "receives the soul.* receives the soul";
-	assert that the health of the player is the permanent health of the player;
+	assert that the health of the player is the permanent health of the player with label "health of the player";
 
 [TODO: test armadillo and reaper following]
 

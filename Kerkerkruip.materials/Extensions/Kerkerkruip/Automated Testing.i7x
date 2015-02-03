@@ -372,6 +372,9 @@ First after showing the title screen (this is the run all tests rule):
 	follow the scenario rules;
 	transcribe and restart capturing text because "done setting scenario for";
 
+[Prevent the status window from opening]	
+The check info panel capacity rule does nothing when done testing is false.
+
 To decide which test set is the initiator of (the event -  a test step):
 	Repeat with the candidate running through test sets:
 		if the event is the first move of the candidate, decide on the candidate;
@@ -516,13 +519,7 @@ To test (event - an outcome) against (success - a truth state):
 	let percent-tolerance be 5; [a constant - do we want it to be a property?]
 	increment attempt count of the event;
 	if likelihood of the event is 0:
-		assert "[event] happened after [attempt count of the event] attempts, but it should never happen" based on whether or not success is false;
-		if success is true:
-			now the event is failed;
-		otherwise:
-			now the last successful outcome is the event;
-			if the attempt count of the event is not less than the maximum attempts of the event:
-				now the event is achieved;
+		fail event based on success;
 	otherwise:
 		if success is true:
 			now the last successful outcome is the event;
@@ -538,15 +535,20 @@ To test (event - an outcome) against (success - a truth state):
 			[say "succeeded [success count of the event] times after [attempt count of the event] attempts, coming within [tolerance] of [target].";]
 			now the event is achieved;
 		otherwise if the attempt count of the event is not less than the maximum attempts of the event:
-			assert "After [maximum attempts of the event] attempt[s], [the event] happened [success count of the event] times (never within [tolerance] of the target number [target])" based on whether or not likelihood of the event is 0;
+			assert "After [maximum attempts of the event] attempt[s], [the event] happened [success count of the event] times (never within [tolerance] of the target number [target])" based on false;
 			now the event is failed.
 
 To test (event - an outcome) against (T - a text):
 	test event against whether or not the event description matches the regular expression T;
 
 To fail (event - an outcome) based on (result - a truth state):
-	now likelihood of event is 0;
-	test event against result;
+	if result is true:
+		assert "[event] happened after [attempt count of the event] attempts, but it should never happen" based on false;
+		now the event is failed;
+	otherwise:
+		now the last successful outcome is the event;
+		if the attempt count of the event is not less than the maximum attempts of the event:
+			now the event is achieved;
 		
 To fail (event - an outcome) on result (T - a text):
 	fail event based on whether or not the event description matches the regular expression T;
@@ -585,8 +587,6 @@ To decide which room is the action-destination of (current move - a test step):
 	if the current destination is nothing, decide on Null-room;
 	if the current destination is a room, decide on the current destination;
 	decide on the location of the current destination.
-
-The delayed action is a stored action that varies. The delayed action is the action of waiting.
 
 A test step can be extracting.
 
@@ -722,14 +722,11 @@ To assert that/-- (A - a value) is (B - a value) with label (T - an indexed text
 		Let error_msg be an indexed text;
 		now error_msg is "Expected [T]: [B], Got: [A][line break]";
 		record a failure report of error_msg;
-
-To assert truth of/-- (C - a truth state) with message (T - an indexed text):
+	
+To assert (T - an indexed text) based on (C - a truth state):
 	record a test attempt;
 	unless C is true:
 		record a failure report of T;
-	
-To assert (T - an indexed text) based on (C - a truth state):
-	assert truth of C with message T;
 	
 To succeed based on (result - a truth state) within (N - a number) attempts:
 	Now description of generic reusable event is "[the scheduled event]";
@@ -819,7 +816,7 @@ To have (guy - a person) defeat (loser - a person):
 	
 To have the player sacrifice (stuff - a power):
 	Let the power-level be the power level of stuff;
-	assert truth of whether or not power-level > 0 with message "power level of sacrificed ability should be positive";
+	assert "power level of sacrificed ability should be positive" based on whether or not power-level > 0;
 	Let divinity be a random god who infuses the location;
 	transcribe "Sacrificing [stuff] to [divinity]";
 	now the current question is "Which power do you want to sacrifice?";
@@ -846,12 +843,12 @@ To assert that (message - an indexed text) does not include (pattern - an indexe
 		record a failure report of error_msg;
 
 To assert that (N - a number) is between (A - a number) and (B - a number):
-	assert truth of whether or not N is at least A and N is at most B with message "[N] is not between [A] and [B]";
+	assert "[N] is not between [A] and [B]" based on whether or not N is at least A and N is at most B;
 	
 To assert that (item - a thing) is in (place - an object):
 	Let msg be indexed text;
 	Now msg is "Expected location of [the item]: [place]. Got: [location of the item].";
-	assert truth of whether or not the location of item is place with message msg;
+	assert msg based on whether or not the location of item is place;
 	
 To pause and assert that the event description includes (pattern - an indexed text):
 	stop and save event description because "checking output of";
@@ -998,7 +995,7 @@ A person has a number called the hitting count.
 To assert (N - a number) hit/hits by (guy - a person):
 	Let msg be indexed text;
 	Now msg is "Expected hitting count for [The guy]: [N] Got: [hitting count of the guy].";
-	assert truth of whether or not N is hitting count of the guy with message msg;
+	assert msg based on whether or not N is hitting count of the guy;
 
 First before an actor hitting (this is the increment hitting count rule):
 	increment the hitting count of the actor;
