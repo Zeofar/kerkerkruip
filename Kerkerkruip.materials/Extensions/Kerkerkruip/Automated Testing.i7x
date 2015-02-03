@@ -39,9 +39,9 @@ To transcribe and stop capturing text/--:
 	
 To transcribe and stop capturing text/-- because (reason - a text):
 	stop capturing text;
-	if "[the captured text]" matches the regular expression ".":
-		transcribe "[reason] [current test description]";
-		append "[the captured text]" to file of test transcript;
+	[if "[the captured text]" matches the regular expression ".":]
+	transcribe "[reason] [current test description]";
+	append "[the captured text]" to file of test transcript;
 	 
 To transcribe and restart capturing text/--:
 	transcribe and restart capturing because "transcribe and restart capturing";
@@ -143,7 +143,7 @@ normal keyboard input
 
 To decide what number is the repeated moves:
 	Let the moves be 0;
-	Repeat with the event running through possible randomized outcomes:
+	Repeat with the event running through possible outcomes:
 		if the attempt count of the event > the moves:
 			now the moves is the attempt count of the event;
 	decide on the moves.
@@ -296,10 +296,11 @@ Before taking a player action when the scheduled event is generated (this is the
 	start capturing text;
 	follow the testing effects rules for the scheduled event;
 	transcribe and stop capturing because "done testing effects of";
-	if there is a possible randomized outcome [repeat is true]:
-		schedule the scheduled event;
-	otherwise:
+	if we reset every possible outcome:
 		schedule the next move of the scheduled event;
+	otherwise:
+		[repeats are needed]
+		schedule the scheduled event;
 
 Chapter - Test Sets
 
@@ -449,38 +450,38 @@ Before printing the player's obituary when done testing is false (this is the ab
 		
 Chapter - Randomized Events
 
-[TODO: put all randomized outcomes in a table and save it to a file. Then we can restart the game repeatedly and use randomized outcomes to generate statistics about dungeon generation]
-A randomized outcome is a kind of value. Some randomized outcomes are defined by the Table of Randomized Outcomes.
+[TODO: put all outcomes in a table and save it to a file. Then we can restart the game repeatedly and use outcomes to generate statistics about dungeon generation]
+An outcome is a kind of value. Some outcomes are defined by the Table of outcomes.
 
-A randomized outcome has a text called the description.
+An outcome has a text called the description.
 
-To say (result - a randomized outcome):
+To say (result - an outcome):
 	if the description of the result is not empty:
 		say "[description of the result]";
 	otherwise:
 		say "[the result]";
 		
-A randomized outcome can be untested, possible, failed, or achieved. A randomized outcome is usually untested.
-Definition: a randomized outcome is resolved if it is failed or it is achieved.
+An outcome can be untested, possible, failed, or achieved. An outcome is usually untested.
+Definition: an outcome is resolved if it is failed or it is achieved.
 
-The last successful outcome is a randomized outcome that varies. The last successful outcome is boring lack of results.
+The last successful outcome is an outcome that varies. The last successful outcome is boring lack of results.
 
-To decide whether (event - a randomized outcome) just succeeded:
+To decide whether (event - an outcome) just succeeded:
 	if the event is untested, no;
 	decide on whether or not the event is the last successful outcome;
 
-A randomized outcome has a number called the likelihood. A randomized outcome has a number called the minimum attempts. [The expected probability of success is likelihood/minimum attempts]
+An outcome has a number called the likelihood. An outcome has a number called the minimum attempts. [The expected probability of success is likelihood/minimum attempts]
 
-A randomized outcome has a number called the attempt count. A randomized outcome has a number called the success count.
+An outcome has a number called the attempt count. An outcome has a number called the success count.
 
-A randomized outcome has a number called the maximum attempts.
+An outcome has a number called the maximum attempts.
 
-Table of Randomized Outcomes
+Table of Outcomes
 outcome	description	attempt count	success count	likelihood (number)	minimum attempts (number)	maximum attempts (number)
 boring lack of results	""	0	0	0	1	1
 generic reusable event	""	0	0	1	1	100
 
-To decide whether we make (event - a randomized outcome) possible:
+To decide whether we make (event - an outcome) possible:
 	if event is untested:
 		now event is possible;
 		if the maximum attempts of event is 0:
@@ -493,23 +494,23 @@ To decide whether we make (event - a randomized outcome) possible:
 	if the last successful outcome is the event, now the last successful outcome is boring lack of results; [so this event will not be "just succeeded"]
 	decide on whether or not event is possible;
 	
-To make (event - a randomized outcome) possible:
+To make (event - an outcome) possible:
 	Let throwaway result be whether or not we make the event possible.
 	
 To decide whether waiting for resolution:
-	decide on whether or not there is a possible randomized outcome;
+	decide on whether or not there is a possible outcome;
 	
 [This phrase tells us whether we need to keep looping. It also resets everything as a side effect when we're done looping.
 
 To be used when deciding whether to repeat test steps]
 To decide whether we reset every possible outcome:
 	if waiting for resolution, no;
-	now every randomized outcome is untested;
+	now every outcome is untested;
 	yes.
 	
 [TODO: Normalize regex matches against event description so we can use a brief consistent phrase. Also, do we really need event description, or can we just use the captured text?]
 
-To test (event - a randomized outcome) against (success - a truth state):
+To test (event - an outcome) against (success - a truth state):
 	[TODO: print a period to show progress]
 	unless we make the event possible, stop;
 	let percent-tolerance be 5; [a constant - do we want it to be a property?]
@@ -540,17 +541,17 @@ To test (event - a randomized outcome) against (success - a truth state):
 			assert "After [maximum attempts of the event] attempt[s], [the event] happened [success count of the event] times (never within [tolerance] of the target number [target])" based on whether or not likelihood of the event is 0;
 			now the event is failed.
 
-To test (event - a randomized outcome) against (T - a text):
+To test (event - an outcome) against (T - a text):
 	test event against whether or not the event description matches the regular expression T;
 
-To fail (event - a randomized outcome) based on (result - a truth state):
+To fail (event - an outcome) based on (result - a truth state):
 	now likelihood of event is 0;
 	test event against result;
 		
-To fail (event - a randomized outcome) on result (T - a text):
+To fail (event - an outcome) on result (T - a text):
 	fail event based on whether or not the event description matches the regular expression T;
 	
-To achieve (event - a randomized outcome) based on (result - a truth state):
+To achieve (event - an outcome) based on (result - a truth state):
 	unless we make the event possible, stop;
 	increment attempt count of event;
 	if result is true:
@@ -561,7 +562,7 @@ To achieve (event - a randomized outcome) based on (result - a truth state):
 		assert "[the event] never happened after [attempt count of event] attempts" based on false;
 		now event is failed;
 		
-To achieve (event - a randomized outcome) on result (T - a text):
+To achieve (event - an outcome) on result (T - a text):
 	achieve event based on whether or not the event description matches the regular expression T;
 	
 [TODO: combat round tests]
@@ -589,7 +590,7 @@ The delayed action is a stored action that varies. The delayed action is the act
 
 A test step can be extracting.
 
-Table of Randomized Outcomes (continued)
+Table of Outcomes (continued)
 outcome	description	likelihood	minimum attempts
 moving towards the destination	"finding a route from [the location] to [the location-target of the scheduled event][if the location-target of the scheduled event is not the action-destination of the scheduled event](in [the the action-destination of the scheduled event])[end if]"	1	1
 compelling an action	"[the compelled action]"	1	1
@@ -745,14 +746,20 @@ To fail based on (result - a truth state) within (N - a number) attempts:
 To succeed based on (result - a truth state):
 	succeed based on result within 100 attempts;
 	
+To succeed on result (R - a text) within (N - a number) attempts:
+	succeed based on whether or not the event description matches the regular expression R within N attempts;
+	
 To succeed on result (R - a text):
-	succeed based on whether or not the event description matches the regular expression R;
+	succeed on result R within 100 attempts;
 	
 To fail based on (result - a truth state):
 	fail based on result within 100 attempts;
 	
+To fail on result (R - a text) within (N - a number) attempts:
+	fail based on whether or not the event description matches the regular expression R within N attempts;
+	
 To fail on result (R - a text):
-	fail based on whether or not the event description matches the regular expression R;
+	fail on result R within 100 attempts;
 	
 [ Assert that any condition is true, but with less information on failure ]
 To assert that/-- (C - a condition):
@@ -941,7 +948,7 @@ Section - Counting Actions
 
 A person has a number called the act count;
 
-[TODO: replace these counters with randomized outcomes?]
+[TODO: replace these counters with outcomes?]
 
 A person has a number called the reaction count.
 
@@ -1058,7 +1065,7 @@ To prepare a test battle with (guy - a person), inviting groups:
 	Generate the action of challenging guy in Test Arena;
 	Compel the action of guy waiting;
 	
-Combat hit is a randomized outcome.
+Combat hit is an outcome.
 
 To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in/on (likelihood - a number) out of (total tries - a number) attempts:
 	Let original-defender-weapon be a random readied weapon enclosed by guy;

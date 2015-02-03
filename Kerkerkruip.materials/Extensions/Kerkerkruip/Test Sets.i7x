@@ -56,7 +56,7 @@ Intervention possible when the scheduled event is aite spike vs bat:
 Intervention bonus when the scheduled event is aite spike vs bat:
 	if the main actor is the player, increase the intervention-bonus by 100;
 	
-Table of Randomized Outcomes (continued)
+Table of Outcomes (continued)
 outcome
 bat crashing into spike
 bat avoiding huge spike
@@ -475,7 +475,7 @@ After taking a player action when the scheduled event is insane drakul statement
 	
 [some of these appear too unlikey to happen within 100 iterations. Increase iterations?]
 
-Table of Randomized Outcomes (continued)
+Table of Outcomes (continued)
 outcome
 simple drakul identity
 nested conditionals
@@ -540,10 +540,10 @@ Scenario when testing Dreadful-Presence-Test:
 	now the blood ape is testobject;
 	now the zombie toad is testobject;
 	
-A person has a randomized outcome called the cower counter. The cower counter of a person is usually the boring lack of results.
+A person has an outcome called the cower counter. The cower counter of a person is usually the boring lack of results.
 Definition: a person is cowerer if the cower counter of it is not the boring lack of results.
 
-Table of Randomized Outcomes (continued)
+Table of Outcomes (continued)
 outcome	maximum attempts
 ape cower counter	300
 toad cower counter	300
@@ -1339,16 +1339,9 @@ testing effects of partial-explored-sensing:
 	assert that the event description includes "[soul description of the faraway enemy], [best route from on-the-way place to location of the faraway enemy] from [the on-the-way place] \(which lies [best route from the location to on-the-way place] from here\)[line break]"
 
 meeting-malygris is a hidden-traveling test step. The location-target of meeting-malygris is Malygris.
-
-malygris not seeing is a randomized outcome.
-
-Initial scheduling of meeting-malygris:
-	make malygris not seeing possible.
 	
-Testing combat round of Malygris when testing meeting-malygris:
-	stop and save event description because "checking if Malygris can't see you";
-	achieve malygris not seeing on result "(does not (detect|notice)|remains unaware of) you(r presence)?[run paragraph on]";
-	transcribe and restart capturing because "checked if Malygris can't see you";
+Testing effects of meeting-malygris:
+	succeed on result "(does not (detect|notice)|remains unaware of) you(r presence)?[run paragraph on]" within 5 attempts;
 	
 psycholocation-expiring is a hidden-traveling test step.
 
@@ -1362,15 +1355,16 @@ Initial scheduling for moving-malygris:
 	
 testing effects of moving-malygris:
 	if waiting for compelled action:
+		fail based on whether or not the location of malygris is not the location;
 		make no decision;
 	assert that the event description includes "Malygris suddenly teleports away";
 	
-First choosing a player action when testing moving-malygris:
+[First choosing a player action when testing moving-malygris:
 	if the location of Malygris is not the location:
 		make no decision;
 	if the fuligin cloak is worn:
 		make no decision;
-	generate the action of waiting;
+	generate the action of waiting;]
 	
 remembering-malygris is a test step.   
 
