@@ -517,6 +517,9 @@ To decide whether we reset every possible outcome:
 	now every outcome is untested;
 	yes.
 	
+To decide whether we haven't reset every possible outcome:
+	decide on whether or not not (we reset every possible outcome).
+	
 [TODO: Normalize regex matches against event description so we can use a brief consistent phrase. Also, do we really need event description, or can we just use the captured text?]
 
 To test (event - an outcome) against (success - a truth state):
@@ -545,7 +548,7 @@ To test (event - an outcome) against (success - a truth state):
 			now the event is failed.
 
 To test (event - an outcome) against (T - a text):
-	update the event description; [todo - roll this into a text-testing phrase?]
+	update the event description because "testing [event] against '[T]'"; [todo - roll this into a text-testing phrase?]
 	test event against whether or not the event description matches the regular expression T;
 
 To fail (event - an outcome) based on (result - a truth state):

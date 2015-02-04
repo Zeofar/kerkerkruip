@@ -1954,7 +1954,7 @@ imp-stashing is a test step.
 Testing effects of imp-stashing:
 	succeed based on whether or not a package of ment is in the lair of the imp within 2 attempts;
 	
-[
+
 Section - Starting Kits
 
 starting-kits-test is an test set.
@@ -1997,7 +1997,7 @@ Generation test when testing starting-kits-test:
 	Assert that the original owner of the sword of light is the angel of compassion with label "original owner of the sword of light";
 	Assert that the original owner of the claymore is fafhrd with label "original owner of the claymore";
 		[TODO: starting kit items should match the player's size?]
-				
+
 Section - Bloodlust - issue 279
 
 bloodlust-279 is a test set.
@@ -2052,7 +2052,7 @@ choosing a player action when testing hitting-ape:
 testing effects of hitting-ape:
 	assert that bloodlusting is true when "after hitting the ape the first time";
 	
-fafhrd-killing-ape is a repeatable test step.
+fafhrd-killing-ape is a test step.
 
 initial scheduling of fafhrd-killing-ape:
 	now the melee of fafhrd is 100;
@@ -2069,8 +2069,8 @@ testing effects of fafhrd-killing-ape:
 	if the blood ape is alive:
 		make no decision;
 	assert that bloodlusting is false when "after Fafhrd kills the ape";
-	now fafhrd-killing-ape is not repeatable.
-	
+
+[
 Section - bug 291
 
 bug-291 is a test set.
