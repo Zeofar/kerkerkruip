@@ -34,33 +34,31 @@ To transcribe (T - a text):
 To say current test description:
 	say  "[current test set], [scheduled event] turn [the turn count], assertion count=[test assertion count]";
 	
+To update the/-- event description/--:
+	update the event description because "transcribe and stop capturing";
+	
+To update the/-- event description because (reason - a text):
+	stop capturing text;
+	if "[the captured text]" matches the regular expression ".":
+		transcribe "[reason] [current test description]";
+		update the event description;
+		now the event description is the substituted form of "[the event description][the captured text]";
+		append "[the captured text]" to file of test transcript;
+		start capturing text; [and clear the captured text]
+	
 To transcribe and stop capturing text/--:
 	transcribe and stop capturing because "transcribe and stop capturing";
 	
 To transcribe and stop capturing text/-- because (reason - a text):
+	if text capturing is active, update the event description because reason;
 	stop capturing text;
-	if "[the captured text]" matches the regular expression ".":
-		transcribe "[reason] [current test description]";
-		now the event description is the substituted form of "[the event description][the captured text]";
-		append "[the captured text]" to file of test transcript;
-		start capturing text; [clear the captured text]
-		stop capturing text;	 
 	
-To transcribe and restart capturing text/--:
-	transcribe and restart capturing because "transcribe and restart capturing";
-	
-To transcribe and restart capturing text/-- because (reason - a text):
-	[not sure if this should be different from stop and save]
-	if text capturing is active, transcribe and stop capturing text because reason;
-	start capturing text;
-	
-To stop and save event description:
-	stop and save event description because "stop and save";
-	
-To stop and save event description because (reason - a text):
+To clear the/-- event description:
+	clear the event description because "clearing the event description";
+To clear the/-- event description because (reason - a text):
+	if text capturing is active, update the event description because reason;
 	now the event description is "";
-	transcribe and stop capturing text because reason;
-	
+			
 The file of test results is called "testresults".
 
 Table of Test Results
@@ -94,8 +92,7 @@ To record a test attempt:
 		now failures entry is 0;
 		now failure messages entry is "";
 	increment the total entry;
-	transcribe and stop capturing because "recording test attempt for";
-	start capturing text;
+	update event description because "recording test attempt for";
 
 To record a/-- failure report of/-- (msg - a text):
 	choose row with test set of current test set in Table of Test Results;	
@@ -273,7 +270,7 @@ Initial scheduling for a test step (this is the reset act counts rule):
 rescheduling rules are a test step based rulebook.
 
 To schedule (the event described - a test step):
-	transcribe and restart capturing because "scheduling [the event described] for";
+	update event description because "scheduling [the event described] for";
 	if the event described is not the scheduled event:
 		now the scheduled event is the event described;
 		if the event described is normal keyboard input:
@@ -288,16 +285,15 @@ To schedule (the event described - a test step):
 		start capturing text;
 		follow the rescheduling rules for the event described;
 	now the event described is not generated;
-	transcribe and restart capturing because "done scheduling";
 	
 Before taking a player action when the scheduled event is generated (this is the test event effects rule):
-	stop and save event description because "testing effects of";
 	[Let repeat be whether or not (the scheduled event is repeatable) and (the repeated moves > 0);]
 	now the scheduled event is not generated;
+	transcribe and stop capturing text;
 	say " .[run paragraph on]";
 	start capturing text;
 	follow the testing effects rules for the scheduled event;
-	transcribe and stop capturing because "done testing effects of";
+	clear event description;
 	if we reset every possible outcome:
 		schedule the next move of the scheduled event;
 	otherwise:
@@ -354,7 +350,6 @@ First for showing the title screen when done testing is false:
 	do nothing.
 	
 First after showing the title screen (this is the run all tests rule):
-	transcribe and stop capturing because "starting test set with";
 	if done testing is true, make no decision;
 	now allowing screen effects is false;
 	initialize test steps;
@@ -371,8 +366,8 @@ First after showing the title screen (this is the run all tests rule):
 			log "  [failures entry] failures in [test set entry]";
 	log "Now testing [the current test set].";
 	[TODO: handle interaction between test config file and scenario]
+	start capturing text;
 	follow the scenario rules;
-	transcribe and restart capturing text because "done setting scenario for";
 
 [Prevent the status window from opening]	
 The check info panel capacity rule does nothing when done testing is false.
@@ -603,7 +598,7 @@ For taking a player action (this is the move to the destination of a test step r
 		make no decision;
 	Let the place be the action-destination of the scheduled event;
 	if the place is the location:
-		transcribe and restart capturing because "arrived at destination [the place] for";
+		update event description because "arrived at destination [the place] for";
 	if the place is Null-room or the place is the location:
 		make no decision;
 	if the scheduled event is extracting:
@@ -830,18 +825,18 @@ To have the player sacrifice (stuff - a power):
 	follow the sacrifice rule;
 	assert that the favour of the player with divinity is the previous favour + the power-level;
 
-To assert that (message - an indexed text) includes (pattern - an indexed text):
+To assert that the event description includes (pattern - an indexed text):
 	record a test attempt;
-	unless message matches the regular expression pattern:
+	unless the event description matches the regular expression pattern:
 		Let error_msg be an indexed text;
-		now error_msg is "Regular expression '[pattern]' was not found in the text:[paragraph break]'[message]'[line break]";
+		now error_msg is "Regular expression '[pattern]' was not found in the text:[paragraph break]'[the event description]'[line break]";
 		record a failure report of error_msg;
 		
-To assert that (message - an indexed text) does not include (pattern - an indexed text):
+To assert that the event description does not include (pattern - an indexed text):
 	record a test attempt;
-	if message matches the regular expression pattern:
+	if the event description matches the regular expression pattern:
 		Let error_msg be an indexed text;
-		now error_msg is "Regular expression '[pattern]' should not have been found in the text:[paragraph break]'[message]'[line break]";
+		now error_msg is "Regular expression '[pattern]' should not have been found in the text:[paragraph break]'[the event description]'[line break]";
 		record a failure report of error_msg;
 
 To assert that (N - a number) is between (A - a number) and (B - a number):
@@ -851,16 +846,6 @@ To assert that (item - a thing) is in (place - an object):
 	Let msg be indexed text;
 	Now msg is "Expected location of [the item]: [place]. Got: [location of the item].";
 	assert msg based on whether or not the location of item is place;
-	
-To pause and assert that the event description includes (pattern - an indexed text):
-	stop and save event description because "checking output of";
-	assert that the event description includes pattern;
-	transcribe and restart capturing because "done output of";
-	
-To pause and assert that the event description does not include (pattern - an indexed text):
-	stop and save event description because "checking output of";
-	assert that the event description does not include pattern;
-	transcribe and restart capturing because "done checking output of".
 
 Section - hiding-check, hidden-traveling and hiding-reveal
 
@@ -1078,7 +1063,7 @@ To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength 
 	now likelihood of combat hit is likelihood;
 	make combat hit possible;
 	while combat hit is not resolved: 
-		transcribe and restart capturing;
+		clear event description;
 		assign reaction to guy;
 		now the melee of the aggressor is strength;
 		now the health of guy is 1000;
@@ -1088,10 +1073,9 @@ To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength 
 		now aggressor carries original-attacker-weapon;
 		if original-attacker-weapon is not readied, try aggressor readying original-attacker-weapon;
 		try the aggressor hitting guy;
-		stop and save event description because "[combat hit] attempt [attempt count of combat hit] -";
+		update event description because "[combat hit] attempt [attempt count of combat hit] -";
 		if report of the reaction is not empty, assert that the event description includes "[report of reaction]";
 		test combat hit against "[outcome]";
-	transcribe and restart capturing;
 	
 To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit with result (outcome - a text):
 	have guy do a reaction to a strength melee hit by the player with result outcome.
@@ -1225,14 +1209,27 @@ Chapter: Advanced usage
 
 Section: Controlling text capture
 
-Usually the event description contains all the text that was generated during the previous turn. But we can manipulate what is saved.
+Text capturing should work fine behind the scenes, but sometimes you might need to step in and take control.
 
-This phrase stops text capturing:
+Because sometimes the system needs to stop capturing and display something to the screen, the full output of the current turn is saved in a text called the "event description." This is automatically cleared at the beginning of a turn and updated when it is likely to be needed. But sometimes we might want to clear it and update it manually. Use these phrases:
+	
+clear the event description
 
-	stop and save event description
+This will set the event description to an empty string. As text is captured, it will be appended to the event description.
 
-And this restarts it:
+update the event description
 
-	Transcribe and start capturing;
+This will force the most recently captured text to be added to the end of the event description. Versions of these two phrases take a "reason" parameter, which will be included in the transcript, e.g:
+	
+clear the event description because "starting an iteration of the foobar test"
 
-It's important to use the "transcribe" version of this phrase so that our transcript output will contain everything.
+update the event description because "checking for frobnitz usage"
+
+If we want to output information to the screen, use the phrase:
+
+log (message - a text)
+
+And if we want to output something to the transcript only, use the phrase:
+
+transcribe (message - a text)
+
