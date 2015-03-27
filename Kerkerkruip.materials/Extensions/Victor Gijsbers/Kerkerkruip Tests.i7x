@@ -559,7 +559,7 @@ For taking a player action when the fight count is at least 1 (this is the let t
 	try battling the test-challenger;
 	try recruiting the test-champion;
 
-The let test combatants fight rule is listed before the test step player action rule in the for taking a player action rulebook.
+The let test combatants fight rule is listed before the compel player attack rule in the for taking a player action rulebook.
 
 Section - Died and Kill Stats
 

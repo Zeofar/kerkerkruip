@@ -6,6 +6,7 @@ Volume - All Test Sets (not for release)
 
 Include Automated Testing by Kerkerkruip.
 
+[
 Section - Aite Champions vs Bat
 
 Aite champions vs bat is a test set.
@@ -1529,34 +1530,35 @@ testing effects of secret-room-remembering:
 [make sure tunnels don't show up when they shouldn't, make sure they do show up in unexplored list]
 
 [psycholocation + sense]
+]
 
 Section - Blessed Grenade - bug #261
 
-blessed-grenade-test is a test set.
-
-Scenario when testing blessed-grenade-test:
+Scenario for blessed-grenade-test:
 	now Drakul is testobject;
 	now the Alchemical Laboratory is testobject;
 	now the Blessed Grenade is bannedobject;
 	
 Table of Outcomes (continued)
-outcome	likelihood	minimum attempts	maximum attempts
-getting-blessed	1	0	400
-no-extra-blessed	0	400	400
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+blessed-grenade-test	1	0	400	restarting for tests
+no-extra-blessed	0	400	400	--
+throwing-blessed	1	0	10	--
+no-new-blessed	0	400	400	--
 
-Test play when testing blessed-grenade-test:
+initial scheduling of blessed-grenade-test:
 	now the defence of the player is 100;
 	now the player carries the reusable item;
 	Now the reusable item is the staff of insanity;
 	Now every room is not rust-spored;
 	Now every thing is not rusted;
 	extract the player to the alchemical laboratory, making sure it is unoccupied;
-	while we haven't reset getting-blessed:
-		produce a grenade;
-		test getting-blessed against "the Blessed Grenade drops on the ground";
-	while we haven't reset no-extra-blessed:
-		produce a grenade;
-		test no-extra-blessed against "the Blessed Grenade drops on the ground";
+	
+regular scheduling of blessed-grenade-test: produce a grenade.
+testing effects of blessed-grenade-test: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
+	 
+regular scheduling of no-extra-blessed: produce a grenade.
+testing effects of no-extra-blessed: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
 
 To produce a grenade:
 	Repeat with item running through grenades in the location:
@@ -1571,62 +1573,9 @@ To produce a grenade:
 	if the location is not Alchemical Laboratory, extract the player to Alchemical Laboratory;
 	[If the current move is hidden-traveling, now the player is hidden;]
 	
-	
-[A test step can be grenade-producing.
-
-When play begins:
-	repeat with the move running through grenade-producing test steps:
-		now the move is hidden-traveling;
-		now the move is extracting;
-		now the location-target of the move is the alchemical laboratory.
-
-blessed-grenade-alchemy is a grenade-producing test step. The first move of blessed-grenade-test is blessed-grenade-alchemy.
-
-Choosing a player action when testing a grenade-producing test step:
-	generate the action of inserting the reusable item into the curious machine.
-
-[TODO: make this a while loop, not a cycle of turns]
-
-First every turn when the scheduled event is a grenade-producing test step (called the current move):
-	Now the health of the player is 100;
-	Now the player is not asleep;
-	If the current move is hidden-traveling, now the player is hidden;
-	Now every room is not rust-spored;
-	Now every thing is not rusted;
-	
-Last testing effects of a grenade-producing test step:
-	Repeat with item running through grenades in the location:
-		if item is not a custom-grenade, remove item from play;
-]
-[
-testing effects of blessed-grenade-alchemy:
-	succeed on result "the Blessed Grenade drops on the ground" within 400 attempts;
-	if waiting for resolution, make no decision;
-	Repeat with the item running through grenades:
-		Let name be indexed text;
-		Now name is the printed name of the item;
-		if the name is "Blessed Grenade":
-			assert "[The item] in [holder of the item] looks like a blessed grenade, but it isn't" based on whether or not the item is the blessed grenade;
-			assert that the item is in the location;
-		
-no-extra-blessed-grenade is a grenade-producing test step. [This number could be higher, but it's a slow test] 
-
-Initial scheduling of no-extra-blessed-grenade:
-	assert that the location of the blessed grenade is Alchemical Laboratory with label "location of the blessed grenade";
-	assert "The blessed grenade should be placed" based on whether or not the blessed grenade is placed;
-	assert "The blessed grenade should not be cloneable" based on whether or not the blessed grenade is not cloneable;
-	
-testing effects of no-extra-blessed-grenade:
-	fail on result "the Blessed Grenade drops on the ground" within 400 attempts [it would be nice to make faster].
-]
-
-throwing-blessed is a test step. The first move of blessed-grenade-test is throwing-blessed;
-
-Initial scheduling of throwing-blessed:
+Regular scheduling of throwing-blessed:
 	now the player carries the blessed grenade;
 	extract Drakul to the Alchemical Laboratory;
-	
-Choosing a player action when testing throwing-blessed:
 	generate the action of throwing the blessed grenade;
 	
 testing effects of throwing-blessed:
@@ -1635,16 +1584,15 @@ testing effects of throwing-blessed:
 	assert "The blessed grenade should be placed" based on whether or not the Blessed Grenade is placed;
 	assert "The blessed grenade should be off-stage" based on whether or not the blessed grenade is off-stage;
 	assert result "As the grenade explodes you hear the singing of angels, several of whom swoop down from the heavens with huge swords and eviscerate <^[line break]>*Drakul";
-	while we haven't reset no-extra-blessed:
-		produce a grenade;
-		test no-extra-blessed against "the Blessed Grenade drops on the ground";
-	assert "The Blessed Grenade should be off-stage" based on whether or not the blessed grenade is off-stage.
+	rule succeeds.
 	
-[no-new-blessed-grenade is a grenade-producing test step. 
+Regular scheduling of no-new-blessed: produce a grenade.
 
-testing effects of no-new-blessed-grenade:
-	fail based on whether or not the blessed grenade is not off-stage within 100 attempts;
-]
+Testing effects of no-new-blessed:
+	assert "The Blessed Grenade should be off-stage" based on whether or not the blessed grenade is off-stage;
+	if result includes "the Blessed Grenade drops on the ground", rule succeeds;
+	
+[
 
 Section - At-react after getting mazed - bug 210
 
@@ -3310,10 +3258,11 @@ failing move is a test step.
 Testing effects of failing move:
 	assert "truth is false" based on false.
 
-]
+]]
 
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	maximum attempts	antecedent
+outcome-behavior	1	0	600	restarting for tests
 coin-flip	1	2	20	--
 easy-flip	1	1	20	coin-flip
 third-flip	1	2	20	easy-flip
@@ -3328,31 +3277,29 @@ wrong-success	2	3	30	after-first
 intended-failure	0	0	100	--
 unintended-success	0	0	100	--
 
-
-Outcome-behavior is a test set.
-
 [This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail.]
 
-Definition: outcome-behavior is enabled:
+[Definition: outcome-behavior is enabled:
 	decide on whether or not the number of filled rows in Table of Test Set Queue is 1. [only runs when it's the only test]
+	
+not sure how to do this now]
 
-Outcome-behavior-testing is a test step. The first move of outcome-behavior is outcome-behavior-testing.
+Testing effects of outcome-behavior: rule succeeds.
+Testing effects of coin-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
+Testing effects of easy-flip: rule succeeds.
+Testing effects of third-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
+Testing effects of new-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
+Testing effects of after-new-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
+Testing effects of insufficient-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
+Testing effects of impossible-flip: rule fails.
+Testing effects of more-impossible: rule succeeds.
+Testing effects of first-time: if the attempt count of coin-flip is 1, rule succeeds.
+Testing effects of after-first: rule succeeds.
+Testing effects of wrong-success: if a random chance of 1 in 3 succeeds, rule succeeds.
+Testing effects of intended-failure: rule fails.
+Testing effects of unintended-success: rule succeeds.
 
-Testing effects of outcome-behavior-testing:
-	test coin-flip against whether or not a random chance of 1 in 2 succeeds;
-	test easy-flip against true;
-	test third-flip against whether or not a random chance of 1 in 2 succeeds;
-	test new-flip against whether or not a random chance of 1 in 2 succeeds;
-	test after-new-flip against whether or not a random chance of 1 in 2 succeeds;
-	test insufficient-flip against whether or not a random chance of 1 in 2 succeeds;
-	test impossible-flip against false;
-	test more-impossible against true;
-	test first-time against whether or not the attempt count of coin-flip is 1;
-	test after-first against true;
-	test wrong-success against whether or not a random chance of 1 in 3 succeeds;
-	fail intended-failure based on false;
-	fail unintended-success based on true;
-
+[
 Resizing salves is a test set.
 
 To assert that (item - a thing) is (size - a size):
@@ -3398,5 +3345,6 @@ Test play when testing resizing salves:
 	now the player worships Sul;
 	now favour of the player is 1;
 	have the player do a block reaction to a 100 melee hit by the armadillo with result "defender's shield too small" in 0 out of 1 attempts;
+]
 		
 Test Sets ends here.

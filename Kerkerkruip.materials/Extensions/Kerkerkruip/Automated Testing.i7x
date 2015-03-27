@@ -2,6 +2,27 @@ Automated Testing by Kerkerkruip begins here.
 
 Use authorial modesty.
 
+[Using outcomes only:
+
+To queue a test, make its final dependency possible
+
+To run test, trace dependencies backwards, then run them in forwards order
+
+How to distinguish branching dependencies from dependencies that are used in two different places? Use 'reusable' property?
+
+two ways to run tests - implicitly or explicitly. Maybe branching dependencies need to be explicit
+
+special outcomes: taking a turn, restarting for tests
+
+taking a turn sets an action - either player or npc
+
+By default every outcome depends on its predecessor?
+
+To compel (action) - take a turn
+To react to (person) with (action) - take a turn with attack/react rounds
+To wait for (person) to act
+]
+
 Volume - Test Framework (not for release)
 
 Include Simple Unit Tests by Dannii Willis.
@@ -9,6 +30,396 @@ Include Text Capture by Eric Eve. [Actually, this must be included before Basic 
 
 Use maximum capture buffer length of at least 16384.
 Use maximum text length of at least 16384.
+
+Chapter - Randomized Events
+
+Section - Outcomes
+
+[TODO: put all outcomes in a table and save it to a file. Then we can restart the game repeatedly and use outcomes to generate statistics about dungeon generation]
+An outcome is a kind of value. Some outcomes are defined by the Table of outcomes.
+
+To say (result - an outcome):
+	if the description of the result is not empty:
+		say "[description of the result]";
+	otherwise:
+		say "[the result]";
+		
+outcome state is a kind of value. The outcome states are outcome-untested, outcome-possible, outcome-failed, and outcome-achieved.
+
+Definition: an outcome is resolved if the state of it is at least outcome-failed.
+Definition: an outcome is untested if the state of it is outcome-untested.
+Definition: an outcome is possible if the state of it is outcome-possible.
+Definition: an outcome is failed if the state of it is outcome-failed.
+Definition: an outcome is achieved if the state of it is outcome-achieved.
+
+An outcome can be just-succeeded.
+	
+[Outcome properties:
+
+description - a 'printed name' style text
+attempt count - number of times outcome has been tested
+success count - number of times a test "succeeded"
+likelihood -
+minimum attempts -
+
+The probability of a test "succeeding" should be likelihood / minimum attempts.
+
+This has some special interpretations:
+	
+if likelihood = 0 or likelihood = minimum attempts, then success or failure of each test is considered a certainty, and the whole outcome will fail if a single test does not perform as expected
+if minimum attempts = 0, then likelihood is considered a minimum number of successes, not a probability. Setting likelihood to 1 means the whole outcome will be achieved if a single test succeeds
+For all other values, a tolerance range will be established that should achieve the outcome in 99% of cases with correctly randomized successes
+
+maximum attempts - outcome will "time out" and fail if it reaches this number without being achieved first. If you don't set this, a reasonable default will be chosen for you
+maximum tolerance - do not set, will be calculated
+state - determines whether the outcome should be tested. do not set directly, use "make ... possible" phrases, etc
+dependency - determines whether the next outcome should be tested. do not set directly, use "serial outcome dependency" phrases
+]
+
+Table of Outcomes
+outcome	description	attempt count	success count	likelihood (number)	minimum attempts (number)	maximum attempts (number)	maximum tolerance (number)	state (outcome state)	antecedent (outcome)
+boring lack of results	""	0	0	0	1	1	0	outcome-untested	boring lack of results
+restarting for tests	""	0	0	1	1	99999	0	--	--
+
+Section - Outcome Persistence
+
+The file of test outcomes is called "testoutcomes"
+
+To save test outcomes:
+	Repeat through Table of Outcomes:
+		now the description entry is the description of the outcome entry;
+		now the attempt count entry is the attempt count of the outcome entry;
+		now the success count entry is the success count of the outcome entry;
+		now the likelihood entry is the likelihood of the outcome entry;
+		now the minimum attempts entry is the minimum attempts of the outcome entry;
+		now the maximum attempts entry is the maximum attempts of the outcome entry;
+		now the state entry is the state of the outcome entry;
+		now the antecedent entry is the antecedent of the outcome entry;
+		[ingore maximum tolerance, it will be recalculated]
+	write file of test outcomes from table of outcomes;
+	
+To load test outcomes:
+	unless file of test outcomes exists, stop;
+	Read file of test outcomes into table of outcomes;
+	Repeat through table of outcomes:
+		[skip description entry]
+		if there is an attempt count entry, now the attempt count of the outcome entry is the attempt count entry;
+		if there is a success count entry, now the success count of the outcome entry is the success count entry;
+		if there is a likelihood entry, now the likelihood of the outcome entry is the likelihood entry;
+		if there is a minimum attempts entry, now the minimum attempts of the outcome entry is the minimum attempts entry;
+		if there is a maximum attempts entry, now the maximum attempts of the outcome entry is the maximum attempts entry;
+		[ingore maximum tolerance, it will be recalculated]
+		if there is a state entry, now the state of the outcome entry is the state entry;
+		if there is an antecedent entry, now the the antecedent of the outcome entry is the antecedent entry;
+
+Section - Statistical Help
+
+[This phrase helps us set a reasonable error tolerance of repeated tests so they will succeed most of the time. If we use a success rate of 0.99, that will set a threshold of error such that the outcome will be achieved for 99% of random seeds]
+
+To set the maximum tolerance for (event - an outcome) with (success rate - a real number) achievement:
+	if minimum attempts of event is 0 or likelihood of event is 0 or likelihood of event is minimum attempts of event:
+		now maximum tolerance of event is 0;
+	otherwise:
+		Let success-target be (likelihood of event * maximum attempts of event) / (minimum attempts of event);
+		Let P be (likelihood of event) / (minimum attempts of event * 1.0);
+		Let current rate be 0.0;
+		Let current threshold be 0;
+		while current rate < success rate:
+			increase current rate by the probability of winning (success-target + current threshold) times out of maximum attempts of event with likelihood P;
+			if current threshold > 0:
+				increase current rate by the probability of winning (success-target - current threshold) times out of maximum attempts of event with likelihood P;
+			increment current threshold;
+		now the maximum tolerance of event is current threshold - 1;
+			
+To decide what real number is the probability of winning (K - a number) times out of (N - a number) with likelihood (P - a real number):
+	if K < 0 or K > N:
+		decide on 0.0;
+	let product be 1.0;
+	[probability = N choose K * P(success)^N * P(failure)^(K-N)]
+	[N choose K method cribbed from Wikipedia page on the binomial coefficient]
+	[interspersed with multiplying by P and 1 - P to prevent the number from getting too big or too small]
+	Repeat with i running from 1 to K:
+		now product is product * (n + 1 - i) / (i * 1.0);
+		now product is product * P;
+		if i is not greater than (N - K):
+			now product is product * (1 - P);
+	Repeat with i running from (K + 1) to (N - K):
+		now product is product * (1 - P);
+	decide on product;
+		
+[
+To decide what real number is (N - a number) choose (K - a number):
+	Let the product be 1.0;
+	Repeat with i running from 1 to K:
+		now product is product * (n + 1 - i) / (i * 1.0);
+	decide on product;
+]
+
+Section - Generating Actions
+
+For taking a player action when the blocking event is still testable (this is the take a player test turn rule):
+	transcribe "DEBUG: take a player test turn - [blocking event]";
+	generate the action of waiting;
+	
+For taking a player action when testing compelling an action next (this is the compel player action rule):
+	if the actor part of the compelled action is not the player, make no decision;
+	if compelling an attack is not resolved and the player is not at-react, make no decision;
+	generate the compelled action;
+	forget the compelled action;
+	test compelling an action and continue scheduling;
+
+For taking a player action when testing compelling an attack next (this is the compel player attack rule):
+	if the compelled attacker is not the player, make no decision;
+	generate the action of attacking (the actor part of the compelled action);
+	test compelling an attack and continue scheduling;
+	
+The take a player test turn rule is listed first in the for taking a player action rulebook.
+The compel player action rule is listed before the take a player test turn rule in the for taking a player action rulebook.
+The compel player attack rule is listed before the compel player action rule in the for taking a player action rulebook.
+		
+[A test step has an object called the location-target.
+
+To decide which room is the action-destination of (current move - a test step):
+	Let the current destination be the location-target of the current move;
+	if the current destination is nothing, decide on Null-room;
+	if the current destination is a room, decide on the current destination;
+	decide on the location of the current destination.
+
+A test step can be extracting.]
+
+to say moving-description:
+	say "finding a route from [the location] to [the location-to-go]";
+	
+to say compelled-attack:
+	say "an attack by [the compelled attacker] against [the actor part of the compelled action]";
+
+to say compelled-reaction:
+	say "[the compelled action] in reaction to [the compelled attacker]"
+
+Table of Outcomes (continued)
+outcome	description	likelihood	minimum attempts	antecedent
+taking a turn	""	1	0	--
+moving towards the destination	"[moving-description]"	1	0	taking a turn
+compelling an attack	"[compelled-attack]"	1	0	taking a turn
+compelling an action	"[the compelled action]"	1	0	taking a turn
+compelling a reaction	"[compelled-reaction]"	1	1	compelling an attack
+free npc action	""	1	0	taking a turn
+
+For taking a player action when the scheduled event is not boring lack of results (this is the move to the destination of an outcome rule):
+	if the player is at-React:
+		make no decision;
+	if the location-to-go is the location:
+		update event description because "arrived at destination [the location] for";
+	if the location-to-go is Null-room or the location-to-go is the location:
+		make no decision;
+	Now the way-to-get-there is the best route from the location to the location-to-go;
+	Now the way-to-get-back is the opposite of the way-to-get-there;
+	fail moving towards the destination based on whether or not the way-to-get-there is not a direction;
+	if the way-to-get-there is a direction, generate the action of going the way-to-get-there;
+		
+The move to the destination of an outcome rule is listed before the compel player attack rule in the for taking a player action rulebook.
+
+[I7 names borrowed from Ron Newcomb's Original Parser]
+The action in progress is an action name that varies. 
+The person requesting is a person that varies. 
+The action in progress variable translates into I6 as "action".
+The person requesting variable translates into I6 as "act_requester".
+
+To begin the current action: (- BeginAction(action, noun, second); -)
+
+To generate (the desired action - a stored action):
+	transcribe "Player [if the player is at-react]re[end if]action: [the desired action]";
+	now the action in progress is the action name part of the desired action;
+	now the person asked is the actor part of the desired action;
+	[now the person requesting is nothing;] [not allowed in I7?]
+	if the person asked is not the player, now the person requesting is the player;
+	now the noun is the noun part of the desired action;
+	now the second noun is the second noun part of the desired action;
+	begin the current action;
+	
+The compelled attacker is an object that varies. The npc test subject is an object that varies. [TODO: use this for compelled attacks too?]
+The compelled action is a stored action that varies. The compelled action is the action of waiting.
+
+[A test step can be npc-suppressing or npc-enabling. A test step is usually npc-suppressing. Normal keyboard input is npc-enabling.
+
+First initial scheduling rule for a test step (called current move) (this is the enable npc actions rule):
+	now suppress npc action is whether or not current move is npc-suppressing;
+	
+]
+
+Suppress npc action is a truth state that varies.
+
+To make everyone wait:
+	transcribe "suppressing NPC actions";
+	now suppress npc action is true;
+	
+To let everyone act freely:
+	transcribe "enabling NPC actions";
+	now suppress npc action is false;
+	
+To compel (the desired action - a stored action):
+	Let the guy be the actor part of the desired action;
+	transcribe "compelling [the desired action][if the guy is asleep] and waking up [the guy]";
+	now the guy is not asleep;
+	Now the compelled action is the desired action;
+	Schedule compelling an action; [this should automatically stop and wait for a turn]
+	
+To compel (the desired action - a stored action) as a reaction to (guy - a person):
+	transcribe "setting the compelled attacker to [the guy][if the guy is asleep] and waking [them] up";
+	now the guy is not asleep;
+	Now the compelled attacker is the guy;
+	Now the compelled action is the desired action;
+	Schedule compelling a reaction; [this should automatically stop and wait for a turn]
+	
+To wait for (guy - a person) to act freely:
+	transcribe "waiting for [the guy] to act freely[if the guy is asleep] and waking [them] up";
+	now the npc test subject is the guy;
+	Schedule free npc action;
+	
+To forget the/-- compelled action:
+	now the compelled attacker is nothing;
+	now the compelled action is the action of waiting;
+	
+The automated menu question answer is a number that varies.
+
+First for reading a command when the automated menu question answer is greater than 0:
+	change the text of the player's command to "[the automated menu question answer]".
+
+To select menu question answer (N - a number):
+	transcribe "Selecting answer [N]";
+	now the automated menu question answer is N;
+	carry out the reading a command activity;
+	now the automated menu question answer is 0;
+
+A Standard AI rule for the compelled attacker when testing compelling an attack next (this is the compel an attack rule):
+	try the compelled attacker attacking (the actor part of the compelled action);
+	test compelling an attack and continue scheduling;
+	
+A Standard AI rule for a person (called P) when testing compelling a reaction next (this is the compel a reaction rule):
+	unless the actor part of the compelled action is P and P is at-React:
+		make no decision;
+	try the compelled action;
+	forget the compelled action;
+	test compelling a reaction and continue scheduling;
+	rule succeeds;
+
+A Standard AI rule for a person (called P) when testing compelling an action next (this is the compel an action rule):
+	unless the actor part of the compelled action is P and P is at-Act:
+		make no decision;
+	try the compelled action;
+	forget the compelled action;
+	test compelling an action and continue scheduling;
+	rule succeeds;
+	
+A Standard AI rule for a person (called P) (this is the suppress actions rule):
+	if suppress npc action is true:
+		if P is at-react:
+			transcribe "allowing [P] to react";
+		otherwise:
+			transcribe "suppressed action for [P]";
+			rule succeeds;
+	
+The suppress actions rule is listed before the insane people attack themselves rule in the standard AI rulebook.
+
+The compel an action rule is listed before the suppress actions rule in the standard AI rulebook.
+
+The compel a reaction rule is listed before the compel an action rule in the standard AI rulebook.
+
+The compel an attack rule is listed before the compel a reaction rule in the standard AI rulebook.
+
+Section - Testing Outcomes
+
+[TODO: Normalize regex matches against event description so we can use a brief consistent phrase. ]
+
+To decide whether (event - an outcome) timed out:
+	decide on whether or not the attempt count of the event is not less than the maximum attempts of the event;
+		
+To decide what number is the expected successes of (event - an outcome) after (attempts - a number):
+	if the minimum attempts of the event is 0, decide on likelihood of the event;
+	decide on (likelihood of the event * attempts) / minimum attempts of the event;
+
+To resolve (event - an outcome):
+	Let the tolerance be the maximum tolerance of the event;
+	Let target be the expected successes of the event after the maximum attempts of the event;
+	let the upper bound be target + tolerance;
+	let the lower bound be (target - tolerance)  - maximum attempts of the event + attempt count of the event;
+	if the success count of the event is less than the lower bound or the success count of the event is greater than the upper bound:
+		[achievement is impossible within the maximum number of attempts]
+		now the state of event is outcome-failed;
+		assert "After [attempt count of the event] attempt[s], [the event] happened [success count of the event] times (not between [lower bound] and [upper bound] of target [target] for maximum attempts [maximum attempts of event] with tolerance [tolerance])" based on false;
+	otherwise if the attempt count of the event is at least the minimum attempts of the event:
+		now the tolerance is (tolerance * attempt count of the event) / maximum attempts of the event;
+		now target is expected successes of the event after the attempt count of the event;
+		now the upper bound is the target + tolerance;
+		now the lower bound is the target - tolerance;
+		if likelihood of the event is at least 1 and lower bound is less than 1:
+			say "Programming error: I don't think this code should be needed.";
+			now lower bound is 1;
+		if the success count of the event is at least lower bound and the success count of the event is at most upper bound:
+			now the state of event is outcome-achieved;
+			assert "success" based on true;
+
+[
+failure tolerance: no way end result will be within tolerance.
+
+eg 1 in 15 with 200 attempts
+success-target=13
+tolerance=9
+maximum failures=200-13-9=178
+(max success=22, min success=4)
+
+necessary success = min success - maximum attempts + attempts
+at 196 attempts:
+4 - 200 + 196 = 0
+at 197:
+4 - 200 + 197 = 1
+]
+	
+To resolve dependents of (event - an outcome):
+	if the state of the event is outcome-failed or the event timed out:
+		if the event has unresolved dependents:
+			Repeat with item running through dependent not resolved outcomes:
+				[if the event failed, dependents fail silently. If the event succeeded, they fail noisily]
+				if state of the event is outcome-achieved, assert "[item] ([success count of item]/[attempt count of item]) stalled because [event] timed out after [attempt count of event - 1] attempt[s]" based on false;
+				now state of item is outcome-failed;
+			
+To test (event - an outcome) against (success - a truth state):
+	make the event testable;
+	if the event is still testable:
+		increment attempt count of the event;
+		if success is true:
+			increment success count of the event;
+		if event is resolved:
+			resolve dependents of the event;
+		otherwise:
+			resolve event;
+		[There is a subtle conflict between "success count" and "just-succeeded". "success count" is the number of times the "success" condition was met. However, if likelihood is 0, this is not really a success - it will result in a positive "error" during resolution. On the other hand, just-succeeded is only true if we got a desirable result, even if that result is false (as it should be in the case of likelihood=0). Feel free to suggest better names for these two variables]
+		if success is (whether or not likelihood of the event is greater than 0), now the event is just-succeeded;
+
+To test (event - an outcome) against (T - a text):
+	update the event description because "testing [event] against '[T]'"; [todo - roll this into a text-testing phrase?]
+	[TODO: include event description in failure report]
+	test event against whether or not the event description matches the regular expression T;
+
+To fail (event - an outcome) based on (result - a truth state):
+	now likelihood of event is 0;
+	test event against result;
+		
+To fail (event - an outcome) on result (T - a text):
+	[TODO: don't test regexp if we're going to ignore the test result]
+	update the event description;
+	fail event based on whether or not the event description matches the regular expression T;
+	
+To achieve (event - an outcome) based on (result - a truth state):
+	now likelihood of event is 1;
+	now minimum attempts of event is 0;
+	test event against result;
+			
+To achieve (event - an outcome) on result (T - a text):
+	update the event description;
+	achieve event based on whether or not the event description matches the regular expression T;
+	
+[TODO: combat round tests]
 
 Chapter - Persistent data
 
@@ -32,7 +443,7 @@ To transcribe (T - a text):
 		append "[message]" to file of test transcript;
 
 To say current test description:
-	say  "[current test set], [scheduled event] turn [the turn count], ";
+	say  "[primary outcome], [scheduled event] turn [the turn count], ";
 	if there is an achieved outcome:
 		say "achieved [the list of achieved outcomes] | ";
 	if there is a failed outcome:
@@ -70,42 +481,46 @@ To clear the/-- event description because (reason - a text):
 The file of test results is called "testresults".
 
 Table of Test Results
-Test Set (test set)	Total (number)	Failures (number)	Failure Messages (indexed text)
+Test Set (outcome)	Total (number)	Failures (number)	Failure Messages (indexed text)
 with 100 blank rows
 
 The file of test set queue is called "testqueue"
 
 Table of Test Set Queue
-Test Set (test set)	Random-Seed (number)	Unresolved Count (number)
-with 100 blank rows
+Random-Seed (number)	Unresolved Count (number)
+40	0
+with 1 blank row
 
-To queue (T - a test set):
-	choose a blank row in Table of Test Set Queue;
-	Now test set entry is T;
-	Now the random-seed entry is 39. [TODO: set this manually if desired]
+To queue (T - an outcome):
+	make T testable;
+	choose row 1 in Table of Test Set Queue;
+	unless there is an unresolved count entry:
+		now the unresolved count entry is 0;
+	increment the unresolved count entry;
+	Now the random-seed entry is 40. [TODO: set this manually if desired]
 	
-To queue all test sets:
-	Repeat with T running through enabled test sets:
+To queue all automated tests:
+	Repeat with T running through enabled outcomes:
 		queue T.
 			
 To record a test attempt:
 	increment the test assertion count;
 	increment the total assertion count;
-	if there is a test set of the current test set in Table of Test Results:
-		choose row with test set of current test set in Table of Test Results;
+	if there is a test set of the primary outcome in Table of Test Results:
+		choose row with test set of primary outcome in Table of Test Results;
 	otherwise:
 		choose a blank row in Table of Test Results;
-		now test set entry is the current test set;
+		now test set entry is the primary outcome;
 		now total entry is 0;
 		now failures entry is 0;
 		now failure messages entry is "";
 	increment the total entry;
 
 To record a/-- failure report of/-- (msg - a text):
-	choose row with test set of current test set in Table of Test Results;	
+	choose row with test set of primary outcome in Table of Test Results;	
 	increment the assertion failures count;
 	increment the failures entry;
-	let new message be "Failure for test: [the current test set], step: [the scheduled event], assertion [the test assertion count]: [msg][paragraph break]";
+	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], assertion [the test assertion count]: [msg][paragraph break]";
 	now the failure messages entry is the substituted form of "[failure messages entry][new message]";
 	log the new message;
 	
@@ -117,7 +532,7 @@ To say grand test summary:
 		now grand test failures is grand test failures plus failures entry;
 	say "[grand test total] test[s] in [number of filled rows in Table of Test Results] set[s], [grand test failures] failure[s]";
 	Let the remaining outcome tests be 0;
-	Repeat with event running through possible outcomes:
+	Repeat with event running through not preset possible outcomes:
 		Let ancestor be event;
 		while ancestor is not boring lack of results:
 			Let remainder be maximum attempts of ancestor - attempt count of ancestor;
@@ -125,7 +540,7 @@ To say grand test summary:
 				now remaining outcome tests is the remainder;
 			now ancestor is the antecedent of ancestor;
 	if the remaining outcome tests is at least 1:
-		say "; [number of possible outcomes] outcome[s] to be tested up to [remaining outcome tests] more times" ;
+		say "; [number of not preset possible outcomes] outcome[s] to be tested up to [remaining outcome tests] more times" ;
 	
 To display test results:
 	If the number of filled rows in Table of Test Results is 0, stop;
@@ -149,7 +564,7 @@ To display test results:
 	otherwise:
 		pause the game;
 	
-Chapter - test steps
+[Chapter - test steps
 
 Section - Properties
 
@@ -169,11 +584,11 @@ To decide what number is the repeated moves:
 			now the moves is the attempt count of the event;
 	decide on the moves.
 
-A test step can be generated.
+A test step can be generated.]
+
+Chapter - Controlling Text Capture
 
 Allowing screen effects is a truth state that varies.
-
-testing effects rules are a test step based rulebook.
 
 Section - Capture-aware Screen Clearing (in place of Section - Clearing the screen in Basic Screen Effects by Emily Short)
 
@@ -268,364 +683,35 @@ To stop the/-- game abruptly:
 
 Section - Enabling screen effects when testing is done
 
-Initial scheduling of normal keyboard input:
+regular scheduling of boring lack of results:
 	now allowing screen effects is true.
 
-Section - Scheduling
+Chapter - Scheduling
 
-To decide whether testing (T - a test step):
-	decide on whether or not the scheduled event is T;
-
-To decide whether testing (D - a description of test steps):
-	Repeat with T running through D:
-		if testing T, yes;
-	no.
-
-The scheduled event is a test step that varies. The scheduled event is the normal keyboard input.
-
-Initial scheduling rules are a test step based rulebook.
-
-Initial scheduling for a test step (this is the reset act counts rule):
-	repeat with guy running through people:
-		now the act count of guy is 0;
-			
-rescheduling rules are a test step based rulebook.
-
-To schedule (the event described - a test step):
-	update event description because "scheduling [the event described] for";
-	if the event described is not the scheduled event:
-		now the scheduled event is the event described;
-		if the event described is normal keyboard input:
-			transcribe and stop capturing because "normal keyboard input was the new event of";
-			say line break;
-			start capturing text;
-		otherwise:
-			log "  next step:  [the event described]";
-		follow the initial scheduling rules for the event described;
-	otherwise:
-		transcribe "rescheduling [the event described]";
-		follow the rescheduling rules for the event described;
-	now the event described is not generated;
-	
-Before taking a player action when the scheduled event is generated (this is the test event effects rule):
-	[Let repeat be whether or not (the scheduled event is repeatable) and (the repeated moves > 0);]
-	now the scheduled event is not generated;
-	update the event description because "testing effects of";
-	follow the testing effects rules for the scheduled event;
-	clear event description because "done testing effects of";
-	if we reset every possible outcome:
-		schedule the next move of the scheduled event;
-	otherwise:
-		[repeats are needed]
-		schedule the scheduled event;
-
-Chapter - Test Sets
-
-A test set is a kind of value. null-test is a test set.
-
-Definition: A test set (called the procedure) is enabled: yes.
-Definition: the null-test is enabled: no.
-
-A test set has a test step called the first move. The first move of a test set is usually normal keyboard input.
-
-The current test set is a test set that varies.
-
-To decide what number is (T - a test set) as a number: (- {T} -);
-To decide what test set is (T - a number) as a test set: (- {T} -);
-
-Done testing is a truth state that varies.
-
-To decide whether testing (T - a test set):
-	if done testing is true, no;
-	decide on whether or not the current test set is T;
-	
-The file of noninteractive tests is called "noninteractivetests".
-
-The run the unit tests rule is listed before the load achievements rule in the before showing the title screen rules.
-
-Before showing the title screen (this is the run the unit tests rule):
-	now allowing screen effects is true;
-	if the file of test set queue exists:
-		read file of test set queue into Table of Test Set Queue;
-	choose row 1 in Table of Test Set Queue;
-	if there is an unresolved count entry and the unresolved count entry is at least 1:
-		load test outcomes;
-	if the file of test results exists:
-		read file of test results into Table of Test Results;
-	if the file of noninteractive tests exists:
-		if screen reader mode is unset:
-			enable screen reader mode;
-		if the number of filled rows in Table of Test Set Queue is 0 and the number of filled rows in Table of Test Results is 0:
-			try all-test queueing;
-	if the number of filled rows in Table of Test Set Queue is 0:
-		display test results;
-		now done testing is true;
-	otherwise:
-		now roguelike mode is false;
-
-First for showing the title screen when done testing is false:
-	do nothing.
-	
-To decide which number is (T - a test set) as a number: (- {T} -);
-
-First after showing the title screen (this is the run all tests rule):
-	transcribe and stop capturing because "starting test set with";
-	if done testing is true, make no decision;
-	now allowing screen effects is false;
-	initialize test steps;
-	Choose row 1 in Table of Test Set Queue;
-	if the random-seed entry is not 0:
-		log "Seeding random number generator and dungeon generation with [random-seed entry]";
-		now the dungeon generation seed is the random-seed entry;
-		seed the random-number generator with the random-seed entry;
-	now the current test set is the test set entry;	
-	Now the current unit test name is "[the current test set]";
-	log "Completed so far: [grand test summary], with [number of filled rows in Table of Test Set Queue] set[s] left to test";
-	Repeat through Table of Test Results:
-		if failures entry > 0:
-			log "  [failures entry] failures in [test set entry]";
-	log "Now testing [the current test set] ([test set entry as a number]).";
-	[TODO: handle interaction between test config file and scenario]
-	start capturing text;
-	follow the scenario rules;
-	
-A last startup rule (this is the keep using the xorshift generator for automated tests rule):
-	if done testing is false:
-		now the xorshift seed is the dungeon generation seed.
-
-[Prevent the status window from opening]	
-The check info panel capacity rule does nothing when done testing is false.
-
-To decide which test set is the initiator of (the event -  a test step):
-	Repeat with the candidate running through test sets:
-		if the event is the first move of the candidate, decide on the candidate;
-	Decide on the null-test.
-	
-To initialize test steps:
-	Let the current set be the null-test;
-	Let the last event be normal keyboard input;
-	Repeat with the next event running through test steps:
-		Let the new test set be the initiator of the next event;
-		if the new test set is not the null-test:
-			now the current set is the new test set;
-		otherwise if the last event is not normal keyboard input:
-			now the next move of the last event is the next event;
-		now the last event is the next event;
-	
-Last when play begins (this is the start the next test rule):
-	if done testing is false:
-		update event description;
-		follow the generation test rules;
-		follow the test play rules; [TODO: get rid of these]
-		schedule the first move of the current test set;
-	
-The scenario rules are a rulebook.
-
-The test play rules are a rulebook.
-
-Chapter - Commands to Start Tests
-
-Test queueing is an action out of world applying to one test set. Understand "queue test [test set]" as test queueing.
-
-Carry out test queueing a test set:
-	queue the test set understood;
-	say "[The test set understood] will run now.";
-	start test transcript with "[the test set understood]".
-	
-All-test queueing is an action out of world applying to nothing. Understand "queue test all" as all-test queueing.
-
-Carry out all-test queueing:
-	queue all test sets;
-	say "All test sets will run now.";
-	start test transcript with "all test sets".
-		
-To start test transcript with (T - a text):
-	unless the file of noninteractive tests exists:
-		pause the game;
-	write "Test transcript for Kerkerkruip: [T].[line break]" to file of test transcript;
-	start the next test;
-	
-	
-Understand "queue test/tests" and "queue test [text]" as a mistake ("You can 'queue test all' or test one of the following sets: [list test sets]").
-
-To say list test sets:
-	repeat with T running through enabled test sets:
-		say "[line break][T]";
-	say paragraph break.
-
-Chapter - Resetting the Game After Each Test Set (in place of Chapter - The Unit test rules unindexed in Simple Unit Tests by Dannii Willis)
-
-The current unit test name is an indexed text variable.
-
-To start the/-- next test:
-	choose row 1 in Table of Test Set Queue;
-	if waiting for resolution:
-		now the unresolved count entry is the number of possible outcomes;
-		if the random-seed entry is not 0:
-			if the dungeon generation seed is 0:
-				increment the random-seed entry;
-			otherwise:
-				now the xorshift seed is the dungeon generation seed;
-				Let throwaway result be a random number from 1 to 2;
-				transcribe "advancing random seed to [the xorshift seed]";	
-				now the the random-seed entry is the xorshift seed;
-		transcribe "restarting with random seed [random-seed entry] to continue [current test description]";
-		save test outcomes;
-	otherwise:
-		[this doesn't work: delete file of test outcomes;]
-		if the current test set is the test set entry:
-			blank out the whole row;
-	write file of test set queue from Table of Test Set Queue;
-	if file of save data exists:
-		delete file of save data;
-	transcribe and stop capturing because "starting the next test after";
-	restart immediately.
-
-For reading a command when done testing is false (this is the finish current test set rule):
-	transcribe and stop capturing text because "finished all tests for set of";
-	write file of test results from Table of Test Results;
-	start the next test;
-	
-Before printing the player's obituary when done testing is false (this is the abort the current test set if game over rule):
-	record failure report "the player died";
-	transcribe and stop capturing because "game over at";
-	write file of test results from Table of Test Results;
-	start the next test.
-		
-Chapter - Randomized Events
-
-Section - Outcomes
-
-[TODO: put all outcomes in a table and save it to a file. Then we can restart the game repeatedly and use outcomes to generate statistics about dungeon generation]
-An outcome is a kind of value. Some outcomes are defined by the Table of outcomes.
-
-To say (result - an outcome):
-	if the description of the result is not empty:
-		say "[description of the result]";
-	otherwise:
-		say "[the result]";
-		
-outcome state is a kind of value. The outcome states are outcome-untested, outcome-possible, outcome-failed, and outcome-achieved.
-
-Definition: an outcome is resolved if the state of it is at least outcome-failed.
-Definition: an outcome is untested if the state of it is outcome-untested.
-Definition: an outcome is possible if the state of it is outcome-possible.
-Definition: an outcome is failed if the state of it is outcome-failed.
-Definition: an outcome is achieved if the state of it is outcome-achieved.
-
-An outcome can be just-succeeded;
-	
-[Outcome properties:
-
-description - a 'printed name' style text
-attempt count - number of times outcome has been tested
-success count - number of times a test "succeeded"
-likelihood -
-minimum attempts -
-
-The probability of a test "succeeding" should be likelihood / minimum attempts.
-
-This has some special interpretations:
-	
-if likelihood = 0 or likelihood = minimum attempts, then success or failure of each test is considered a certainty, and the whole outcome will fail if a single test does not perform as expected
-if minimum attempts = 0, then likelihood is considered a minimum number of successes, not a probability. Setting likelihood to 1 means the whole outcome will be achieved if a single test succeeds
-For all other values, a tolerance range will be established that should achieve the outcome in 99% of cases with correctly randomized successes
-
-maximum attempts - outcome will "time out" and fail if it reaches this number without being achieved first. If you don't set this, a reasonable default will be chosen for you
-maximum tolerance - do not set, will be calculated
-state - determines whether the outcome should be tested. do not set directly, use "make ... possible" phrases, etc
-dependency - determines whether the next outcome should be tested. do not set directly, use "serial outcome dependency" phrases
-]
-
-Table of Outcomes
-outcome	description	attempt count	success count	likelihood (number)	minimum attempts (number)	maximum attempts (number)	maximum tolerance (number)	state (outcome state)	antecedent (outcome)
-boring lack of results	""	0	0	0	1	1	0	outcome-untested	boring lack of results
-generic reusable event	""	0	0	1	1	100	0	--	--
-finish-on-success	""	0	0	1	1	1	0	--	--	
-
-Section - Outcome Persistence
-
-The file of test outcomes is called "testoutcomes"
-
-To save test outcomes:
-	Repeat through Table of Outcomes:
-		now the description entry is the description of the outcome entry;
-		now the attempt count entry is the attempt count of the outcome entry;
-		now the success count entry is the success count of the outcome entry;
-		now the likelihood entry is the likelihood of the outcome entry;
-		now the minimum attempts entry is the minimum attempts of the outcome entry;
-		now the maximum attempts entry is the maximum attempts of the outcome entry;
-		now the state entry is the state of the outcome entry;
-		now the antecedent entry is the antecedent of the outcome entry;
-		[ingore maximum tolerance, it will be recalculated]
-	write file of test outcomes from table of outcomes;
-	
-To load test outcomes:
-	unless file of test outcomes exists, stop;
-	Read file of test outcomes into table of outcomes;
-	Repeat through table of outcomes:
-		[skip description entry]
-		if there is an attempt count entry, now the attempt count of the outcome entry is the attempt count entry;
-		if there is a success count entry, now the success count of the outcome entry is the success count entry;
-		if there is a likelihood entry, now the likelihood of the outcome entry is the likelihood entry;
-		if there is a minimum attempts entry, now the minimum attempts of the outcome entry is the minimum attempts entry;
-		if there is a maximum attempts entry, now the maximum attempts of the outcome entry is the maximum attempts entry;
-		[ingore maximum tolerance, it will be recalculated]
-		if there is a state entry, now the state of the outcome entry is the state entry;
-		if there is an antecedent entry, now the the antecedent of the outcome entry is the antecedent entry;
-
-Section - Statistical Help
-
-[This phrase helps us set a reasonable error tolerance of repeated tests so they will succeed most of the time. If we use a success rate of 0.99, that will set a threshold of error such that the outcome will be achieved for 99% of random seeds]
-
-To set the maximum tolerance for (event - an outcome) with (success rate - a real number) achievement:
-	if minimum attempts of event is 0 or likelihood of event is 0 or likelihood of event is minimum attempts of event:
-		now maximum tolerance of event is 0;
-	otherwise:
-		Let success-target be (likelihood of event * maximum attempts of event) / (minimum attempts of event);
-		Let P be (likelihood of event) / (minimum attempts of event * 1.0);
-		Let current rate be 0.0;
-		Let current threshold be 0;
-		while current rate < success rate:
-			increase current rate by the probability of winning (success-target + current threshold) times out of maximum attempts of event with likelihood P;
-			if current threshold > 0:
-				increase current rate by the probability of winning (success-target - current threshold) times out of maximum attempts of event with likelihood P;
-			increment current threshold;
-		now the maximum tolerance of event is current threshold - 1;
-			
-To decide what real number is the probability of winning (K - a number) times out of (N - a number) with likelihood (P - a real number):
-	if K < 0 or K > N:
-		decide on 0.0;
-	let product be 1.0;
-	[probability = N choose K * P(success)^N * P(failure)^(K-N)]
-	[N choose K method cribbed from Wikipedia page on the binomial coefficient]
-	[interspersed with multiplying by P and 1 - P to prevent the number from getting too big or too small]
-	Repeat with i running from 1 to K:
-		now product is product * (n + 1 - i) / (i * 1.0);
-		now product is product * P;
-		if i is not greater than (N - K):
-			now product is product * (1 - P);
-	Repeat with i running from (K + 1) to (N - K):
-		now product is product * (1 - P);
-	decide on product;
-		
-[
-To decide what real number is (N - a number) choose (K - a number):
-	Let the product be 1.0;
-	Repeat with i running from 1 to K:
-		now product is product * (n + 1 - i) / (i * 1.0);
-	decide on product;
-]
+testing effects rules are an outcome based rulebook.
 
 Section - Controlling Outcomes
 
 The dependency test outcome is an outcome that varies. The dependency test outcome is boring lack of results.
 
-[Returns true if another outcome depends on the event, and also sets the dependency test outcome so we can use the "dependent" adjective]
+[The phrase below returns true if another outcome depends on the event, and also sets the dependency test outcome so we can use the "dependent" adjective
+
+Dependency is defined differently for different outcomes. In effect, the dependency tree has two segments:
+	
+an unbranching "trunk" of preset outcomes, ending at the scheduled event
+a branching tree of outcomes, all rooted at the scheduled event
+
+Everything in the full tree except for the scheduled outcome is "scheduled anonymously" - i.e. the tree is identified by scheduled event only.
+
+When scheduling happens, everything in the "trunk" will be manually made possible. No other branches should be followed, even though many preset outcomes have multiple dependents. But all the branches of the scheduled event should be made possible. This phrase reflects that: preset outcomes only search for possible dependents, while non-preset outcomes follow all branches of "not resolved" dependents.
+]
 
 To decide whether (event - an outcome) has unresolved dependents:
 	now the dependency test outcome is the event;
-	decide on whether or not there is a not resolved dependent outcome.
+	if event is preset:
+		decide on whether or not there is a possible dependent outcome;
+	otherwise:
+		decide on whether or not there is a not resolved dependent outcome.
 	
 Definition: an outcome (called event) is dependent:
 	Let candidate be the event;
@@ -636,18 +722,8 @@ Definition: an outcome (called event) is dependent:
 			decide yes;
 	decide no.
 	
-[this phrase has no side effects]
-To decide whether (event - an outcome) is still testable:
-	if event is possible:
-		if the antecedent of the event is boring lack of results:
-			decide yes;
-		otherwise:
-			decide on whether or not the antecedent of the event is just-succeeded;
-	otherwise:
-		decide on whether or not the event has unresolved dependents.
-			
-[this version has the side effect of initializing untested outcomes and resetting the just-succeeded flag. Use this first, and use "is still testable" afterwards]
-To decide whether we make (event - an outcome) testable:
+To make (event - an outcome) testable:
+	[now the event is not just-succeeded;] [do this in "we haven't reset" phrase]
 	if event is untested:
 		now state of event is outcome-possible;
 		if the maximum attempts of event is 0:
@@ -656,12 +732,42 @@ To decide whether we make (event - an outcome) testable:
 			otherwise:
 				now maximum attempts of event is 100;
 		set the maximum tolerance for event with 0.99 achievement;
-	Let testability be whether or not event is still testable;
-	now the event is not just-succeeded;
-	decide on testability;
-	
-To make (event - an outcome) possible:
-	Let throwaway result be whether or not we make the event testable.
+
+To make (event - boring lack of results) testable:
+	do nothing;
+		
+[use this phrase for outcomes that have already started being tested]
+Definition: an outcome (called event) is still testable:
+	if event is possible:
+		if the antecedent of the event is boring lack of results:
+			decide yes;
+		otherwise:
+			decide on whether or not the antecedent of the event is just-succeeded;
+	otherwise:
+		[is this right? it can be still testable even if it's not ready to test - even untested]
+		decide on whether or not the event has unresolved dependents.
+		
+Definition: boring lack of results is still testable: no.
+				
+Definition: an outcome is scheduled anonymously if it is preset or the antecedent of it is not preset.
+
+Definition: an outcome is default-dependent if it is not preset and the antecedent of it is boring lack of results.
+
+Definition: An outcome is enabled if the antecedent of it is restarting for tests.
+
+Definition: An outcome is preset if it is not greater than the final preset outcome.
+
+[test-blocking and immediately testable:
+
+Most outcomes can be tested as soon as they are scheduled, but some must wait for some game mechanics to advance - things like taking a turn and compelling an action, which take place in various rulebooks like before taking a player action and AI rules.
+
+These "test-blocking" outcomes only get tested when their special effects are executed - at which point they are guaranteed to succeed (if anything about their effects is in doubt, it should be tested by a dependent)
+]
+Definition: An outcome is test-blocking if it is not greater than free npc action.
+
+Definition: an outcome (called event) is immediately testable if it is still testable and it is not test-blocking.
+
+testing effects of a test-blocking outcome: rule succeeds.
 	
 To reset (event - an outcome):
 	now success count of event is 0;
@@ -694,260 +800,349 @@ To decide whether we haven't reset every possible outcome:
 	decide on whether or not not (we reset every possible outcome).
 	
 To decide whether we haven't reset (event - an outcome):
-	report an iteration because "checking one outcome -";
+	if event is boring lack of results:
+		no;
+	now event is not just-succeeded;
+	if event is not preset, report an iteration because "checking one outcome -";
 	if event is not resolved, yes; [different from "every possible" version - it makes sure the loop runs at least once]
-	if the event has unresolved dependents:
-		if event is not just-succeeded:
-			yes; [keep looping until success if there are dependents]
+	if the event has unresolved dependents, yes;
 	repeat with item running through dependent outcomes:
 		reset item;
-	reset event;
+	Let blocker be event;
+	While blocker is not boring lack of results:
+		if blocker is resolved and not (blocker has unresolved dependents):
+			reset blocker;
+		now blocker is the antecedent of blocker;
 	no.
-		
-Section - Testing Outcomes
 
-[TODO: Normalize regex matches against event description so we can use a brief consistent phrase. ]
+[use this phrase for outcomes that might not be possible yet, but should be]
+[We must be aware of the special meaning of "boring lack of results" when it is an antecedent. It gives default behavior to outcomes,
+but default behavior is different depending on whether an outcome is preset or not.
 
-To decide whether (event - an outcome) timed out:
-	decide on whether or not the attempt count of the event is not less than the maximum attempts of the event;
-		
-To decide what number is the expected successes of (event - an outcome) after (attempts - a number):
-	if the minimum attempts of the event is 0, decide on likelihood of the event;
-	decide on (likelihood of the event * attempts) / minimum attempts of the event;
+Preset outcomes that depend on boring lack of results are independent - they have no blockers.
 
-To resolve (event - an outcome):
-	Let the tolerance be the maximum tolerance of the event;
-	Let target be the expected successes of the event after the maximum attempts of the event;
-	let the upper bound be target + tolerance;
-	let the lower bound be (target - tolerance)  - maximum attempts of the event + attempt count of the event;
-	if the success count of the event is less than the lower bound or the success count of the event is greater than the upper bound:
-		[achievement is impossible within the maximum number of attempts]
-		now the state of event is outcome-failed;
-		assert "After [attempt count of the event] attempt[s], [the event] happened [success count of the event] times (not between [lower bound] and [upper bound] of target [target] for maximum attempts [maximum attempts of event] with tolerance [tolerance])" based on false;
-	otherwise if the attempt count of the event is at least the minimum attempts of the event:
-		now the tolerance is (tolerance * attempt count of the event) / maximum attempts of the event;
-		now target is expected successes of the event after the attempt count of the event;
-		now the upper bound is the target + tolerance;
-		now the lower bound is the target - tolerance;
-		if likelihood of the event is at least 1 and lower bound is less than 1:
-			say "Programming error: I don't think this code should be needed.";
-			now lower bound is 1;
-		if the success count of the event is at least lower bound and the success count of the event is at most upper bound:
-			now the state of event is outcome-achieved;
-			assert "success" based on true;
+Non-preset outcomes that depend on boring lack of results follow sequential behavior. In practice, they are blocked by the outcome that comes before them AND by the entire dependency tree attached to that outcome. 
 
-[
-failure tolerance: no way end result will be within tolerance.
+This is complicated by the fact that outcomes depending on "restarting for tests" are considered primary - playthroughs that start when the game is rebooted and end when the next test set is encountered. The primary outcome is set when we reboot. We can't run a sequential step unless its immediate precursor belongs to the same primary outcome.
 
-eg 1 in 15 with 200 attempts
-success-target=13
-tolerance=9
-maximum failures=200-13-9=178
-(max success=22, min success=4)
+Most of these rules are unimportant except when starting the game. At that point we must search through all the outcomes until we find the primary outcome.]
 
-necessary success = min success - maximum attempts + attempts
-at 196 attempts:
-4 - 200 + 196 = 0
-at 197:
-4 - 200 + 197 = 1
+To decide whether (event - an outcome) is testable after (previous event - an outcome):
+	unless the event has unresolved dependents or the event is not resolved, no;
+	if event is preset and event is untested, no;
+	if the primary outcome is boring lack of results and the previous event is not the antecedent of event, no;
+	if the antecedent of the event is boring lack of results, yes;
+	if the antecedent of the event is not just-succeeded, no;
+	transcribe "DEBUG: ready to test [event]? - unresolved, has just-succeeded antecedent, [state of event]";
+	if the antecedent of the event is preset, decide on whether or not the event is possible;
+	transcribe "DEBUG: ready to test [event] - unresolved, has just-succeeded not preset antecedent"; 
+	yes;
+	
+[Side effects:
+	
+Sets the primary outcome
+Resets the last event if all of its dependency tree is resolved
+
+Returns:
+	
+The next "not scheduled anonymously" outcome that should be scheduled as "the scheduled outcome"
+
+(that outcome may have preset antecedents we need to schedule first)
 ]
-	
-To resolve dependents of (event - an outcome):
-	if the state of the event is outcome-failed or the event timed out:
-		if the event has unresolved dependents:
-			Repeat with item running through dependent not resolved outcomes:
-				[if the event failed, dependents fail silently. If the event succeeded, they fail noisily]
-				if state of the event is outcome-achieved, assert "[item] ([success count of item]/[attempt count of item]) stalled because [event] timed out after [attempt count of event - 1] attempt[s]" based on false;
-				now state of item is outcome-failed;
-			
-To test (event - an outcome) against (success - a truth state):
-	if we make the event testable:
-		increment attempt count of the event;
-		if success is true:
-			increment success count of the event;
-		if event is resolved:
-			resolve dependents of the event;
-		otherwise:
-			resolve event;
-		[There is a subtle conflict between "success count" and "just-succeeded". "success count" is the number of times the "success" condition was met. However, if likelihood is 0, this is not really a success - it will result in a positive "error" during resolution. On the other hand, just-succeeded is only true if we got a desirable result, even if that result is false (as it should be in the case of likelihood=0). Feel free to suggest better names for these two variables]
-		if success is (whether or not likelihood of the event is greater than 0), now the event is just-succeeded;
-
-To test (event - an outcome) against (T - a text):
-	update the event description because "testing [event] against '[T]'"; [todo - roll this into a text-testing phrase?]
-	[TODO: include event description in failure report]
-	test event against whether or not the event description matches the regular expression T;
-
-To fail (event - an outcome) based on (result - a truth state):
-	now likelihood of event is 0;
-	test event against result;
-		
-To fail (event - an outcome) on result (T - a text):
-	[TODO: don't test regexp if we're going to ignore the test result]
-	update the event description;
-	fail event based on whether or not the event description matches the regular expression T;
-	
-To achieve (event - an outcome) based on (result - a truth state):
-	now likelihood of event is 1;
-	now minimum attempts of event is 0;
-	test event against result;
-			
-To achieve (event - an outcome) on result (T - a text):
-	update the event description;
-	achieve event based on whether or not the event description matches the regular expression T;
-	
-[TODO: combat round tests]
-
-Section - Generating Actions
-
-For taking a player action when the scheduled event is not the normal keyboard input (this is the test step player action rule):
-	if the player is at-React:
-		follow the choosing a player reaction rules;
+To decide which outcome is the outcome after we reset (the last event - an outcome):
+	Let the next event be the outcome after the last event;
+	transcribe "DEBUG: finding the outcome after [the last event], starting with [the next event]";
+	while the next event is not boring lack of results:
+		if the next event is testable after the last event:
+			if the next event is scheduled anonymously:
+				decide on the next event;
+			otherwise:
+				break;
+		now the next event is the outcome after the next event;
+	if we haven't reset the scheduled event: [are repeats needed?]
+		transcribe "DEBUG: repeating scheduled event [the scheduled event]";
+		decide on the scheduled event; [yes - go back and repeat]
 	otherwise:
-		follow the choosing a player action rules;
-		now the scheduled event is generated;
-		
-The test step player action rule is listed first in the for taking a player action rulebook.
-		
-A test step has an object called the location-target.
+		transcribe "DEBUG: moving on to [the next event]";
+		decide on the next event; [no - we can move on now]
 
-To decide which room is the action-destination of (current move - a test step):
-	Let the current destination be the location-target of the current move;
-	if the current destination is nothing, decide on Null-room;
-	if the current destination is a room, decide on the current destination;
-	decide on the location of the current destination.
+Section - Scheduling
 
-A test step can be extracting.
-
-Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-moving towards the destination	"finding a route from [the location] to [the location-target of the scheduled event][if the location-target of the scheduled event is not the action-destination of the scheduled event](in [the the action-destination of the scheduled event])[end if]"	1	1
-compelling an action	"[the compelled action]"	1	1
-reacting to compelled action	""	1	1
-
-For taking a player action (this is the move to the destination of a test step rule):
-	if the player is at-React:
-		make no decision;
-	Let the place be the action-destination of the scheduled event;
-	if the place is the location:
-		update event description because "arrived at destination [the place] for";
-	if the place is Null-room or the place is the location:
-		make no decision;
-	if the scheduled event is extracting:
-		extract the player to the place;
-		generate the action of waiting;
-		rule succeeds;
-	Now the way-to-get-there is the best route from the location to the place;
-	Now the way-to-get-back is the opposite of the way-to-get-there;
-	fail moving towards the destination based on whether or not the way-to-get-there is not a direction;
-	if the way-to-get-there is a direction, generate the action of going the way-to-get-there;
-		
-The move to the destination of a test step rule is listed before the test step player action rule in the for taking a player action rulebook.
-
-Choosing a player action is a rulebook. The choosing a player action rules have default success.
-
-Last choosing a player action rule (this is the wait by default rule):
-	generate the action of waiting.
-
-Choosing a player reaction is a rulebook. The choosing a player reaction rules have default success.
-
-First choosing a player reaction (this is the track reaction to compelled action rule):
-	if reacting to compelled action is possible, achieve reacting to compelled action based on true;
-	make no decision;
+To decide whether testing (T - an outcome):
+	if done testing is true, no;
+	if T is not still testable, no;
+	if the antecedent of T is restarting for tests:
+		decide on whether or not T is the primary outcome;
+	yes;
 	
-To decide whether waiting for player reaction:
-	if waiting for compelled action, yes;
-	decide on whether or not reacting to compelled action is possible;
+To decide whether testing (T - an outcome) next:
+	unless testing T, no;
+	decide on whether or not T is the blocking event;
 
-[I7 names borrowed from Ron Newcomb's Original Parser]
-The action in progress is an action name that varies. 
-The person requesting is a person that varies. 
-The action in progress variable translates into I6 as "action".
-The person requesting variable translates into I6 as "act_requester".
+To decide whether testing (D - a description of outcomes):
+	Repeat with T running through D:
+		if testing T, yes;
+	no.
 
-To begin the current action: (- BeginAction(action, noun, second); -)
+[initial scheduling rules don't ever run for preset outcomes]
 
-To generate (the desired action - a stored action):
-	transcribe "Player [if the player is at-react]re[end if]action: [the desired action]";
-	now the action in progress is the action name part of the desired action;
-	now the person asked is the actor part of the desired action;
-	[now the person requesting is nothing;] [not allowed in I7?]
-	if the person asked is not the player, now the person requesting is the player;
-	now the noun is the noun part of the desired action;
-	now the second noun is the second noun part of the desired action;
-	begin the current action;
-	
-The compelled action is a stored action that varies. The compelled action is the action of waiting.
+Initial scheduling rules are an outcome based rulebook.
 
-A test step can be npc-suppressing or npc-enabling. A test step is usually npc-suppressing. Normal keyboard input is npc-enabling.
+[Initial scheduling for a test step (this is the reset act counts rule):
+	repeat with guy running through people:
+		now the act count of guy is 0;]
+			
+regular scheduling rules are an outcome based rulebook.
 
-Suppress npc action is a truth state that varies.
+rescheduling is a truth state that varies.
 
-First initial scheduling rule for a test step (called current move) (this is the enable npc actions rule):
-	now suppress npc action is whether or not current move is npc-suppressing;
-	
-To make everyone wait:
-	transcribe "suppressing NPC actions";
-	now suppress npc action is true;
-	
-To let everyone act:
-	transcribe "enabling NPC actions";
-	now suppress npc action is false;
-	
-To compel (the desired action - a stored action):
-	Let the guy be the actor part of the desired action;
-	transcribe "compelling [the desired action][if the guy is asleep] and waking up [the guy]";
-	now the guy is not asleep;
-	Now the compelled action is the desired action;
-	make compelling an action possible;
-	
-To decide whether waiting for compelled action:
-	decide on whether or not compelling an action is possible;
-	
-To forget the/-- compelled action:
-	if the compelled action is not the action of waiting:
-		achieve compelling an action based on true;
-		now the compelled action is the action of waiting;
-	
-The automated menu question answer is a number that varies.
+The scheduled event is an outcome that varies. The scheduled event is boring lack of results.
 
-First for reading a command when the automated menu question answer is greater than 0:
-	change the text of the player's command to "[the automated menu question answer]".
+[the first outcome that needs testing.
+Since dependencies must ALWAYS be in numerical order, the first one will be the root of the dependency tree.
+Because of the default behavior of "boring lack of results," sometimes this will not be a true antecedent
+of something else that is waiting.
+For example:
+	if the scheduled action compels an action, compelling an action will depend on waiting for a turn.
+	But the scheduled action may not have an antecedent.
+]
+The blocking event is an outcome that varies. The blocking event is boring lack of results.
+[To decide which outcome is the blocking event:
+	Let the blocker be the scheduled event;
+	If the antecedent of the blocker is boring lack of results:
+		Repeat with event running through outcomes:
+			if event is possible:
+				now blocker is the event;
+	While the antecedent of blocker is not boring lack of results:
+		now blocker is the antecedent of blocker;
+	decide on blocker;]
+				
+[The scheduled event is the earliest event that can be repeated. We test it and all its dependents together. It often has major side effects,
+like taking a turn. Its antecedent is always a preset - restarting for tests if it's the beginning of a set, or boring lack of results if
+no antecedent has been specified.]
 
-To select menu question answer (N - a number):
-	transcribe "Selecting answer [N]";
-	now the automated menu question answer is N;
-	carry out the reading a command activity;
-	now the automated menu question answer is 0;
+[This phrase does the following things:
 
-A Standard AI rule for a person (called P) (this is the compel an action rule):
-	if P is at-Act and the actor part of the compelled action is P:
-		try the compelled action;
-		if the action name part of the compelled action is the attacking action:
-			if the noun part of the compelled action is the player:
-				make reacting to compelled action possible;
-		forget the compelled action;
-		rule succeeds;
+Set the scheduled event to the first non-preset outcome to test (the event, most likely)
+Make the scheduled event and all its antecedents possible
+Run scheduling rules for the 
+Return the first (preset or non-preset) outcome to test
+]
 
-A Standard AI rule for a person (called P) (this is the suppress actions rule):
-	if suppress npc action is true:
-		if P is at-react:
-			transcribe "allowing [P] to react";
+To update the schedule with (event - an outcome):
+	if event is boring lack of results:
+		transcribe and stop capturing because "boring lack of results was the new event of";
+		say line break;
+		start capturing text;
+	otherwise:
+		now rescheduling is true;
+		make event testable;
+		if event is not scheduled anonymously:
+			now the scheduled event is event;
+		if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
+			now the blocking event is the event;
+			if attempt count of the event is 0:
+				now rescheduling is false;
+				if the event is the scheduled event, log "  next step:  [the scheduled event]";
+				follow the initial scheduling rules for the event;
+			follow the regular scheduling rules for the event;
 		otherwise:
-			transcribe "suppressed action for [P]";
-			rule succeeds;
+			update the schedule with the antecedent of the event.
+			
+[To update the schedule with (the event - an outcome):
+	Let blocker be the event;
+	transcribe "DEBUG: updating schedule with [event] - scheduled event: [scheduled event] - blocking event: [blocking event]";
+	if the event is boring lack of results:
+		transcribe and stop capturing because "boring lack of results was the new event of";
+		say line break;
+		start capturing text;
+	otherwise:
+		now rescheduling is true;
+		while the blocker is not boring lack of results:
+			make the blocker testable;
+			if the blocker is not scheduled anonymously:
+				[at any time, there should only be one possible event not scheduled anonymously]
+				now the scheduled event is the blocker;
+				break;
+			otherwise if the antecedent of the blocker is preset and the antecedent of the blocker is just-succeeded:
+				[don't need to go back any further]
+				break;
+			now the blocker is the antecedent of the blocker;
+		if the attempt count of the blocker is 0:
+			now rescheduling is false;
+			if the blocking event is the scheduled event, log "  next step:  [the scheduled event]";
+			follow the initial scheduling rules for the blocker;
+		follow the regular scheduling rules for the blocker;
+	transcribe "DEBUG: after updating schedule with [event] - scheduled event: [scheduled event][if the blocker is not the scheduled event] (blocked by [blocker])[end if] - blocking event: [blocking event]";]
 	
-The suppress actions rule is listed before the insane people attack themselves rule in the standard AI rulebook.
+To schedule (the event - an outcome):
+	update the schedule with the event;
+	transcribe "DEBUG: scheduling [event] - scheduled event: [scheduled event] - blocking event: [blocking event]";
+	While the blocking event is immediately testable:
+		transcribe "DEBUG: immediately testing [blocking event] - scheduled event: [scheduled event] - blocking event: [blocking event]";
+		test effects of the blocking event;
+		update the schedule with the outcome after we reset the blocking event;
+		
+To test effects of (event - an outcome):
+	if we haven't reset the event:
+		update the event description because "testing effects of";
+		follow the testing effects rules for the event;
+		let success be whether or not the rule succeeded;
+		clear event description because "done testing effects of";
+		test the event against success;
+		
+To test (event - an outcome) and continue scheduling:
+	test effects of event;
+	schedule the outcome after we reset the event;
+	
+Before taking a player action when the blocking event is still testable (this is the test event effects rule): [TODO make this a combat round rule?]
+	[Let repeat be whether or not (the scheduled event is repeatable) and (the repeated moves > 0);]
+	[now the scheduled event is not generated; todo: this happens when an outcome compels an action]
+	transcribe "DEBUG: after turn, scheduled event [the scheduled event] is [state of scheduled event], blocking event [the blocking event] is [state of blocking event]";
+	test the blocking event and continue scheduling;
 
-The compel an action rule is listed before the suppress actions rule in the standard AI rulebook.
+[TODO: "unblock" phrase that compares the blocking event against a particular outcome?]
 
-Last choosing a player reaction:
-	generate the action of waiting.
+Chapter - Starting Tests
 
-Chapter - Testing Dungeon Generation
+The primary outcome is an outcome that varies.
+
+To decide what number is (T - an outcome) as a number: (- {T} -);
+To decide what outcome is (T - a number) as an outcome: (- {T} -);
+
+Done testing is a truth state that varies.
+	
+The file of noninteractive tests is called "noninteractivetests".
+
+The run the unit tests rule is listed before the load achievements rule in the before showing the title screen rules.
+
+Before showing the title screen (this is the run the unit tests rule):
+	transcribe "DEBUG: run the unit tests rule";
+	now allowing screen effects is true;
+	if the file of test set queue exists:
+		read file of test set queue into Table of Test Set Queue;
+	Let remaining tests be 0;
+	if the number of filled rows in Table of Test Set Queue is at least 1:
+		choose row 1 in Table of Test Set Queue;
+		if there is an unresolved count entry, now remaining tests is the unresolved count entry;
+	if remaining tests is at least 1:
+		transcribe "loading [the remaining tests] unresolved outcomes";
+		load test outcomes;
+	if the file of test results exists:
+		read file of test results into Table of Test Results;
+	if the file of noninteractive tests exists:
+		if screen reader mode is unset:
+			enable screen reader mode;
+		if the remaining tests is 0:
+			try all-test queueing;
+	if remaining tests is 0:
+		display test results;
+		now done testing is true;
+	otherwise:
+		now roguelike mode is false;
+
+First for showing the title screen when done testing is false:
+	do nothing.
+
+First after showing the title screen (this is the run all tests rule):
+	if done testing is true, make no decision;
+	transcribe and stop capturing because "restarting with";
+	now allowing screen effects is false;
+	Choose row 1 in Table of Test Set Queue;
+	if the random-seed entry is not 0:
+		log "Seeding random number generator and dungeon generation with [random-seed entry]";
+		now the dungeon generation seed is the random-seed entry;
+		seed the random-number generator with the random-seed entry;
+	log "Completed so far: [grand test summary], with [number of filled rows in Table of Test Set Queue] set[s] left to test";
+	Repeat through Table of Test Results:
+		if failures entry > 0:
+			log "  [failures entry] failures in [test set entry]";
+	[TODO: handle interaction between test config file and scenario]
+	start capturing text;
+	test effects of restarting for tests;
+	Now the primary outcome is the outcome after we reset restarting for tests; [setting the primary outcome]
+	update the schedule with the primary outcome;
+	follow the scenario rules for the primary outcome;
+	
+The scenario rules are an outcome based rulebook.
+	
+A last startup rule (this is the keep using the xorshift generator for automated tests rule):
+	if done testing is false:
+		now the xorshift seed is the dungeon generation seed.
+
+[Prevent the status window from opening]	
+The check info panel capacity rule does nothing when done testing is false.
+	
+Chapter - Commands to Start Tests
+
+Test queueing is an action out of world applying to one outcome. Understand "queue test [outcome]" as test queueing.
+
+Carry out test queueing an outcome:
+	say "[The outcome understood] will run now.";
+	queue the outcome understood;
+	start test transcript with "[the outcome understood]";
+	
+All-test queueing is an action out of world applying to nothing. Understand "queue test all" as all-test queueing.
+
+Carry out all-test queueing:
+	queue all automated tests;
+	say "All automated tests will run now.";
+	start test transcript with "all tests".
+		
+To start test transcript with (T - a text):
+	unless the file of noninteractive tests exists:
+		pause the game;
+	write "Test transcript for Kerkerkruip: [T].[line break]" to file of test transcript;
+	start the next test;
+	
+	
+Understand "queue test/tests" and "queue test [text]" as a mistake ("You can 'queue test all' or test one of the following sets: [list automated tests]").
+
+To say list automated tests:
+	repeat with T running through enabled outcomes:
+		say "[line break][T]";
+	say paragraph break.
+
+Chapter - Resetting the Game After Each Test Set (in place of Chapter - The Unit test rules unindexed in Simple Unit Tests by Dannii Willis)
+
+To start the/-- next test:
+	schedule restarting for tests.
+	
+Regular scheduling of restarting for tests:
+	choose row 1 in Table of Test Set Queue;
+	now the unresolved count entry is the number of possible outcomes;
+	if the random-seed entry is not 0:
+		if the dungeon generation seed is 0:
+			increment the random-seed entry;
+		otherwise:
+			now the xorshift seed is the dungeon generation seed;
+			Let throwaway result be a random number from 1 to 2;
+			transcribe "advancing random seed to [the xorshift seed]";	
+			now the the random-seed entry is the xorshift seed;
+	transcribe "restarting with random seed [random-seed entry] testing [if the primary outcome is possible][current test description][otherwise][the list of possible enabled outcomes][end if]";
+	save test outcomes;
+	write file of test set queue from Table of Test Set Queue;
+	if file of save data exists:
+		delete file of save data;
+	transcribe and stop capturing because "starting the next test after";
+	restart immediately.
+
+For reading a command when done testing is false (this is the finish primary outcome rule):
+	transcribe and stop capturing text because "finished all tests for set of";
+	write file of test results from Table of Test Results;
+	start the next test;
+	
+Before printing the player's obituary when done testing is false (this is the abort the primary outcome if game over rule):
+	record failure report "the player died";
+	transcribe and stop capturing because "game over at";
+	write file of test results from Table of Test Results;
+	start the next test.
+		
+[Chapter - Testing Dungeon Generation
 
 The generation test rules is a rulebook.
 
-[Generation test rules may test outcomes - if they are left unresolved, the game will restart and they'll be tested again]
+Generation test rules may test outcomes - if they are left unresolved, the game will restart and they'll be tested again]
 
 [the generation count is a number that varies.
 the generation minimum is a number that varies.
@@ -978,6 +1173,14 @@ The test assertion count is a number variable.
 The total assertion count is a number variable.
 The assertion failures count is a number variable.
 
+To decide whether result includes (T - a text):
+	update event description because "checking if result includes '[T]'";
+	decide on whether or not the event description matches the regular expression T;
+	
+To decide whether result does not include (T - a text):
+	update event description because "checking if result does not include '[T]'";
+	decide on whether or not not (the event description matches the regular expression T);
+
 [ Assert that two values are the same ]
 To assert that/-- (A - a value) is (B - a value):
 	assert that A is B with label "value";
@@ -993,7 +1196,8 @@ To assert (T - a text) based on (C - a truth state):
 	record a test attempt;
 	unless C is true:
 		record a failure report of T;
-	
+
+[	
 To succeed based on (result - a truth state) within (N - a number) attempts:
 	Now description of generic reusable event is "test step [the scheduled event]";
 	Now maximum attempts of generic reusable event is N;
@@ -1025,7 +1229,8 @@ To fail on result (R - a text) within (N - a number) attempts:
 	
 To fail on result (R - a text):
 	fail on result R within 100 attempts;
-		
+]
+
 To assert result (pattern - a text):
 	update event description because "testing for result '[pattern]'";
 	assert that the event description includes pattern;
@@ -1162,39 +1367,26 @@ To travel sneakily to (place - a room):
 			
 previously-fast is a truth state that varies.
 
-A test step can be hiding-check.
+[A test step can be hiding-check.
 
 A test step can be hidden-traveling. A hiding-check test step is usually hidden-traveling.
 
 initial scheduling for a test step (called the current move):
 	now traveling sneakily is whether or not the current move is hidden-traveling;
 	if traveling sneakily is true, force the fuligin cloak to work;
+]
 	
 After taking a player action (this is the assume all actions are fast until every turn runs rule):
 	now previously-fast is true;
 	
 First every turn (this is the remember if the last turn took time rule):
 	now previously-fast is false;
-
-[start-of-turn combat is a truth state that varies.
-
-After taking a player action when the scheduled event is a hiding-check test step: 
-	now opposition test subject is the player;
-	Now start-of-turn combat is whether or not the location encloses an opposer person;]
 	
+[
 testing effects for a hiding-check test step (called the current move):
 	[a move can be hiding-check and hiding-reveal if it involves sneaking to a location and then revealing yourself]
 	if the current move is hiding-reveal, make no decision;
 	assert "the player should be hidden" based on whether or not the player is hidden;
-	[ These tests are too slow, and they run way too often.
-	if start-of-turn combat is false, make no decision;
-	if previously-fast is true, make no decision;
-	Now opposition test subject is the player;
-	if the location encloses a not asleep opposer person:
-		assert that the event description includes ", which must be positive\. You remain hidden\.|([doesn't see you pattern])";
-	repeat with guy running through asleep opposer persons in the location:
-		if the act count of guy is at least 1:
-			assert that the event description includes "[The guy] sleeps peacefully";]
 
 A test step can be hiding-reveal.
 
@@ -1203,11 +1395,11 @@ Choosing a player action when testing a hiding-reveal test step (this is the hid
 	generate the action of taking off the fuligin cloak.
 
 Testing effects of a hiding-reveal test step:
-	assert "The player should not be hidden" based on whether or not the player is not hidden.
+	assert "The player should not be hidden" based on whether or not the player is not hidden.]
 
 Section - Counting Actions
 
-A person has a number called the act count;
+[A person has a number called the act count;
 
 [TODO: replace these counters with outcomes?]
 
@@ -1219,7 +1411,7 @@ A first combat round rule (this is the test combat round of previous main actor 
 A combat round rule (this is the count combat actions rule):
 	increment the act count of the main actor;
 
-The count combat actions rule is listed before the dreadful presence effect rule in the combat round rules.
+The count combat actions rule is listed before the dreadful presence effect rule in the combat round rules.]
 	
 Section - The reusable item
 
@@ -1229,7 +1421,7 @@ Before taking a player action:
 	if the reusable item is a thing and the reusable item is not carried:
 		now the player carries the reusable item;
 	
-A test step can be item-reading.
+[A test step can be item-reading.
 
 Choosing a player action when testing an item-reading test step:
 	generate the action of reading the reusable item.
@@ -1238,12 +1430,13 @@ A test step can be item-throwing.
 
 Choosing a player action when testing an item-throwing test step:
 	generate the action of throwing the reusable item.
+]
 
 Section - Occupied and Unoccupied
 
 Definition: A room is occupied rather than unoccupied if it encloses a person.
 
-Section - Counting Hits
+[Section - Counting Hits
 
 [TODO: get rid of this? we can use outcomes instead]
 
@@ -1267,6 +1460,7 @@ A last initial scheduling rule (this is the reset hitting counts when scheduling
 	
 A first sudden combat reset rule for the player (this is the reset hitting counts before extracting the player rule):
 	reset hitting counts;
+]
 
 Section - Diggable
 
@@ -1429,6 +1623,7 @@ outcome	description	likelihood	minimum attempts	antecedent
 combat hit	""	1	1	--
 after-combat-hit	""	1	1	combat hit
 
+
 To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in (likelihood - a number) out of (total tries - a number) attempts, checking damage:
 	if combat hit is untested:
 		reset after-combat-hit;
@@ -1491,6 +1686,9 @@ To have (guy - a person) defeat (loser - a person):
 	Now the health of loser is -1;
 	Have an event of guy killing loser;	
 	
+Table of Outcomes (continued)
+outcome
+Final Preset Outcome
 
 Automated Testing ends here.
 
@@ -1628,7 +1826,7 @@ By default, all (non-compelled) NPC actions are suppressed during tests. In the 
 	
 We can also enable AI actions manually with the phrase:
 
-	Let everyone act;
+	Let everyone act freely;
 	
 And disable them again with:
 	
