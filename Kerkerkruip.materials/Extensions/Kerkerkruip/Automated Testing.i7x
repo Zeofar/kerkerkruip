@@ -262,19 +262,19 @@ To compel (the desired action - a stored action):
 	transcribe "compelling [the desired action][if the guy is asleep] and waking up [the guy]";
 	now the guy is not asleep;
 	Now the compelled action is the desired action;
-	Schedule compelling an action; [this should automatically stop and wait for a turn]
+	Schedule compelling an action, blocking; [this should automatically stop and wait for a turn]
 	
 To compel (the desired action - a stored action) as a reaction to (guy - a person):
 	transcribe "setting the compelled attacker to [the guy][if the guy is asleep] and waking [them] up";
 	now the guy is not asleep;
 	Now the compelled attacker is the guy;
 	Now the compelled action is the desired action;
-	Schedule compelling a reaction; [this should automatically stop and wait for a turn]
+	Schedule compelling a reaction, blocking; [this should automatically stop and wait for a turn]
 	
 To wait for (guy - a person) to act freely:
 	transcribe "waiting for [the guy] to act freely[if the guy is asleep] and waking [them] up";
 	now the npc test subject is the guy;
-	Schedule free npc action;
+	Schedule free npc action, blocking;
 	
 To forget the/-- compelled action:
 	now the compelled attacker is nothing;
@@ -762,12 +762,10 @@ Definition: An outcome is preset if it is not greater than the final preset outc
 Most outcomes can be tested as soon as they are scheduled, but some must wait for some game mechanics to advance - things like taking a turn and compelling an action, which take place in various rulebooks like before taking a player action and AI rules.
 
 These "test-blocking" outcomes only get tested when their special effects are executed - at which point they are guaranteed to succeed (if anything about their effects is in doubt, it should be tested by a dependent)
-]
-Definition: An outcome is test-blocking if it is not greater than free npc action.
 
-Definition: an outcome (called event) is immediately testable if it is still testable and it is not test-blocking.
+Definition: An outcome is test-blocking if it is not greater than free npc action.]
 
-testing effects of a test-blocking outcome: rule succeeds.
+Definition: an outcome (called event) is immediately testable if it is still testable and the yielding event is boring lack of results.
 	
 To reset (event - an outcome):
 	now success count of event is 0;
@@ -831,11 +829,10 @@ To decide whether (event - an outcome) is testable after (previous event - an ou
 	unless the event has unresolved dependents or the event is not resolved, no;
 	if event is preset and event is untested, no;
 	if the primary outcome is boring lack of results and the previous event is not the antecedent of event, no;
+	transcribe "DEBUG: is [event] testable after [previous event]? primary outcome: [primary outcome] antecedent: [antecedent of the event]";
 	if the antecedent of the event is boring lack of results, yes;
 	if the antecedent of the event is not just-succeeded, no;
-	transcribe "DEBUG: ready to test [event]? - unresolved, has just-succeeded antecedent, [state of event]";
 	if the antecedent of the event is preset, decide on whether or not the event is possible;
-	transcribe "DEBUG: ready to test [event] - unresolved, has just-succeeded not preset antecedent"; 
 	yes;
 	
 [Side effects:
@@ -851,7 +848,6 @@ The next "not scheduled anonymously" outcome that should be scheduled as "the sc
 ]
 To decide which outcome is the outcome after we reset (the last event - an outcome):
 	Let the next event be the outcome after the last event;
-	transcribe "DEBUG: finding the outcome after [the last event], starting with [the next event]";
 	while the next event is not boring lack of results:
 		if the next event is testable after the last event:
 			if the next event is scheduled anonymously:
@@ -860,10 +856,10 @@ To decide which outcome is the outcome after we reset (the last event - an outco
 				break;
 		now the next event is the outcome after the next event;
 	if we haven't reset the scheduled event: [are repeats needed?]
-		transcribe "DEBUG: repeating scheduled event [the scheduled event]";
+		transcribe "DEBUG: repeating scheduled event [the scheduled event] after [the last event]";
 		decide on the scheduled event; [yes - go back and repeat]
 	otherwise:
-		transcribe "DEBUG: moving on to [the next event]";
+		transcribe "DEBUG: moving on from [the last event] to [the next event]";
 		decide on the next event; [no - we can move on now]
 
 Section - Scheduling
@@ -975,9 +971,11 @@ To update the schedule with (event - an outcome):
 		follow the regular scheduling rules for the blocker;
 	transcribe "DEBUG: after updating schedule with [event] - scheduled event: [scheduled event][if the blocker is not the scheduled event] (blocked by [blocker])[end if] - blocking event: [blocking event]";]
 	
-To schedule (the event - an outcome):
+To schedule (the event - an outcome), blocking:
 	update the schedule with the event;
 	transcribe "DEBUG: scheduling [event] - scheduled event: [scheduled event] - blocking event: [blocking event]";
+	if blocking:
+		now the yielding event is the event;
 	While the blocking event is immediately testable:
 		transcribe "DEBUG: immediately testing [blocking event] - scheduled event: [scheduled event] - blocking event: [blocking event]";
 		test effects of the blocking event;
@@ -990,18 +988,30 @@ To test effects of (event - an outcome):
 		let success be whether or not the rule succeeded;
 		clear event description because "done testing effects of";
 		test the event against success;
+	if event is the yielding event:
+		now the yielding event is boring lack of results;
 		
 To test (event - an outcome) and continue scheduling:
 	test effects of event;
 	schedule the outcome after we reset the event;
+		
+the yielding event is an outcome that varies.
+
+To block scheduling:
+	Now the yielding event is the blocking event;
 	
+To yield (event - an outcome):
+	Now the yielding event is the event;
+	test the blocking event and continue scheduling;
+	
+Last testing effects of the yielding event (this is the blockers succeed by default rule):
+	if the yielding event is the blocking event, rule succeeds.
+
 Before taking a player action when the blocking event is still testable (this is the test event effects rule): [TODO make this a combat round rule?]
 	[Let repeat be whether or not (the scheduled event is repeatable) and (the repeated moves > 0);]
 	[now the scheduled event is not generated; todo: this happens when an outcome compels an action]
 	transcribe "DEBUG: after turn, scheduled event [the scheduled event] is [state of scheduled event], blocking event [the blocking event] is [state of blocking event]";
 	test the blocking event and continue scheduling;
-
-[TODO: "unblock" phrase that compares the blocking event against a particular outcome?]
 
 Chapter - Starting Tests
 
@@ -1059,8 +1069,11 @@ First after showing the title screen (this is the run all tests rule):
 			log "  [failures entry] failures in [test set entry]";
 	[TODO: handle interaction between test config file and scenario]
 	start capturing text;
+	now the yielding event is restarting for tests;
+	now the blocking event is restarting for tests;
 	test effects of restarting for tests;
 	Now the primary outcome is the outcome after we reset restarting for tests; [setting the primary outcome]
+	showme the primary outcome;
 	update the schedule with the primary outcome;
 	follow the scenario rules for the primary outcome;
 	

@@ -3273,7 +3273,7 @@ impossible-flip	39	40	400	insufficient-flip
 more-impossible	1	2	1	impossible-flip
 first-time	2	10	100	--
 after-first	2	3	30	first-time
-wrong-success	2	3	30	after-first
+wrong-success	2	3	100	after-first
 intended-failure	0	0	100	--
 unintended-success	0	0	100	--
 
@@ -3293,7 +3293,7 @@ Testing effects of after-new-flip: if a random chance of 1 in 2 succeeds, rule s
 Testing effects of insufficient-flip: if a random chance of 1 in 2 succeeds, rule succeeds.
 Testing effects of impossible-flip: rule fails.
 Testing effects of more-impossible: rule succeeds.
-Testing effects of first-time: if the attempt count of coin-flip is 1, rule succeeds.
+Testing effects of first-time: if the attempt count of first-time is 1, rule succeeds.
 Testing effects of after-first: rule succeeds.
 Testing effects of wrong-success: if a random chance of 1 in 3 succeeds, rule succeeds.
 Testing effects of intended-failure: rule fails.
