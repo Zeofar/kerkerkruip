@@ -394,12 +394,12 @@ at 197:
 To resolve dependents of (event - an outcome):
 	if the state of the event is outcome-failed or the event timed out:
 		if the event has unresolved dependents:
-			Repeat with item running through the dependents list:
-				if item is dependent and item is not resolved:
+			Repeat with item running through dependent outcomes:
+				if item is not resolved:
 					[if the event failed, dependents fail silently. If the event succeeded, they fail noisily]
 					if state of the event is outcome-achieved, assert "[item] ([success count of item]/[attempt count of item]) stalled because [event] timed out after [attempt count of event - 1] attempt[s]" based on false;
 					now state of item is outcome-failed;
-			
+
 To test (event - an outcome) against (success - a truth state):
 	make the event testable;
 	if the event is pending:
@@ -443,6 +443,9 @@ Chapter - Persistent data
 The file of test transcript is called "testtranscript".
 
 The event description is a text that varies.
+[globals to cut down on block copying, which is slow]
+The transcription reason is a text that varies. 
+Default transcription reason is a truth state that varies. Default transcription reason is true.
 
 To log (msg - a text):
 	Let T be the substituted form of msg;
@@ -469,31 +472,62 @@ To say current test description:
 		say "'[event]' [success count of event]/[attempt count of event] times | ";
 	say "([test assertion count] assertions)";
 	
+To decide whether the captured text is empty: (- (captured_text-->0 == 0) -)
+
+To flush to transcript:
+	unless the captured text is empty:
+		append "[the captured text]" to file of test transcript;
+		if default transcription reason is true:
+			transcribe "transcribed during [current test description]";
+		otherwise:
+			transcribe "[transcription reason] [current test description]";
+			now default transcription reason is true;
+	start capturing text; [and clear the captured text]
+
 To update the/-- event description/--:
-	update the event description because "transcribe and stop capturing";
+	if text capturing is active:
+		if default transcription reason is true:
+			now transcription reason is "updated event description -";
+			now default transcription reason is false;
+		stop capturing text;
+		unless the captured text is empty:
+			now the event description is the substituted form of "[the event description][the captured text]";
+		flush to transcript;
 	
 To update the/-- event description because (reason - a text):
-	if text capturing is active: [is this necessary to check? Is it a good idea?]
-		stop capturing text;
-		if "[the captured text]" matches the regular expression ".":
-			now the event description is the substituted form of "[the event description][the captured text]";
-			append "[the captured text]" to file of test transcript;
-			transcribe "[reason] [current test description]";
-		start capturing text; [and clear the captured text]
+	if text capturing is active:
+		now default transcription reason is false;
+		now transcription reason is reason;
+	update event description;
 	
 To transcribe and stop capturing text/--:
-	transcribe and stop capturing because "transcribe and stop capturing";
+	if text capturing is active:
+		if default transcription reason is true:
+			now transcription reason is "stopped capturing -";
+			now default transcription reason is false;
+		update the event description;
+		stop capturing text;
 	
 To transcribe and stop capturing text/-- because (reason - a text):
-	update the event description because reason;
-	stop capturing text;
+	if text capturing is active:
+		now default transcription reason is false;
+		now transcription reason is reason;
+		transcribe and stop capturing.
 	
 To clear the/-- event description:
-	clear the event description because "clearing the event description";
+	if text capturing is active:
+		if default transcription reason is true:
+			now transcription reason is "cleared event description -";
+			now default transcription reason is false;
+		stop capturing text;
+		flush to transcript;			
+	now the event description is "";
 	
 To clear the/-- event description because (reason - a text):
-	if text capturing is active, update the event description because reason;
-	now the event description is "";
+	if text capturing is active:
+		now transcription reason is reason;
+		now default transcription reason is false;
+		clear event description;
 			
 The file of test results is called "testresults".
 
@@ -713,7 +747,6 @@ Section - Controlling Outcomes
 
 The dependency test outcome is an outcome that varies. The dependency test outcome is boring lack of results.
 The dependency test root is an outcome that varies. The dependency test root is boring lack of results.
-The dependents list is a list of outcomes that varies.
 
 [The phrase below returns true if another outcome depends on the event, and also sets the dependency test outcome so we can use the "dependent" adjective
 
@@ -728,27 +761,13 @@ When scheduling happens, everything in the "trunk" will be manually made possibl
 ]
 
 To decide whether (event - an outcome) has unresolved dependents:
-	if the dependency test outcome is not the event:
-		Let root be event;
-		While the antecedent of root is not boring lack of results:
-			now root is the antecedent of root;
-		if root is not the dependency test root:
-			cache dependency for root;
-		now the dependency test outcome is event;
-	Repeat with item running through the dependents list:
+	now the dependency test outcome is the event;
+	Repeat with item running through dependent outcomes:
 		if event is preset:
 			if item is possible and item is dependent, yes;
 		otherwise:
 			if item is not resolved and item is dependent, yes;
-	no;
-	
-To cache dependency for (event - an outcome):
-	now the dependency test root is event;
-	now the dependency test outcome is the event;
-	now the dependents list is {};
-	Repeat with item running through outcomes:
-		if item is dependent:
-			add item to the dependents list;
+	no.
 	
 Definition: an outcome (called event) is dependent:
 	Let candidate be the event;
@@ -782,9 +801,9 @@ Definition: an outcome is scheduled anonymously if it is preset or the anteceden
 Definition: an outcome is test set if the antecedent of it is restarting for tests.
 Definition: an outcome is test step if it is not preset and the antecedent of it is boring lack of results.
 
-Definition: An outcome is enabled if the antecedent of it is restarting for tests.
+Definition: An outcome is enabled if it is a test set.
 
-The first test set is an outcome that varies.
+The first test set is an outcome that varies. The first test set is boring lack of results.
 The next test set is an outcome that varies.
 
 To find test sets:
@@ -810,8 +829,6 @@ To decide which outcome is the test set of (event - an outcome):
 	While event is not boring lack of results and event is not a test set:
 		now event is the outcome before event;
 	decide on event;
-
-The first test set is an outcome that varies. The first test set is boring lack of results.
 
 Definition: An outcome (called event) is preset:
 	if the first test set is boring lack of results:
@@ -870,9 +887,10 @@ To decide whether we haven't reset (event - an outcome):
 	While the antecedent of root is not boring lack of results and not (antecedent of root has unresolved dependents):
 		Now root is the antecedent of root;
 	if root has unresolved dependents:
-		[this should never happen, but the phrase returns something so we test it]
+		[we call this phrase to set the dependency test outcome - it should never be true, but the phrase returns a value so we test it]
+		[TODO: set the dependency test outcome directly without testing - are there risks?]
 		yes;
-	repeat with item running through the dependents list:
+	repeat with item running through outcomes:
 		if item is dependent, reset item;
 	reset root;
 	Repeat with item running through not pending resolved preset outcomes:
@@ -1031,10 +1049,11 @@ To continue scheduling:
 
 
 To test effects of (event - an outcome):
-	update the event description because "testing effects of [event] - ";
+	update event description because "testing effects of [event] -";
 	follow the testing effects rules for the event;
 	let success be whether or not the rule succeeded;
-	if event is the scheduled event, clear event description because "done testing effects of [event] - ";
+	if event is the scheduled event:
+		update event description because "done testing effects of [event] -";
 	test the event against success;
 
 Before taking a player action when the blocking event is not boring lack of results (this is the test event effects rule): [TODO make this a combat round rule?]
