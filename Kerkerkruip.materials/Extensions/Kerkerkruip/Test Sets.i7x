@@ -1541,7 +1541,8 @@ Scenario for blessed-grenade-test:
 	
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	maximum attempts	antecedent
-blessed-grenade-test	1	0	400	restarting for tests
+blessed-grenade-test	0	1	1	restarting for tests
+getting-blessed	1	0	400	--
 no-extra-blessed	0	400	400	--
 throwing-blessed	1	0	10	--
 no-new-blessed	0	400	400	--
@@ -1554,8 +1555,8 @@ initial scheduling of blessed-grenade-test:
 	Now every thing is not rusted;
 	extract the player to the alchemical laboratory, making sure it is unoccupied;
 	
-regular scheduling of blessed-grenade-test: produce a grenade.
-testing effects of blessed-grenade-test: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
+regular scheduling of getting-blessed: produce a grenade.
+testing effects of getting-blessed: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
 	 
 regular scheduling of no-extra-blessed: produce a grenade.
 testing effects of no-extra-blessed: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
@@ -2198,21 +2199,22 @@ choosing a player action when testing sleepy-slaying:
 testing effects of sleepy-slaying:
 	assert result "fog of sleep";
 	assert that the player is fully alert.
-
+]
 
 Section - bug 244
 
 [This test is not catching the bug I saw. I have no idea how to reproduce it.]
 [TODO: roll this into another dungeon generation test set]
 
-bug-244 is a test set.
 
 Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-mausoleum-placed	""	20	20
+outcome	likelihood	minimum attempts	antecedent
+bug-244	0	20	restarting for tests
+mausoleum-placed	20	20	bug-244
+mausoleum-secret	20	20	bug-244
 
 
-Scenario when testing bug-244:
+Scenario for bug-244:
 	now generation info is true;
 	now the rarity of the mausoleum is 0;
 
@@ -2223,10 +2225,10 @@ Map approval rule when testing bug-244 (this is the only approve secret mausoleu
 	if the path is a direction:
 		rule fails;
 	
-Generation test when testing bug-244:
-	test mausoleum-placed against whether or not the mausoleum is placed;
-	assert "The mausoleum should be marked secretly placeable" based on whether or not the mausoleum is secretly placeable;
-	
+Testing effects of mausoleum-placed: if the mausoleum is placed, rule succeeds;
+Testing effects of mausoleum-secret: if the mausoleum is secretly placeable, rule succeeds;
+
+[	
 Section - Bug 301 Redux
 
 bug-301-aite is a test set.

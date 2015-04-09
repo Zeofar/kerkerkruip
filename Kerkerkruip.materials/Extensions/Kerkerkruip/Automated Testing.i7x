@@ -917,7 +917,8 @@ To decide whether (event - an outcome) is testable after (previous event - an ou
 	if the primary outcome is boring lack of results and the previous event is not the antecedent of event, no;
 	if the event is a test step, decide on whether or not the test set of event is the primary outcome; 
 	if the antecedent of the event is not just-succeeded, no;
-	if the antecedent of the event is preset, decide on whether or not the event is possible; [what if it's resolved but has unresolved dependents?]
+	transcribe "DEBUG: whether [event] is testable after [previous event]: event is [state of event]";
+ 	if the antecedent of the event is preset and event is untested, no; [skip untested test sets]
 	yes;
 	
 [Side effects:
@@ -942,13 +943,12 @@ To decide which outcome is the outcome after we reset (the last event - an outco
 		now the next event is the outcome after the next event;
 	if we haven't reset the scheduled event: [are repeats needed?]
 		[transcribe "DEBUG: repeating scheduled event [the scheduled event] after [the last event]";]
-		decide on the scheduled event; [yes - go back and repeat]
-	otherwise:
-		[transcribe "DEBUG: moving on from [the last event] to [the next event]";]
-		if the last event is not restarting for tests and the antecedent of the next event is restarting for tests:
-			[this is a hack. more thinking may be needed.]
-			now restarting for tests is immediately testable;
-		decide on the next event; [no - we can move on now]
+		now the next event is the scheduled event; [yes - go back and repeat]
+	[transcribe "DEBUG: moving on from [the last event] to [the next event]";]
+	if the last event is not restarting for tests and the next event is a test set:
+		[this is a hack. more thinking may be needed.]
+		now restarting for tests is immediately testable;
+	decide on the next event; [no - we can move on now]
 
 Section - Scheduling
 
@@ -1015,6 +1015,7 @@ Return the first (preset or non-preset) outcome to test
 ]
 
 To update the schedule with (event - an outcome):
+	transcribe "DEBUG: update the schedule with [event]";
 	if event is not scheduled anonymously:
 		now the scheduled event is event;
 	if event is boring lack of results:
@@ -1042,7 +1043,7 @@ To schedule (the event - an outcome):
 To continue scheduling:
 	While the blocking event is not scheduled for later testing and the blocking event is not boring lack of results:
 		if the blocking event is not immediately testable:
-			transcribe "WARNING: immediately testing [outcome condition of blocking event] [blocking event] - scheduled event: [scheduled event]";
+			transcribe "WARNING: immediately testing [outcome condition of blocking event] [blocking event] - scheduled event: [scheduled event] - scheduled for later: [list of scheduled for later testing outcomes]";
 		let blocker be the blocking event;
 		test effects of the blocker;
 		update the schedule with the outcome after we reset the blocker;
