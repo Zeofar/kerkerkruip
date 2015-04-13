@@ -536,49 +536,26 @@ Test play when testing Sleeping Fallen:
 	assert "the blood ape should be dead" based on whether or not the blood ape is dead;
 	have the player and the blood ape fight in Arena of the Fallen;
 	assert that the blood ape is awake;
+]
 	
 Section - Dreadful Presence
 
 [E91A270C9962]
 
-Dreadful-Presence-Test is a test set.
-
-Scenario when testing Dreadful-Presence-Test:
-	now the blood ape is testobject;
-	now the zombie toad is testobject;
-	block interventions;
-	
-A person has an outcome called the cower counter. The cower counter of a person is usually the boring lack of results.
-Definition: a person is cowerer if the cower counter of it is not the boring lack of results.
-
 Table of Outcomes (continued)
-outcome	maximum attempts
-ape cower counter	200
-toad cower counter	200
-player cower counter	200
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+dreadful-presence-test	0	1	200	restarting for tests
+player-presence	1	1	1	dreadful-presence-test
+ape-only-cowering	0	1	200	--
+ape-cower1	21	100	200	ape-only-cowering
+toad-cower1	0	20	200	ape-only-cowering
+player-cower1	0	20	200	ape-only-cowering
+insane-player-cowering	0	1	200	--
+ape-cower2	21	100	200	insane-player-cowering
+toad-cower2	0	20	200	insane-player-cowering
+player-cower2	6	25	200	insane-player-cowering
 
-The cower counter of the blood ape is ape cower counter. The cower counter of the zombie toad is toad cower counter. The cower counter of the player is player cower counter.
-
-Test play when testing Dreadful-Presence-Test:
-	repeat with guy running through denizen people:
-		now the defence of guy is 100;
-	now the mind score of the player is 10;
-	now the player worships Nomos;
-	raise the favour of the player to 9;
-	try wearing the gown of the red court;
-	try readying the malleus;
-	now the blood ape is not asleep;
-	now the zombie toad is not asleep;
-  	extract the player to the location of the blood ape;
-	extract the zombie toad to the location;
-	assert that the dreadful presence of the player is 2;
-	[Can't depend on the blood ape's mind being constant - there could be room effects, for example
-	assert that the final mind of the blood ape is 5;]
-	assert "the blood ape should have a nonzero target cower percentage" based on whether or not the target cower percentage of the blood ape is at least 1;
-  	assert that the target cower percentage of the player is 0;
-	assert that the target cower percentage of the zombie toad is 0;
-	
-To decide which number is the target cower percentage of (guy - a person):
+[To decide which number is the target cower percentage of (guy - a person):
 	if guy is undead, decide on 0;
 	if guy is the player and the player is not insane, decide on 0;
 	let P be (dreadful presence of the player) times 12;
@@ -590,39 +567,50 @@ To decide which number is the target cower percentage of (guy - a person):
 		decide on 1;
 	decide on P;
 	
-A test step can be cower-counting.
+blood ape: (dreadful presence 2) * 12 - (level 1 *3) = 21
+insane player: (dreadful presence 2) * 12 - (level 0 * 3) = 24]
 
-When play begins:
-	Repeat with event running through cower-counting test steps:
-		now event is npc-enabling.
+Scenario for Dreadful-Presence-Test:
+	block interventions;
 	
-initial scheduling for a cower-counting test step:
-	repeat with guy running through cowerer people:
-		Let counter be the cower counter of guy;
-		Now the description of counter is "[guy] cowering";
-		Let P be the target cower percentage of guy;
-		If the remainder after dividing P by 5 is 0:
-			[we don't need all that precision]
-			now the likelihood of counter is P / 5;
-			now the minimum attempts of counter is 20;
-		otherwise:
-			now the likelihood of counter is P;
-			now the minimum attempts of counter is 100;
-		make the counter possible;
-		transcribe "Set [the counter] target to [likelihood of the counter]/[minimum attempts of the counter]";
-
-testing combat round of a cowerer person (called guy) when testing a cower-counting test step:
-	test cower counter of guy against "[The guy] [cower] before your dreadful presence";
-	clear the event description; [todo: have a separate combat round text?]
-
-Ape-cowering is a cower-counting test step. The first move of Dreadful-Presence-Test is Ape-cowering.
-		
-Player-cowering is a cower-counting test step. The next move of Ape-cowering is Player-cowering.
-
-initial scheduling for Player-cowering:
-	now the player is insane;
-	assert "the insane player's target cower percentage should be at least 1" based on whether or not the target cower percentage of the player is at least 1; 
+regular scheduling of Dreadful-Presence-Test:
+	repeat with guy running through denizen people:
+		now the defence of guy is 100;
+	now the mind score of the player is 10;
+	now the player worships Nomos;
+	raise the favour of the player to 9;
+	try wearing the gown of the red court;
+	try readying the malleus;
+	prepare a test battle with the blood ape;
+	revive the zombie toad in the location;
 	
+Testing effects of player-presence: if we confirm that the dreadful presence of the player is 2, rule succeeds;
+	
+To decide which object is the cowerer of (event - an outcome):
+	if event is ape-cower1 or event is ape-cower2:
+		decide on the blood ape;
+	if event is toad-cower1 or event is toad-cower2:
+		decide on the zombie toad;
+	if event is player-cower1 or event is player-cower2:
+		decide on the player;
+	decide on nothing;
+
+Definition: an outcome is cower-counter if the cowerer of it is a person;
+
+regular scheduling of an outcome (called event):
+	if event is ape-only-cowering or event is insane-player-cowering:
+		now the health of the player is 1000;
+		now the health of the blood ape is 1000;
+		now the health of the zombie toad is 1000;
+	
+regular scheduling of a cower-counter outcome (called event): wait for the cowerer of event to act freely;
+
+testing effects of a cower-counter outcome (called the event) (this is the cower counting rule):
+	if result includes "[The main actor] [cower] before your dreadful presence", rule succeeds;
+
+initial scheduling of insane-player-cowering: now the player is insane.
+
+[
 Section - Controlling pipes
 
 Controlling pipes is a test set.

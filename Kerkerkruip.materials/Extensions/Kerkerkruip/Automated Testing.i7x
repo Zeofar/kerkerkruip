@@ -52,7 +52,7 @@ Definition: an outcome is possible if the state of it is outcome-possible.
 Definition: an outcome is failed if the state of it is outcome-failed.
 Definition: an outcome is achieved if the state of it is outcome-achieved.
 
-An outcome can be unscheduled, immediately testable, scheduled for later testing, or just-succeeded.
+An outcome can be unscheduled, immediately testable, scheduled for later testing, just-tested, or just-succeeded.
 	
 [Outcome properties:
 
@@ -157,6 +157,13 @@ To decide what real number is (N - a number) choose (K - a number):
 
 Section - Generating Actions
 
+For taking a player action when a person is scheduled to act freely (this is the player combat round action rule):
+	transcribe "DEBUG: player combat round action rule: [list of scheduled to act freely people] scheduled to act freely";
+	if the actor part of the compelled action is not the player:
+		generate the action of waiting;
+	otherwise:
+		generate the compelled action;
+	
 For taking a player action when testing compelling an action (this is the compel player action rule):
 	if the actor part of the compelled action is not the player and the player is not at-act, make no decision;
 	generate the compelled action;
@@ -177,7 +184,8 @@ For taking a player action when testing compelling an attack (this is the compel
 	test compelling an attack against true;
 	schedule compelling a reaction;
 	
-The compel player action rule is listed first in the for taking a player action rulebook.
+The player combat round action rule is listed first in the for taking a player action rulebook.
+The compel player action rule is listed before the player combat round action rule in the for taking a player action rulebook.
 The compel player reaction rule is listed before the compel player action rule in the for taking a player action rulebook.
 The compel player attack rule is listed before the compel player reaction rule in the for taking a player action rulebook.
 		
@@ -207,6 +215,7 @@ moving towards the destination	"[moving-description]"	1	0
 compelling an attack	"[compelled-attack]"	1	0
 compelling an action	"[the compelled action]"	1	0
 compelling a reaction	"[compelled-reaction]"	1	1
+free combat round	""	1	0
 free npc action	""	1	0
 
 Definition: an outcome is schedule-blocking if it is at least taking a turn and it is at most free npc action.
@@ -247,8 +256,15 @@ To generate (the desired action - a stored action):
 	now the second noun is the second noun part of the desired action;
 	begin the current action;
 	
-The compelled attacker is an object that varies. The npc test subject is an object that varies. [TODO: use this for compelled attacks too?]
+The compelled attacker is an object that varies.
 The compelled action is a stored action that varies. The compelled action is the action of waiting.
+
+A person has an outcome called the act-outcome. The act-outcome of a person is usually boring lack of results.
+
+Definition: a person is scheduled to act freely:
+	Let the event be the act-outcome of it;
+	if the event is boring lack of results, no;
+	decide on whether or not the event is scheduled for later testing;
 
 [A test step can be npc-suppressing or npc-enabling. A test step is usually npc-suppressing. Normal keyboard input is npc-enabling.
 
@@ -259,14 +275,6 @@ First initial scheduling rule for a test step (called current move) (this is the
 
 Suppress npc action is a truth state that varies.
 
-To make everyone wait:
-	transcribe "suppressing NPC actions";
-	now suppress npc action is true;
-	
-To let everyone act freely:
-	transcribe "enabling NPC actions";
-	now suppress npc action is false;
-	
 To compel (the desired action - a stored action):
 	Let the guy be the actor part of the desired action;
 	transcribe "compelling [the desired action][if the guy is asleep] and waking up [the guy]";
@@ -283,9 +291,13 @@ To compel (the desired action - a stored action) as a reaction to (guy - a perso
 	schedule compelling an attack; [this should automatically stop and wait for a turn]
 	
 To wait for (guy - a person) to act freely:
-	transcribe "waiting for [the guy] to act freely[if the guy is asleep] and waking [them] up";
-	now the npc test subject is the guy;
-	schedule free npc action;
+	if guy is asleep:
+		transcribe "waking [the guy] up so [they] can act freely";
+	now the act-outcome of the guy is the outcome described;
+	now the outcome described is scheduled for later testing;
+	
+Initial scheduling of taking a turn:
+	now suppress npc action is true;
 	
 To forget the/-- compelled action:
 	now the compelled attacker is nothing;
@@ -327,6 +339,7 @@ A Standard AI rule for a person (called P) when testing compelling an action (th
 	
 A Standard AI rule for a person (called P) (this is the suppress actions rule):
 	if suppress npc action is true:
+		if P is scheduled to act freely, make no decision;
 		if P is at-react:
 			transcribe "allowing [P] to react";
 		otherwise:
@@ -354,6 +367,8 @@ To decide what number is the expected successes of (event - an outcome) after (a
 	if the minimum attempts of the event is 0, decide on likelihood of the event;
 	decide on (likelihood of the event * attempts) / minimum attempts of the event;
 
+The failure report is a text that varies;
+
 To resolve (event - an outcome):
 	Let the tolerance be the maximum tolerance of the event;
 	Let target be the expected successes of the event after the maximum attempts of the event;
@@ -362,7 +377,9 @@ To resolve (event - an outcome):
 	if the success count of the event is less than the lower bound or the success count of the event is greater than the upper bound:
 		[achievement is impossible within the maximum number of attempts]
 		now the state of event is outcome-failed;
-		assert "After [attempt count of the event] attempt[s], [the event] happened [success count of the event] times (not between [lower bound] and [upper bound] of target [target] for maximum attempts [maximum attempts of event] with tolerance [tolerance])" based on false;
+		if the failure report is empty:
+			now the failure report is "After [attempt count of the event] attempt[s], [the event] happened [success count of the event] times (not between [lower bound] and [upper bound] of target [target] for maximum attempts [maximum attempts of event] with tolerance [tolerance])";
+		assert failure report based on false;
 	otherwise if the attempt count of the event is at least the minimum attempts of the event:
 		now the tolerance is (tolerance * attempt count of the event) / maximum attempts of the event;
 		now target is expected successes of the event after the attempt count of the event;
@@ -411,7 +428,10 @@ To test (event - an outcome) against (success - a truth state):
 		otherwise:
 			resolve event;
 		[There is a subtle conflict between "success count" and "just-succeeded". "success count" is the number of times the "success" condition was met. However, if likelihood is 0, this is not really a success - it will result in a positive "error" during resolution. On the other hand, just-succeeded is only true if we got a desirable result, even if that result is false (as it should be in the case of likelihood=0). Feel free to suggest better names for these two variables]
-		if success is (whether or not likelihood of the event is greater than 0), now the event is just-succeeded;
+		if success is (whether or not likelihood of the event is greater than 0):
+			now the event is just-succeeded;
+		otherwise:
+			now the event is just-tested;
 
 To test (event - an outcome) against (T - a text):
 	update the event description because "testing [event] against '[T]'"; [todo - roll this into a text-testing phrase?]
@@ -462,13 +482,19 @@ To transcribe (T - a text):
 	otherwise:
 		append "[message]" to file of test transcript;
 
+Definition: an outcome (called event) is relevant:
+	while event is not boring lack of results:
+		if event is the scheduled event, yes;
+		now event is the antecedent of event;
+	no.
+
 To say current test description:
-	say  "[primary outcome], [scheduled event] turn [the turn count], ";
+	say  "[primary outcome], [scheduled event] attempt [attempt count of the scheduled event] turn [the turn count], ";
 	if there is an achieved outcome:
-		say "achieved [the list of achieved outcomes] | ";
+		say "achieved [the list of relevant achieved outcomes] | ";
 	if there is a failed outcome:
-		say "failed [the list of failed outcomes] | ";
-	repeat with event running through possible outcomes:
+		say "failed [the list of relevant failed outcomes] | ";
+	repeat with event running through possible relevant outcomes:
 		say "'[event]' [success count of event]/[attempt count of event] times | ";
 	say "([test assertion count] assertions)";
 	
@@ -574,6 +600,7 @@ To record a/-- failure report of/-- (msg - a text):
 	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], assertion [the test assertion count]: [msg][paragraph break]";
 	now the failure messages entry is the substituted form of "[failure messages entry][new message]";
 	log the new message;
+	now the failure report is "";
 	
 To say grand test summary:
 	let grand test total be 0;
@@ -843,13 +870,6 @@ These "test-blocking" outcomes only get tested when their special effects are ex
 
 Definition: An outcome is test-blocking if it is not greater than free npc action.]
 	
-To reset (event - an outcome):
-	now success count of event is 0;
-	now attempt count of event is 0;
-	now state of event is outcome-untested;
-	now event is unscheduled;
-	[reset dependents?]
-	
 To decide whether waiting for resolution:
 	decide on whether or not there is a possible outcome;
 	
@@ -858,97 +878,6 @@ To report an iteration because (reason - a text):
 	say " .[run paragraph on]";
 	start capturing text;
 		
-[use this phrase for outcomes that have already started being tested]
-Definition: an outcome (called event) is pending:
-	if event is untested:
-		decide no;
-	if event is possible:
-		if the antecedent of the event is boring lack of results:
-			decide yes;
-		otherwise:
-			decide on whether or not the antecedent of the event is just-succeeded;
-	otherwise:
-		decide on whether or not the event has unresolved dependents.
-		
-Definition: boring lack of results is pending: no.
-				
-[This phrase tells us whether we need to keep looping. It also resets everything as a side effect when we're done looping.]
-
-To decide whether we haven't reset (event - an outcome):
-	if an outcome is scheduled for later testing:
-		yes;
-	now event is unscheduled;
-	if event is not preset, report an iteration because "completed an iteration, now [state of event] with[unless event has unresolved dependents]out[end if] unresolved dependents -";
-	if event is not resolved, yes; [makes sure the loop runs at least once]
-	if event is not preset:
-		if there is a pending not test set outcome that is not restarting for tests: [TODO: fix this hack!]
-			yes;
-	Let root be event;
-	While the antecedent of root is not boring lack of results and not (antecedent of root has unresolved dependents):
-		Now root is the antecedent of root;
-	if root has unresolved dependents:
-		[we call this phrase to set the dependency test outcome - it should never be true, but the phrase returns a value so we test it]
-		[TODO: set the dependency test outcome directly without testing - are there risks?]
-		yes;
-	repeat with item running through outcomes:
-		if item is dependent, reset item;
-	reset root;
-	Repeat with item running through not pending resolved preset outcomes:
-		reset item;
-	no.
-	
-To decide whether we haven't reset (event - boring lack of results): no;
-
-[use this phrase for outcomes that might not be possible yet, but should be]
-[We must be aware of the special meaning of "boring lack of results" when it is an antecedent. It gives default behavior to outcomes,
-but default behavior is different depending on whether an outcome is preset or not.
-
-Preset outcomes that depend on boring lack of results are independent - they have no blockers.
-
-Non-preset outcomes that depend on boring lack of results follow sequential behavior. In practice, they are blocked by the outcome that comes before them AND by the entire dependency tree attached to that outcome. 
-
-This is complicated by the fact that outcomes depending on "restarting for tests" are considered primary - playthroughs that start when the game is rebooted and end when the next test set is encountered. The primary outcome is set when we reboot. We can't run a sequential step unless its immediate precursor belongs to the same primary outcome.
-
-Most of these rules are unimportant except when starting the game. At that point we must search through all the outcomes until we find the primary outcome.]
-
-To decide whether (event - an outcome) is testable after (previous event - an outcome):
-	unless the event has unresolved dependents or the event is not resolved, no;
-	if event is preset and event is untested, no;
-	if the primary outcome is boring lack of results and the previous event is not the antecedent of event, no;
-	if the event is a test step, decide on whether or not the test set of event is the primary outcome; 
-	if the antecedent of the event is not just-succeeded, no;
-	transcribe "DEBUG: whether [event] is testable after [previous event]: event is [state of event]";
- 	if the antecedent of the event is preset and event is untested, no; [skip untested test sets]
-	yes;
-	
-[Side effects:
-	
-Sets the primary outcome
-Resets the last event if all of its dependency tree is resolved
-
-Returns:
-	
-The next "not scheduled anonymously" outcome that should be scheduled as "the scheduled outcome"
-
-(that outcome may have preset antecedents we need to schedule first)
-]
-To decide which outcome is the outcome after we reset (the last event - an outcome):
-	Let the next event be the outcome after the last event;
-	while the next event is not boring lack of results:
-		if the next event is testable after the last event:
-			if the next event is scheduled anonymously:
-				decide on the next event;
-			otherwise:
-				break;
-		now the next event is the outcome after the next event;
-	if we haven't reset the scheduled event: [are repeats needed?]
-		[transcribe "DEBUG: repeating scheduled event [the scheduled event] after [the last event]";]
-		now the next event is the scheduled event; [yes - go back and repeat]
-	[transcribe "DEBUG: moving on from [the last event] to [the next event]";]
-	if the last event is not restarting for tests and the next event is a test set:
-		[this is a hack. more thinking may be needed.]
-		now restarting for tests is immediately testable;
-	decide on the next event; [no - we can move on now]
 
 Section - Scheduling
 
@@ -978,6 +907,8 @@ rescheduling is a truth state that varies.
 
 The scheduled event is an outcome that varies. The scheduled event is boring lack of results.
 
+The outcome described is an outcome that varies.
+
 [the first outcome that needs testing.
 Since dependencies must ALWAYS be in numerical order, the first one will be the root of the dependency tree.
 Because of the default behavior of "boring lack of results," sometimes this will not be a true antecedent
@@ -987,21 +918,134 @@ For example:
 	But the scheduled action may not have an antecedent.
 ]
 
-To decide which outcome is the blocking event:
-	Repeat with event running through outcomes:
-		if event is pending and event is not just-succeeded:
-			decide on event;
-	decide on boring lack of results.
-[
-	Let the blocker be the scheduled event;
-	If the antecedent of the blocker is boring lack of results:
-		Repeat with event running through outcomes:
-			if event is possible:
-				now blocker is the event;
-	While the antecedent of blocker is not boring lack of results:
-		now blocker is the antecedent of blocker;
-	decide on blocker;]
+[TODO: do we still need these? or can we use immediately schedulable or something?]
+
+Definition: an outcome is blocker if it is pending and it is not just-succeeded;
+
+[use this phrase for outcomes that have already started being tested]
+Definition: an outcome (called event) is pending:
+	if event is untested:
+		decide no;
+	if event is possible:
+		if the antecedent of the event is boring lack of results:
+			decide yes;
+		otherwise:
+			decide on whether or not the antecedent of the event is just-succeeded;
+	otherwise:
+		decide on whether or not the event has unresolved dependents.
+		
+Definition: boring lack of results is pending: no.
 				
+[This phrase tells us whether we need to keep looping. It also resets everything as a side effect when we're done looping.]
+
+[To decide whether we haven't reset (event - an outcome):
+	if an outcome is scheduled for later testing:
+		yes;
+	now event is unscheduled;
+	if event is not preset, report an iteration because "completed an iteration, now [state of event] with[unless event has unresolved dependents]out[end if] unresolved dependents -";
+	if event is not resolved, yes; [makes sure the loop runs at least once]
+	if event is not preset:
+		if there is a pending not test set outcome that is not restarting for tests: [TODO: fix this hack!]
+			yes;
+	Let root be event;
+	While the antecedent of root is not boring lack of results and not (antecedent of root has unresolved dependents):
+		Now root is the antecedent of root;
+	if root has unresolved dependents:
+		[we call this phrase to set the dependency test outcome - it should never be true, but the phrase returns a value so we test it]
+		[TODO: set the dependency test outcome directly without testing - are there risks?]
+		yes;
+	repeat with item running through outcomes:
+		if item is dependent, reset item;
+	reset root;
+	Repeat with item running through not pending resolved preset outcomes:
+		reset item;
+	no.]
+	
+[To decide whether we haven't reset (event - boring lack of results): no;]
+
+[use this phrase for outcomes that might not be possible yet, but should be]
+[We must be aware of the special meaning of "boring lack of results" when it is an antecedent. It gives default behavior to outcomes,
+but default behavior is different depending on whether an outcome is preset or not.
+
+Preset outcomes that depend on boring lack of results are independent - they have no blockers.
+
+Non-preset outcomes that depend on boring lack of results follow sequential behavior. In practice, they are blocked by the outcome that comes before them AND by the entire dependency tree attached to that outcome. 
+
+This is complicated by the fact that outcomes depending on "restarting for tests" are considered primary - playthroughs that start when the game is rebooted and end when the next test set is encountered. The primary outcome is set when we reboot. We can't run a sequential step unless its immediate precursor belongs to the same primary outcome.
+
+Most of these rules are unimportant except when starting the game. At that point we must search through all the outcomes until we find the primary outcome.]
+
+[To decide whether (event - an outcome) is testable after (previous event - an outcome):
+	unless the event has unresolved dependents or the event is not resolved, no;
+	if event is preset and event is untested, no;
+	if the primary outcome is boring lack of results and the previous event is not the antecedent of event, no;
+	if the event is a test step, decide on whether or not the test set of event is the primary outcome; 
+	transcribe "DEBUG: whether [event] is testable after [previous event]: antecedent is [outcome condition of antecedent of event]";
+	if the antecedent of the event is not just-succeeded, no;
+	transcribe "DEBUG: whether [event] is testable after [previous event]: event is [state of event]";
+ 	if the antecedent of the event is preset and event is untested, no; [skip untested test sets]
+	yes;]
+	
+Definition: boring lack of results is resettable: no; [or yes?]
+
+Definition: an outcome (called event) is resettable:
+	if event is not the scheduled event, no;
+	if event is not resolved, no;
+	if event has unresolved dependents, no;
+	if there is a pending not test set outcome that is not restarting for tests, [TODO: fix this hack!] no;
+	yes;
+	
+Definition: an outcome (called event) is reschedulable:
+	if event is unscheduled or event is scheduled for later testing, no;
+	Now the dependency test outcome is event;
+	Repeat with item running through dependent outcomes:
+		if item is scheduled for later testing, no;
+		if the antecedent of item is just-succeeded and item is unscheduled, no;
+	if event has unresolved dependents, yes;
+	decide on whether or not event is not resolved;
+	
+To reset (event - an outcome):
+	if event is the scheduled event:
+		if event has unresolved dependents:
+			repeat with item running through outcomes:
+				if item is dependent, reset item;
+		repeat with item running through not pending resolved preset outcomes:
+			reset item;
+	now success count of event is 0;
+	now attempt count of event is 0;
+	now state of event is outcome-untested;
+	now event is unscheduled;
+	Repeat with guy running through people:
+		if the act-outcome of guy is the event, now the act-outcome of guy is boring lack of results;
+
+To prepare (event - an outcome) for rescheduling:
+	report an iteration because "rescheduling [event] -";
+	if event is the scheduled event:
+		let the dependent test outcome be event;
+		repeat with item running through outcomes:
+			if item is dependent, now item is unscheduled;
+		[todo: unschedule presets too?]
+	now event is unscheduled;
+			
+Definition: an outcome (called event) is already scheduled if it is immediately testable or it is scheduled for later testing;
+Definition: an outcome (called event) is already tested if it is just-tested or it is just-succeeded;
+
+Definition: boring lack of results is immediately schedulable: no.
+
+Definition: an outcome (called event) is immediately schedulable:
+	if event is already tested, no;
+	if event is not the scheduled event and the antecedent of the event is not just-succeeded, no;
+	if the test set of event is not the primary outcome, no; [this includes presets, which are scheduled manually or by antecedent]
+	Let the blocker be event;
+	While the blocker is not boring lack of results:
+		if blocker is already scheduled, no;
+		now blocker is the antecedent of blocker;
+	if event is resettable, no;
+	if a preset outcome is scheduled for later testing, no;
+	Repeat with dependent running through outcomes:
+		if dependent is already scheduled and the antecedent of dependent is the event, no;
+	yes.
+		
 [The scheduled event is the earliest event that can be repeated. We test it and all its dependents together. It often has major side effects,
 like taking a turn. Its antecedent is always a preset - restarting for tests if it's the beginning of a set, or boring lack of results if
 no antecedent has been specified.]
@@ -1014,18 +1058,15 @@ Run scheduling rules for the
 Return the first (preset or non-preset) outcome to test
 ]
 
-To update the schedule with (event - an outcome):
+[To update the schedule with (event - an outcome):
 	transcribe "DEBUG: update the schedule with [event]";
 	if event is not scheduled anonymously:
 		now the scheduled event is event;
 	if event is boring lack of results:
-		transcribe and stop capturing because "boring lack of results was the new event of";
-		say line break;
-		start capturing text;
 	otherwise:
 		make the event testable;
 		if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
-			unless an outcome is scheduled for later testing:
+			if event is immediately schedulable:
 				now rescheduling is true;
 				now the event is immediately testable;
 				if attempt count of the event is 0:
@@ -1034,34 +1075,144 @@ To update the schedule with (event - an outcome):
 					follow the initial scheduling rules for the event;
 				follow the regular scheduling rules for the event;
 		otherwise:
-			update the schedule with the antecedent of the event.
+			update the schedule with the antecedent of the event.]
 			
-To schedule (the event - an outcome):
+[To schedule (the event - an outcome):
 	update the schedule with the event;
-	continue scheduling.
+	continue scheduling.]
 		
+To schedule (the event - boring lack of results):
+	transcribe and stop capturing because "boring lack of results was the new event of";
+	say line break;
+	start capturing text;
+	
+To schedule (the event - an outcome):
+	if event is a test step, now the scheduled event is event;
+	make the event testable;
+	if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
+		now the outcome described is the event;
+		now rescheduling is true;
+		now the event is immediately testable;
+		if attempt count of the event is 0:
+			now rescheduling is false;
+			if the event is the scheduled event, log "  next step:  [the scheduled event]";
+			follow the initial scheduling rules for the event;
+		follow the regular scheduling rules for the event;
+	otherwise if the antecedent of the event is immediately schedulable:
+		schedule the antecedent of the event;
+	otherwise:
+		transcribe "WARNING: [the event] could not be scheduled, nor could its antecedent [antecedent of the event]";
+
+[[Side effects:
+	
+Sets the primary outcome
+Resets the last event if all of its dependency tree is resolved
+
+Returns:
+	
+The next "not scheduled anonymously" outcome that should be scheduled as "the scheduled outcome"
+
+(that outcome may have preset antecedents we need to schedule first)
+]
+To decide which outcome is the outcome after we reset (the last event - an outcome):
+	Let the next event be the outcome after the last event;
+	while the next event is not boring lack of results:
+		if the next event is testable after the last event:
+			if the next event is scheduled anonymously:
+				decide on the next event;
+			otherwise:
+				break;
+		now the next event is the outcome after the next event;
+	if we haven't reset the scheduled event: [are repeats needed?]
+		[transcribe "DEBUG: repeating scheduled event [the scheduled event] after [the last event]";]
+		now the next event is the scheduled event; [yes - go back and repeat]
+	[transcribe "DEBUG: moving on from [the last event] to [the next event]";]
+	if the last event is not restarting for tests and the next event is a test set:
+		[this is a hack. more thinking may be needed.]
+		now restarting for tests is immediately testable;
+	decide on the next event; [no - we can move on now]]
+	
+To decide which outcome is the test step after (event - an outcome):
+	Now event is the outcome after event;
+	While event is not boring lack of results:
+		if event is a test set and event is possible:
+			decide on event;
+		if event is a test step:
+			if the primary outcome is boring lack of results or the test set of event is the primary outcome:
+				decide on event;
+		Now event is the outcome after event;
+	decide on boring lack of results;
+
 To continue scheduling:
+	Let repeat be true;
+	While repeat is true:
+		now repeat is false;
+		transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";
+		Repeat with event running through immediately schedulable outcomes:
+			schedule event;
+		transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";
+		Repeat with event running through immediately testable outcomes:
+			test effects of event;
+			if event is just-succeeded, now repeat is true;
+		if the scheduled event is resettable:
+			transcribe "DEBUG: continue scheduling, reset [the scheduled event] and schedule [the test step after the scheduled event]";
+			reset the scheduled event;
+			now the scheduled event is the test step after the scheduled event;
+			if the scheduled event is not boring lack of results, now repeat is true;
+		otherwise if the scheduled event is reschedulable:
+			transcribe "DEBUG: continue scheduling, reschedule [the scheduled event]";
+			prepare the scheduled event for rescheduling;
+			now repeat is true;
+	transcribe "DEBUG: continue scheduling, nothing left to do - [the list of scheduled for later testing outcomes]";
+			
+[	if the blocking event is unscheduled:
+		update the schedule with the blocking event;
 	While the blocking event is not scheduled for later testing and the blocking event is not boring lack of results:
 		if the blocking event is not immediately testable:
 			transcribe "WARNING: immediately testing [outcome condition of blocking event] [blocking event] - scheduled event: [scheduled event] - scheduled for later: [list of scheduled for later testing outcomes]";
 		let blocker be the blocking event;
 		test effects of the blocker;
-		update the schedule with the outcome after we reset the blocker;
+		update the schedule with the outcome after we reset the blocker;]
 
 
 To test effects of (event - an outcome):
+	Now the outcome described is event;
 	update event description because "testing effects of [event] -";
 	follow the testing effects rules for the event;
 	let success be whether or not the rule succeeded;
 	if event is the scheduled event:
 		update event description because "done testing effects of [event] -";
 	test the event against success;
+	[todo: make dependents unscheduled?]
 
-Before taking a player action when the blocking event is not boring lack of results (this is the test event effects rule): [TODO make this a combat round rule?]
+Before taking a player action when an outcome is blocker (this is the test event effects rule):
 	[Let repeat be whether or not (the scheduled event is repeatable) and (the repeated moves > 0);]
 	[now the scheduled event is not generated; todo: this happens when an outcome compels an action]
 	if taking a turn is scheduled for later testing, test taking a turn against true;
+	[TODO: always schedule taking a turn, just to ensure timeouts?]
 	continue scheduling;
+
+Section - Counting Actions
+
+[A person has a number called the act count;
+
+[TODO: replace these counters with outcomes?]]
+
+The testing combat round rules are an object based rulebook.
+
+A first combat round rule (this is the test combat round of previous main actor rule):
+	if the main actor is scheduled to act freely:
+		now the act-outcome of the main actor is immediately testable;
+		continue scheduling;
+	if a person is scheduled to act freely:
+		clear event description because "completed combat round of [the main actor]";
+		Repeat with guy running through scheduled to act freely people:
+			if the location of guy is not the location:
+				assert "[act-outcome of guy] can't be tested because [guy] is not here" based on false;
+				now the act-outcome of guy is unscheduled;
+				now the state of act-outcome of guy is outcome-failed;
+				[TODO: make this work more cleanly - use a combat round timeout or something?]
+				[TODO: special fail immediately phrase?]
 
 Chapter - Starting Tests
 
@@ -1119,9 +1270,10 @@ First after showing the title screen (this is the run all tests rule):
 	[TODO: handle interaction between test config file and scenario]
 	start capturing text;
 	test restarting for tests against true;
-	Now the primary outcome is the outcome after we reset restarting for tests; [setting the primary outcome]
+	Now the primary outcome is the test step after restarting for tests; [setting the primary outcome]
+	now the scheduled event is the primary outcome;
 	showme the primary outcome;
-	update the schedule with the primary outcome;
+	schedule taking a turn;
 	follow the scenario rules for the primary outcome;
 	
 The scenario rules are an outcome based rulebook.
@@ -1166,7 +1318,7 @@ To say list automated tests:
 Chapter - Resetting the Game After Each Test Set (in place of Chapter - The Unit test rules unindexed in Simple Unit Tests by Dannii Willis)
 
 To start the/-- next test:
-	schedule restarting for tests.
+	schedule restarting for tests;
 	
 Regular scheduling of restarting for tests:
 	write file of test results from Table of Test Results;
@@ -1221,6 +1373,11 @@ To assert that/-- (A - a value) is (B - a value) with label (T - an indexed text
 		Let error_msg be an indexed text;
 		now error_msg is "Expected [T]: [B], Got: [A][line break]";
 		record a failure report of error_msg;
+
+To decide whether we confirm that/-- (A - a value) is (B - a value):
+	unless A is B:
+		now the failure report is "Expected value for [the outcome described]: [B], Got: [A]";
+	decide on whether or not A is B;
 	
 To assert (T - a text) based on (C - a truth state):
 	record a test attempt;
@@ -1426,22 +1583,6 @@ Choosing a player action when testing a hiding-reveal test step (this is the hid
 
 Testing effects of a hiding-reveal test step:
 	assert "The player should not be hidden" based on whether or not the player is not hidden.]
-
-Section - Counting Actions
-
-[A person has a number called the act count;
-
-[TODO: replace these counters with outcomes?]
-
-The testing combat round rules are an object based rulebook.
-
-A first combat round rule (this is the test combat round of previous main actor rule):
-	follow the testing combat round rules for the main actor;
-	
-A combat round rule (this is the count combat actions rule):
-	increment the act count of the main actor;
-
-The count combat actions rule is listed before the dreadful presence effect rule in the combat round rules.]
 	
 Section - The reusable item
 
@@ -1686,7 +1827,7 @@ To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (streng
 		reset after-combat-hit;
 	
 To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in/on (likelihood - a number) out of (total tries - a number) attempts, checking damage:
-	while we haven't reset combat hit: 
+	while combat hit is immediately testable [the scheduled event is not resettable]: 
 		if checking damage:
 			test guy doing reaction to a strength melee hit by aggressor with result outcome in likelihood out of total tries attempts, checking damage;
 		otherwise:
