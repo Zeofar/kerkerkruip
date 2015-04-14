@@ -413,7 +413,6 @@ To resolve dependents of (event - an outcome):
 To test (event - an outcome) against (success - a truth state):
 	make the event testable;
 	if the event is pending:
-		transcribe "DEBUG: attempting [event] success=[success]";
 		increment attempt count of the event;
 		if success is true:
 			increment success count of the event;
@@ -876,7 +875,6 @@ Definition: an outcome (called event) is pending:
 	if event is untested, no;
 	unless the antecedent of the event is boring lack of results or the antecedent of the event is just-succeeded, no;
 	if event is possible, yes;
-	transcribe "DEBUG: is [event] pending? [state of event], and [antecedent of event] is [outcome condition of antecedent of event]";
 	if the event has unresolved dependents, yes;
 	if the event is preset and the scheduled event is pending, yes;
 	no.
@@ -982,7 +980,6 @@ To schedule (the event - an outcome):
 To decide which outcome is the test step after (event - an outcome):
 	Now event is the outcome after event;
 	While event is not boring lack of results:
-		if event is a test set, transcribe "DEBUG: is test set [event] the outcome after?";
 		if event is a test set and event is pending:
 			decide on event;
 		if event is a test step and the primary outcome is not boring lack of results:
@@ -995,7 +992,7 @@ To continue scheduling:
 	Let repeat be true;
 	While repeat is true:
 		now repeat is false;
-		transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";
+		[transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";]
 		Repeat with event running through immediately schedulable outcomes:
 			schedule event;
 		[transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";]
