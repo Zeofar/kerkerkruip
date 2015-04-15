@@ -413,6 +413,7 @@ To resolve dependents of (event - an outcome):
 To test (event - an outcome) against (success - a truth state):
 	make the event testable;
 	if the event is pending:
+		transcribe "DEBUG: test [event] against [success] (pending)";
 		increment attempt count of the event;
 		if success is true:
 			increment success count of the event;
@@ -805,22 +806,30 @@ To find test sets:
 	[TODO: do this at start of game?]
 	Let item be boring lack of results;
 	while the first test set is boring lack of results:
-		if item is a test set, now the first test set is item;
 		now item is the outcome after item;
+		transcribe "DEBUG: find test sets: [item] might be the first test set";
+		if item is a test set, now the first test set is item;
+	transcribe "DEBUG: find test sets: first test set is [first test set]";
 	while the primary outcome is boring lack of results and item is not boring lack of results:
+		[increment after, because the primary outcome could be the first test set]
+		transcribe "DEBUG: find test sets: [item] might be the primary outcome";
 		if item is a possible test set, now the primary outcome is item;
 		now item is the outcome after item;
+	transcribe "DEBUG: find test sets: primary outcome is [primary outcome]";
 	while the next test set is boring lack of results and item is not boring lack of results:
-		if item is a possible test set, now the next test set is item;
+		transcribe "DEBUG: find test sets: [item] might be the next test set";
+		if item is a test set, now the next test set is item;
 		now item is the outcome after item;
+	transcribe "DEBUG: find test sets: next test set is [next test set]";
 		
 To decide which outcome is the test set of (event - an outcome):
 	if the first test set is boring lack of results:
 		find test sets;
 	if event is less than the first test set:
 		decide on boring lack of results;
-	if event is at least the primary outcome and event is less than the next test set:
-		decide on the primary outcome;
+	if event is at least the primary outcome:
+		if the next test set is boring lack of results or event is less than the next test set:
+			decide on the primary outcome;
 	While event is not boring lack of results and event is not a test set:
 		now event is the outcome before event;
 	decide on event;
@@ -911,13 +920,20 @@ Definition: an outcome (called event) is reschedulable:
 	if event has unresolved dependents, yes;
 	decide on whether or not event is not resolved;
 	
+To reset (event - boring lack of results):
+	do nothing.
+	
 To reset (event - an outcome):
+	transcribe "reset [event]";
 	if event is the scheduled event:
-		if event has unresolved dependents:
-			repeat with item running through outcomes:
-				if item is dependent, reset item;
-		repeat with item running through not pending resolved preset outcomes:
+		now the dependency test outcome is the event;
+		repeat with item running through dependent outcomes:
 			reset item;
+		repeat with item running through not pending resolved preset outcomes: [why not reset restarting for tests here? I think it causes too many restarts]
+			reset item;
+		reset the antecedent of event; [resets restarting for tests if this is the primary outcome]
+	otherwise:
+		transcribe "reset [event]: the scheduled event is [the scheduled event]";
 	now success count of event is 0;
 	now attempt count of event is 0;
 	now state of event is outcome-untested;
@@ -939,8 +955,11 @@ Definition: boring lack of results is immediately schedulable: no.
 
 Definition: an outcome (called event) is immediately schedulable:
 	if event is already tested, no;
-	if event is not the scheduled event and the antecedent of the event is not just-succeeded, no;
-	if the test set of event is not the primary outcome, no; [this includes presets, which are scheduled manually or by antecedent]
+	if event is not the scheduled event:
+		if event is a test step, no;
+		if event is a test set, no;
+		if the antecedent of the event is not just-succeeded, no;
+	if event is not a test set and the test set of event is not the primary outcome, no; [this includes presets, which are scheduled manually or by antecedent]
 	Let the blocker be event;
 	While the blocker is not boring lack of results:
 		if blocker is already scheduled, no;
@@ -961,6 +980,7 @@ To schedule (the event - boring lack of results):
 	start capturing text;
 	
 To schedule (the event - an outcome):
+	transcribe "DEBUG: scheduling [event]";
 	if event is a test step, now the scheduled event is event;
 	make the event testable;
 	if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
@@ -992,7 +1012,7 @@ To continue scheduling:
 	Let repeat be true;
 	While repeat is true:
 		now repeat is false;
-		[transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";]
+		transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";
 		Repeat with event running through immediately schedulable outcomes:
 			schedule event;
 		[transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";]
@@ -1101,7 +1121,7 @@ First after showing the title screen (this is the run all tests rule):
 	[TODO: handle interaction between test config file and scenario]
 	start capturing text;
 	test restarting for tests against true;
-	Now the primary outcome is the test step after restarting for tests; [setting the primary outcome]
+	Now the primary outcome is the test step after restarting for tests; [setting the primary outcome TODO: integrate with 'find test sets']
 	now the scheduled event is the primary outcome;
 	showme the primary outcome;
 	schedule taking a turn;
@@ -1154,7 +1174,8 @@ To start the/-- next test:
 Regular scheduling of restarting for tests:
 	write file of test results from Table of Test Results;
 	choose row 1 in Table of Test Set Queue;
-	now the unresolved count entry is the number of possible outcomes;
+	transcribe "DEBUG: unresolved count includes [the list of possible test set outcomes]";
+	now the unresolved count entry is the number of possible test set outcomes;
 	if the random-seed entry is not 0:
 		if the dungeon generation seed is 0:
 			increment the random-seed entry;
@@ -1385,8 +1406,9 @@ Section - The reusable item
 
 The reusable item is an object that varies.
 
-Before taking a player action:
+First regular scheduling of an outcome (this is the return the reusable item rule):
 	if the reusable item is a thing and the reusable item is not carried:
+		transcribe "DEBUG: returning [the reusable item]";
 		now the player carries the reusable item;
 	
 [A test step can be item-reading.

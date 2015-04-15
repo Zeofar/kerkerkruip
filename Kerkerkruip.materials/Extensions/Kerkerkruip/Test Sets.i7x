@@ -1537,8 +1537,8 @@ no-new-blessed	0	400	400	--
 
 initial scheduling of blessed-grenade-test:
 	now the defence of the player is 100;
-	now the player carries the reusable item;
 	Now the reusable item is the staff of insanity;
+	now the player carries the reusable item;
 	Now every room is not rust-spored;
 	Now every thing is not rusted;
 	extract the player to the alchemical laboratory, making sure it is unoccupied;
@@ -1554,6 +1554,8 @@ To produce a grenade:
 		if item is not a custom-grenade, remove item from play;
 	Now every room is not rust-spored;
 	Now every thing is not rusted;
+	if the reusable item is not a thing:
+		transcribe "DEBUG: produce a grenade - no reusable item";
 	now the player carries the reusable item;
 	clear event description;
 	try inserting the reusable item into the curious machine;
