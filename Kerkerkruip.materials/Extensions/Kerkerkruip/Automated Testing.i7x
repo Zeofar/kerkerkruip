@@ -963,8 +963,8 @@ To reset (event - an outcome):
 			if item is preset and item is resolved and item is not restarting for tests: [why not reset restarting for tests here? I think it causes too many restarts]
 				reset item;
 		reset the antecedent of event; [resets restarting for tests if this is the primary outcome]
-	otherwise:
-		[transcribe "DEBUG: reset [event]: the scheduled event is [the scheduled event]";]
+	[otherwise:
+		transcribe "DEBUG: reset [event]: the scheduled event is [the scheduled event]";]
 	now success count of event is 0;
 	now attempt count of event is 0;
 	now state of event is outcome-untested;
