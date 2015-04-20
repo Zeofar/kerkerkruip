@@ -158,14 +158,12 @@ To decide what real number is (N - a number) choose (K - a number):
 Section - Generating Actions
 
 For taking a player action when a person is scheduled to act freely (this is the player combat round action rule):
-	transcribe "DEBUG: player combat round action rule: [list of scheduled to act freely people] scheduled to act freely";
 	if the actor part of the compelled action is not the player:
 		generate the action of waiting;
 	otherwise:
 		generate the compelled action;
 	
 For taking a player action when testing compelling an action (this is the compel player action rule):
-	transcribe "DEBUG: compel player action rule: compelling an action is [outcome condition of compelling an action] and [state of compelling an action]";
 	Let the guy be the actor part of the compelled action;
 	if (the player is at-act or the combat status is peace) and the guy is the player:
 		generate the compelled action;
@@ -230,7 +228,6 @@ free npc action	""	1	0
 Definition: an outcome is schedule-blocking if it is at least taking a turn and it is at most free npc action.
 
 Regular scheduling of a schedule-blocking outcome (called the event) (this is the regular block scheduling rule):
-	transcribe "DEBUG: regular block scheduling of [the event]";
 	now the event is scheduled for later testing.
 	
 [TODO: make this work]
@@ -285,7 +282,6 @@ To compel (the desired action - a stored action):
 	Now the compelled action is the desired action;
 	Now the description of compelling an action is "[the compelled action]"; 
 	schedule compelling an action; [this should automatically stop and wait for a turn]
-	transcribe "DEBUG: done compelling [the desired action]";
 	
 To compel (the desired action - a stored action) as a reaction to (guy - a person):
 	transcribe "setting the compelled attacker to [the guy][if the guy is asleep] and waking [them] up";
@@ -421,7 +417,7 @@ To resolve dependents of (event - an outcome):
 
 To test (event - an outcome) against (success - a truth state):
 	make the event testable;
-	transcribe "DEBUG: test [event] against [success]";
+	[transcribe "DEBUG: test [event] against [success]";]
 	increment attempt count of the event;
 	if success is true:
 		increment success count of the event;
@@ -921,7 +917,7 @@ Definition: an outcome (called event) is resettable:
 	if event is not the scheduled event, no;
 	if event is not resolved, no;
 	now the dependency test outcome is event;
-	transcribe "DEBUG: is [event] resettable?";
+	[transcribe "DEBUG: is [event] resettable?";]
 	repeat with item running through outcomes:
 		if item is currently dependent, no;
 		if item is not restarting for tests and item is preset:
@@ -941,7 +937,7 @@ To decide whether (event - an outcome) needs scheduling:
 	yes.
 
 Definition: an outcome (called event) is reschedulable:
-	transcribe "DEBUG: is [event] reschedulable? [state of event] [outcome condition of event]";
+	[transcribe "DEBUG: is [event] reschedulable? [state of event] [outcome condition of event]";]
 	unless event is already tested, no;
 	Now the dependency test outcome is event;
 	Repeat with item running through outcomes:
@@ -950,7 +946,6 @@ Definition: an outcome (called event) is reschedulable:
 			if item needs scheduling, no;
 		otherwise if item is preset:
 			if item is already scheduled:
-				transcribe "DEBUG: is [event] reschedulable? [outcome condition of item] preset [item] prevents rescheduling";
 				no;
 	if event has unresolved dependents, yes;
 	decide on whether or not event is not resolved;
@@ -1017,7 +1012,7 @@ To schedule (the event - boring lack of results):
 	start capturing text;
 	
 To schedule (the event - an outcome):
-	transcribe "DEBUG: scheduling [event]";
+	[transcribe "DEBUG: scheduling [event]";]
 	if event is a test step, now the scheduled event is event;
 	make the event testable;
 	if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
@@ -1049,24 +1044,23 @@ To continue scheduling:
 	Let repeat be true;
 	While repeat is true:
 		now repeat is false;
-		transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";
+		[transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";]
 		Repeat with event running through immediately schedulable outcomes:
-			transcribe "DEBUG: scheduling [event] repeating over [the list of immediately schedulable outcomes]";
 			schedule event;
-		transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";
+		[transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";]
 		Repeat with event running through immediately testable outcomes:
 			test effects of event;
 			if event is just-succeeded, now repeat is true;
 		if the scheduled event is resettable:
-			transcribe "DEBUG: continue scheduling, reset [the scheduled event] and schedule [the test step after the scheduled event]";
+			[transcribe "DEBUG: continue scheduling, reset [the scheduled event] and schedule [the test step after the scheduled event]";]
 			reset the scheduled event;
 			now the scheduled event is the test step after the scheduled event;
 			if the scheduled event is not boring lack of results, now repeat is true;
 		otherwise if the scheduled event is reschedulable:
-			transcribe "DEBUG: continue scheduling, reschedule [the scheduled event]";
+			[transcribe "DEBUG: continue scheduling, reschedule [the scheduled event]";]
 			prepare the scheduled event for rescheduling;
 			now repeat is true;
-	transcribe "DEBUG: continue scheduling, nothing left to do - [the list of scheduled for later testing outcomes]";
+	[transcribe "DEBUG: continue scheduling, nothing left to do - [the list of scheduled for later testing outcomes]";]
 
 To test effects of (event - an outcome):
 	Now the outcome described is event;
@@ -1083,7 +1077,6 @@ Before taking a player action when done testing is false (this is the test event
 	[now the scheduled event is not generated; todo: this happens when an outcome compels an action]
 	if taking a turn is scheduled for later testing, test taking a turn against true;
 	[TODO: always schedule taking a turn, just to ensure timeouts?]
-	transcribe "DEBUG: test event effects - continue scheduling";
 	continue scheduling;
 
 Section - Counting Actions
@@ -1093,7 +1086,6 @@ The testing combat round rules are an object based rulebook.
 A first combat round rule (this is the test combat round of previous main actor rule):
 	if the main actor is scheduled to act freely:
 		now the act-outcome of the main actor is scheduled for immediate testing;
-		transcribe "DEBUG: test combat round of previous main actor - continue scheduling";
 		continue scheduling;
 	if a person is scheduled to act freely:
 		clear event description because "completed combat round of [the main actor]";
@@ -1154,7 +1146,7 @@ First after showing the title screen (this is the run all tests rule):
 		log "Seeding random number generator and dungeon generation with [random-seed entry]";
 		now the dungeon generation seed is the random-seed entry;
 		seed the random-number generator with the random-seed entry;
-	log "Completed so far: [grand test summary], with [number of filled rows in Table of Test Set Queue] set[s] left to test";
+	log "Completed so far: [grand test summary], with [unresolved count entry] set[s] left to test";
 	Repeat through Table of Test Results:
 		if failures entry > 0:
 			log "  [failures entry] failures in [test set entry]";
@@ -1214,7 +1206,7 @@ To start the/-- next test:
 Regular scheduling of restarting for tests:
 	write file of test results from Table of Test Results;
 	choose row 1 in Table of Test Set Queue;
-	transcribe "DEBUG: unresolved count includes [the list of possible test set outcomes]";
+	transcribe "Unresolved count includes [the list of possible test set outcomes]";
 	now the unresolved count entry is the number of possible test set outcomes;
 	if the random-seed entry is not 0:
 		if the dungeon generation seed is 0:
@@ -1448,7 +1440,6 @@ The reusable item is an object that varies.
 
 First regular scheduling of an outcome (this is the return the reusable item rule):
 	if the reusable item is a thing and the reusable item is not carried:
-		transcribe "DEBUG: returning [the reusable item]";
 		now the player carries the reusable item;
 	
 [A test step can be item-reading.
