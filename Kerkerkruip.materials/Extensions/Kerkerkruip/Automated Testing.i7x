@@ -954,8 +954,8 @@ To reset (event - boring lack of results):
 	do nothing.
 	
 To reset (event - an outcome):
-	transcribe "reset [event]";
 	if event is the scheduled event:
+		[transcribe "DEBUG: reset [event], which is the scheduled event";]
 		now the dependency test outcome is the event;
 		repeat with item running through outcomes:
 			if item is dependent:
@@ -964,7 +964,7 @@ To reset (event - an outcome):
 				reset item;
 		reset the antecedent of event; [resets restarting for tests if this is the primary outcome]
 	otherwise:
-		transcribe "reset [event]: the scheduled event is [the scheduled event]";
+		[transcribe "DEBUG: reset [event]: the scheduled event is [the scheduled event]";]
 	now success count of event is 0;
 	now attempt count of event is 0;
 	now state of event is outcome-untested;
