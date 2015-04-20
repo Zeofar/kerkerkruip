@@ -3293,7 +3293,12 @@ Testing effects of wrong-success: if a random chance of 1 in 3 succeeds, rule su
 Testing effects of intended-failure: rule fails.
 Testing effects of unintended-success: rule succeeds.
 
-Regular scheduling of wait-a-turn: compel the action of waiting.
+Regular scheduling of wait-a-turn:
+	transcribe "DEBUG: regular scheduling of wait-a-turn";
+	compel the action of waiting;
+	transcribe "DEBUG: compelled waiting";
+	update event description;
+	
 Testing effects of wait-a-turn:
 	if result includes "Time passes", rule succeeds;
 	otherwise say "No time passing in '[event description]'!";
