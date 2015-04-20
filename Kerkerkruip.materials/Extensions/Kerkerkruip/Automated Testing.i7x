@@ -366,7 +366,7 @@ To decide what number is the expected successes of (event - an outcome) after (a
 	decide on (likelihood of the event * attempts) / minimum attempts of the event;
 
 The failure report is a text that varies;
-
+	
 To resolve (event - an outcome):
 	Let the tolerance be the maximum tolerance of the event;
 	Let target be the expected successes of the event after the maximum attempts of the event;
@@ -485,6 +485,7 @@ To log (msg - a text):
 	
 To transcribe (T - a text):
 	let message be "[bracket][T][close bracket][command clarification break]";
+	give no transcription reason;
 	update event description;
 	append "[message]" to file of test transcript;
 
@@ -495,14 +496,15 @@ Definition: an outcome (called event) is relevant:
 	no.
 
 To say current test description:
-	say  "[primary outcome], [scheduled event] attempt [attempt count of the scheduled event] turn [the turn count], ";
-	if there is a relevant achieved outcome:
-		say "achieved [the list of relevant achieved outcomes] | ";
-	if there is a relevant failed outcome:
-		say "failed [the list of relevant failed outcomes] | ";
-	repeat with event running through possible relevant outcomes:
-		say "'[event]' [success count of event]/[attempt count of event] times | ";
-	say "([test assertion count] assertions)";
+	unless the scheduled event is boring lack of results:
+		say  "[if the primary outcome is not boring lack of results][primary outcome], [scheduled event] attempt [attempt count of the scheduled event] turn [the turn count], ";
+		if there is a relevant achieved outcome:
+			say "achieved [the list of relevant achieved outcomes] | ";
+		if there is a relevant failed outcome:
+			say "failed [the list of relevant failed outcomes] | ";
+		repeat with event running through possible relevant outcomes:
+			say "'[event]' [success count of event]/[attempt count of event] times | ";
+		say "([test assertion count] assertions)";
 	
 To decide whether the captured text is empty: (- (captured_text-->0 == 0) -)
 
@@ -513,10 +515,10 @@ To flush to transcript:
 			transcribe "transcribed during [current test description]";
 		otherwise if giving custom transcription reason:
 			transcribe "[transcription reason] [current test description]";
-			give default transcription reason;
+	give default transcription reason; [for next time]
 	start capturing text; [and clear the captured text]
 
-To update the/-- event description/--:
+To update the/-- event description, anonymously:
 	if text capturing is active:
 		if giving default transcription reason:
 			now transcription reason is "updated event description -";
@@ -616,13 +618,11 @@ To say grand test summary:
 		now grand test failures is grand test failures plus failures entry;
 	say "[grand test total] test[s] in [number of filled rows in Table of Test Results] set[s], [grand test failures] failure[s]";
 	Let the remaining outcome tests be 0;
-	Repeat with event running through not preset possible outcomes:
-		Let ancestor be event;
-		while ancestor is greater than restarting for tests:
-			Let remainder be maximum attempts of ancestor - attempt count of ancestor;
+	Repeat with event running through possible outcomes:
+		if the test set of event is the primary outcome:
+			Let remainder be maximum attempts of event - attempt count of event;
 			if remainder is greater than the remaining outcome tests:
 				now remaining outcome tests is the remainder;
-			now ancestor is the antecedent of ancestor;
 	if the remaining outcome tests is at least 1:
 		say "; [number of not preset possible outcomes] outcome[s] to be tested up to [remaining outcome tests] more times" ;
 
