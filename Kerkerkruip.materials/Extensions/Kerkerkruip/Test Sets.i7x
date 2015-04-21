@@ -3368,7 +3368,7 @@ Initial scheduling of too-small-block:
 	prepare a test battle with the armadillo;
 	now the player is medium;
 	equip the player with the wooden buckler;
-	have the player do a block reaction to a 100 melee hit by the armadillo;
+	do the action of blocking a 100 melee hit by the armadillo;
 
 Testing effects of too-small-block: if we assert result "\+ 2 \(defender's shield too small\)", rule succeeds.
 	
@@ -3376,7 +3376,7 @@ Initial scheduling of agnostic-block:
 	equip the player with the bulwark of faith;
 	now the player worships Sul;
 	now favour of the player is 1;
-	have the player do a block reaction to a 100 melee hit by the armadillo;
+	do the action of blocking a 100 melee hit by the armadillo;
 	
 Testing effects of agnostic-block: if we assert absence of result "defender's shield too small", rule succeeds.
 		

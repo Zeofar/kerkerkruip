@@ -1619,23 +1619,13 @@ Test Arena is an arena. The staging area of Test Arena is maze-waiting-room.
 
 Test Arena is faction-imposing.
 
-reaction-type is a kind of value. The reaction-types are no reaction, parry reaction, dodge reaction, block reaction. [TODO: use action names instead?]
+[reaction-type is a kind of value. The reaction-types are no reaction, parry reaction, dodge reaction, block reaction. [TODO: use action names instead?]
 
 A reaction-type has a text called the report. The report of a reaction-type is usually "";
 
 The report of the parry reaction is "\(defender parrying\)".
 The report of the dodge reaction is "\(defender dodging\)".
-The report of the block reaction is "\(blocking\)". [ watch out - no message if block bonus is 0]
-
-To assign (reaction - a reaction-type) to (guy - a person):
-	now guy is at-react; [enable reactions]
-	if reaction is parry reaction:
-		try guy parrying;
-	else if reaction is dodge reaction:
-		try guy dodging;
-	else if reaction is block reaction:
-		try guy blocking;
-	now guy is at-Inactive; [clear reaction state]
+The report of the block reaction is "\(blocking\)". [ watch out - no message if block bonus is 0]]
 		
 To prepare a test battle with (guy - a person), inviting groups:
 	if inviting groups:
@@ -1650,41 +1640,50 @@ To prepare a test battle with (guy - a person), inviting groups:
 	
 Table of Outcomes (continued)
 outcome	description	likelihood	minimum attempts
-combat hit	"[The combat hit reactor] doing [combat hit reaction] to [melee of compelled attacker] hit by [compelled attacker]"	1	1
+combat hit	"[The compelled action] for a [melee of compelled attacker] hit by [compelled attacker]"	1	1
 
-The combat hit reactor is a person that varies.
-The combat hit reaction is a reaction-type that varies.
 The original defender weapon is an object that varies.
 The original attacker weapon is an object that varies.
+
+To decide what person is the compelled actor: decide on the actor part of the compelled action;
 
 [TODO: extract text for attack roll and attack damage if requested]
 
 [TODO: use the compelled action instead of reactor/reaction]
-To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person):
-	now the combat hit reactor is guy;
+To do (reaction - a stored action) for/-- a (strength - a number) melee hit by (aggressor - a person):
+	now the compelled action is reaction;
 	now the compelled attacker is aggressor;
-	now the combat hit reaction is reaction;
 	now the melee of the compelled attacker is strength;
-	now the defence of the combat hit reactor is 50;
+	now the defence of the compelled actor is 50;
 	schedule combat hit;
 	
 Initial scheduling of combat hit:
-	Now the original defender weapon is a random readied weapon enclosed by the combat hit reactor;
+	Now the original defender weapon is a random readied weapon enclosed by the compelled actor;
 	now the original attacker weapon is a random readied weapon enclosed by the compelled attacker;
 	
 Regular scheduling of combat hit:
-	now the health of the combat hit reactor is 1000;
-	now the combat hit reactor is not asleep;
+	now the health of the compelled actor is 1000;
+	now the compelled actor is not asleep;
 	now the compelled attacker is not asleep;
-	equip the combat hit reactor with the original defender weapon;
+	equip the compelled actor with the original defender weapon;
 	equip the compelled attacker with the original attacker weapon;
 	clear event description;
-	assign combat hit reaction to the combat hit reactor;
-	try the compelled attacker hitting the combat hit reactor;
+	now the compelled actor is at-react; [enable reactions]
+	try the compelled action;
+	now the compelled actor is at-Inactive; [clear reaction state]
+	try the compelled attacker hitting the compelled actor;
 	update event description because "combat hit -";
+	
+[TODO: forget the compelled action? When resetting?]
 
 Testing effects of combat hit:
-	if report of the combat hit reaction is not empty, assert that the event description includes "[report of the combat hit reaction]";
+	Let reaction be the action name part of the compelled action;
+	If the reaction is the parrying action:
+		assert result "\(defender parrying\)";
+	otherwise if the reaction is the dodging action:
+		assert result "\(defender dodging\)";
+	otherwise if the reaction is the blocking action:
+		assert result "\(blocking\)"; [watch out - no message if block bonus is 0];
 	rule succeeds;
 	
 [To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in (likelihood - a number) out of (total tries - a number) attempts, checking damage:
