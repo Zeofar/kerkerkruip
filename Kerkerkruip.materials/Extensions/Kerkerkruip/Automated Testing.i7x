@@ -38,11 +38,11 @@ Section - Outcomes
 [TODO: put all outcomes in a table and save it to a file. Then we can restart the game repeatedly and use outcomes to generate statistics about dungeon generation]
 An outcome is a kind of value. Some outcomes are defined by the Table of outcomes.
 
-[To say (result - an outcome):
+To say (result - an outcome):
 	if the description of the result is not empty:
 		say "[description of the result]";
 	otherwise:
-		say "[the result]";]
+		say "[the result]";
 		
 outcome state is a kind of value. The outcome states are outcome-untested, outcome-possible, outcome-failed, and outcome-achieved.
 
@@ -551,8 +551,7 @@ To transcribe and stop capturing text/-- because (reason - a text):
 To clear the/-- event description:
 	if text capturing is active:
 		if giving default transcription reason:
-			now transcription reason is "cleared event description -";
-			give custom transcription reason;
+			give no transcription reason; [if we want a message when clearing event description, we have to specify one]
 		stop capturing text;
 		flush to transcript;			
 	now the event description is "";
@@ -1013,7 +1012,8 @@ To schedule (the event - boring lack of results):
 	
 To schedule (the event - an outcome):
 	[transcribe "DEBUG: scheduling [event]";]
-	if event is a test step, now the scheduled event is event;
+	if event is a test step:
+		now the scheduled event is event;
 	make the event testable;
 	if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
 		now the outcome described is the event;
@@ -1022,6 +1022,7 @@ To schedule (the event - an outcome):
 		if attempt count of the event is 0:
 			now rescheduling is false;
 			if the event is the scheduled event, log "  next step:  [the scheduled event]";
+			clear event description; [this also happens when rescheduling, under "report an iteration"]
 			follow the initial scheduling rules for the event;
 		follow the regular scheduling rules for the event;
 	otherwise if the antecedent of the event is preset or the antecedent of the event is immediately schedulable:
@@ -1245,6 +1246,12 @@ To decide whether we assert result (T - a text):
 	now the failure report is "Regular expression '[T]' was not found in the text:[paragraph break]'[the event description]'[line break]";
 	no.
 	
+To decide whether we assert absence of result (T - a text):
+	update event description because "checking if result does not include '[T]'";
+	unless the event description matches the regular expression T, yes;
+	now the failure report is "Regular expression '[T]' should not have been found in the text:[paragraph break]'[the event description]'[line break]";
+	no.
+
 To decide whether result does not include (T - a text):
 	update event description because "checking if result does not include '[T]'";
 	decide on whether or not not (the event description matches the regular expression T);
@@ -1642,15 +1649,47 @@ To prepare a test battle with (guy - a person), inviting groups:
 	Generate the action of challenging guy in Test Arena;
 	
 Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts	antecedent
-combat hit	""	1	1	--
-after-combat-hit	""	1	1	combat hit
+outcome	description	likelihood	minimum attempts
+combat hit	"[The combat hit reactor] doing [combat hit reaction] to [melee of compelled attacker] hit by [compelled attacker]"	1	1
 
+The combat hit reactor is a person that varies.
+The combat hit reaction is a reaction-type that varies.
+The original defender weapon is an object that varies.
+The original attacker weapon is an object that varies.
 
-To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in (likelihood - a number) out of (total tries - a number) attempts, checking damage:
+[TODO: extract text for attack roll and attack damage if requested]
+
+[TODO: use the compelled action instead of reactor/reaction]
+To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person):
+	now the combat hit reactor is guy;
+	now the compelled attacker is aggressor;
+	now the combat hit reaction is reaction;
+	now the melee of the compelled attacker is strength;
+	now the defence of the combat hit reactor is 50;
+	schedule combat hit;
+	
+Initial scheduling of combat hit:
+	Now the original defender weapon is a random readied weapon enclosed by the combat hit reactor;
+	now the original attacker weapon is a random readied weapon enclosed by the compelled attacker;
+	
+Regular scheduling of combat hit:
+	now the health of the combat hit reactor is 1000;
+	now the combat hit reactor is not asleep;
+	now the compelled attacker is not asleep;
+	equip the combat hit reactor with the original defender weapon;
+	equip the compelled attacker with the original attacker weapon;
+	clear event description;
+	assign combat hit reaction to the combat hit reactor;
+	try the compelled attacker hitting the combat hit reactor;
+	update event description because "combat hit -";
+
+Testing effects of combat hit:
+	if report of the combat hit reaction is not empty, assert that the event description includes "[report of the combat hit reaction]";
+	rule succeeds;
+	
+[To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in (likelihood - a number) out of (total tries - a number) attempts, checking damage:
 	if combat hit is untested:
 		reset after-combat-hit;
-		now the description of combat hit is the substituted form of "[guy] doing [reaction] to [strength] melee hit by [aggressor] with result '[outcome]'";
 		now the melee of the aggressor is strength;
 		now the defence of guy is 50;
 		now likelihood of combat hit is likelihood;
@@ -1676,9 +1715,9 @@ To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (streng
 		[transcribe re-equipping?]
 		equip guy with original-defender-weapon;
 		equip aggressor with original-attacker-weapon;
-		reset after-combat-hit;
+		reset after-combat-hit;]
 	
-To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in/on (likelihood - a number) out of (total tries - a number) attempts, checking damage:
+[To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in/on (likelihood - a number) out of (total tries - a number) attempts, checking damage:
 	while combat hit is scheduled for immediate testing [the scheduled event is not resettable]: 
 		if checking damage:
 			test guy doing reaction to a strength melee hit by aggressor with result outcome in likelihood out of total tries attempts, checking damage;
@@ -1695,7 +1734,7 @@ To have (guy - a person) do a/-- (reaction - a reaction-type) to a/-- (strength 
 	if checking damage:
 		have guy do a reaction to a strength melee hit by aggressor with result outcome in 1 out of 1 attempts, checking damage;
 	otherwise:
-		have guy do a reaction to a strength melee hit by aggressor with result outcome in 1 out of 1 attempts.
+		have guy do a reaction to a strength melee hit by aggressor with result outcome in 1 out of 1 attempts.]
 		
 To assert that/-- (item - a weapon) readied after (circumstance - a text):
 	assert "[The item] should be readied after [circumstance]" based on whether or not the player holds item and item is readied;

@@ -3322,8 +3322,8 @@ Table of Outcomes (continued)
 Outcome	likelihood	minimum attempts	antecedent
 Simple tests	0	1	restarting for tests
 Resizing salves	1	1	--
-[too-small-block	1	1	--
-agnostic-block	1	1	--]	
+too-small-block	1	1	--
+agnostic-block	1	1	--	
 
 To decide whether we assert that (item - a thing) is (size - a size):
 	if the size of item is size, yes;
@@ -3341,14 +3341,12 @@ Testing effects of resizing salves:
 			if target is not the player, now the player carries target;
 			Let prev-size be medium;
 			now target is medium;
-			give no transcription reason;
 			clear event description;
 			try putting the item on the target;
 			while prev-size is not the size of target:
 				[TODO: how does size affect weapon stats? what about shield stats?]
 				if prev-size is [still] the size of target:
 					assert result "You carefully apply the salve to [if target is the player]yourself[otherwise][the target][end if], turning ";
-				give no transcription reason;
 				clear event description;
 				now prev-size is the size of target;
 				try putting the item on the target;
@@ -3366,20 +3364,20 @@ Testing effects of resizing salves:
 				assert that the target is tiny;
 	rule succeeds;
 
-[Initial scheduling of too-small-block:
+Initial scheduling of too-small-block:
 	prepare a test battle with the armadillo;
 	now the player is medium;
 	equip the player with the wooden buckler;
+	have the player do a block reaction to a 100 melee hit by the armadillo;
 
-Testing effects of too-small-block:
-	have the player do a block reaction to a 100 melee hit by the armadillo with result "\+ 2 \(defender's shield too small\)";
+Testing effects of too-small-block: if we assert result "\+ 2 \(defender's shield too small\)", rule succeeds.
 	
 Initial scheduling of agnostic-block:
 	equip the player with the bulwark of faith;
 	now the player worships Sul;
 	now favour of the player is 1;
+	have the player do a block reaction to a 100 melee hit by the armadillo;
 	
-Testing effects of agnostic-block:
-	have the player do a block reaction to a 100 melee hit by the armadillo with result "defender's shield too small" in 0 out of 1 attempts;]
+Testing effects of agnostic-block: if we assert absence of result "defender's shield too small", rule succeeds.
 		
 Test Sets ends here.
