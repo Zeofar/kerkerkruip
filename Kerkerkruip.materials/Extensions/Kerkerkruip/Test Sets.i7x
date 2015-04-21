@@ -6,6 +6,8 @@ Volume - All Test Sets (not for release)
 
 Include Automated Testing by Kerkerkruip.
 
+Chapter - Tests
+
 [
 Section - Aite Champions vs Bat
 
@@ -606,7 +608,7 @@ regular scheduling of an outcome (called event):
 regular scheduling of a cower-counter outcome (called event): wait for the cowerer of event to act freely;
 
 testing effects of a cower-counter outcome (called the event) (this is the cower counting rule):
-	if result includes "[The main actor] [cower] before your dreadful presence", rule succeeds;
+	if we assert result "[The main actor] [cower] before your dreadful presence", rule succeeds;
 
 initial scheduling of insane-player-cowering: now the player is insane.
 
@@ -1544,10 +1546,10 @@ initial scheduling of blessed-grenade-test:
 	extract the player to the alchemical laboratory, making sure it is unoccupied;
 	
 regular scheduling of getting-blessed: produce a grenade.
-testing effects of getting-blessed: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
+testing effects of getting-blessed: if we assert result "the Blessed Grenade drops on the ground", rule succeeds.
 	 
 regular scheduling of no-extra-blessed: produce a grenade.
-testing effects of no-extra-blessed: if result includes "the Blessed Grenade drops on the ground", rule succeeds.
+testing effects of no-extra-blessed: if we assert result "the Blessed Grenade drops on the ground", rule succeeds.
 
 To produce a grenade:
 	Repeat with item running through grenades in the location:
@@ -1581,7 +1583,7 @@ Regular scheduling of no-new-blessed: produce a grenade.
 
 Testing effects of no-new-blessed:
 	assert "The Blessed Grenade should be off-stage" based on whether or not the blessed grenade is off-stage;
-	if result includes "the Blessed Grenade drops on the ground", rule succeeds;
+	if we assert result "the Blessed Grenade drops on the ground", rule succeeds;
 	
 [
 
@@ -3252,6 +3254,10 @@ Testing effects of failing move:
 
 ]]
 
+Section - Outcome Behavior
+
+[meta tests]
+
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	maximum attempts	antecedent
 outcome-behavior	1	0	600	restarting for tests
@@ -3300,19 +3306,31 @@ Regular scheduling of wait-a-turn:
 	update event description;
 	
 Testing effects of wait-a-turn:
-	if result includes "Time passes", rule succeeds;
+	if we assert result "Time passes", rule succeeds;
 	otherwise say "No time passing in '[event description]'!";
 
 Regular scheduling of jump-a-turn: compel the action of jumping.
-Testing effects of jump-a-turn: if result includes "You jump", rule succeeds.
+Testing effects of jump-a-turn: if we assert result "You jump", rule succeeds.
 
-[
-Resizing salves is a test set.
+Chapter - Simple Tests
 
-To assert that (item - a thing) is (size - a size):
-	assert "[the item] should be [size], but it is [size of item]" based on whether or not the size of item is size;
+Section - Resizing salves
+
+[tests that don't require restart]
+
+Table of Outcomes (continued)
+Outcome	likelihood	minimum attempts	antecedent
+Simple tests	0	1	restarting for tests
+Resizing salves	1	1	--
+[too-small-block	1	1	--
+agnostic-block	1	1	--]	
+
+To decide whether we assert that (item - a thing) is (size - a size):
+	if the size of item is size, yes;
+	now the failure report is "[the item] should be [size], but it is [size of item]";
+	no.
 	
-Test play when testing resizing salves:
+Testing effects of resizing salves:
 	Let object-list be {yourself, the spiked mace of the ape king, the gilded rapier, the wooden buckler, the bulwark of faith, the plate mail};
 	Let the salve-list be a list of things;
 	Add a random unguentum crescendi to the salve-list;
@@ -3320,15 +3338,17 @@ Test play when testing resizing salves:
 	Repeat with item running through the salve-list:
 		now the player carries item;
 		Repeat with target running through object-list:
-			now the player carries target;
+			if target is not the player, now the player carries target;
 			Let prev-size be medium;
 			now target is medium;
+			give no transcription reason;
 			clear event description;
 			try putting the item on the target;
 			while prev-size is not the size of target:
 				[TODO: how does size affect weapon stats? what about shield stats?]
 				if prev-size is [still] the size of target:
 					assert result "You carefully apply the salve to [if target is the player]yourself[otherwise][the target][end if], turning ";
+				give no transcription reason;
 				clear event description;
 				now prev-size is the size of target;
 				try putting the item on the target;
@@ -3344,14 +3364,22 @@ Test play when testing resizing salves:
 			otherwise:
 				assert result "You cannot make [if target is the player]yourself[otherwise][the target] any smaller\.";
 				assert that the target is tiny;
+	rule succeeds;
+
+[Initial scheduling of too-small-block:
 	prepare a test battle with the armadillo;
 	now the player is medium;
 	equip the player with the wooden buckler;
+
+Testing effects of too-small-block:
 	have the player do a block reaction to a 100 melee hit by the armadillo with result "\+ 2 \(defender's shield too small\)";
+	
+Initial scheduling of agnostic-block:
 	equip the player with the bulwark of faith;
 	now the player worships Sul;
 	now favour of the player is 1;
-	have the player do a block reaction to a 100 melee hit by the armadillo with result "defender's shield too small" in 0 out of 1 attempts;
-]
+	
+Testing effects of agnostic-block:
+	have the player do a block reaction to a 100 melee hit by the armadillo with result "defender's shield too small" in 0 out of 1 attempts;]
 		
 Test Sets ends here.

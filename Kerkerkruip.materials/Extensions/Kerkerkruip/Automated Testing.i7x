@@ -1239,9 +1239,11 @@ The test assertion count is a number variable.
 The total assertion count is a number variable.
 The assertion failures count is a number variable.
 
-To decide whether result includes (T - a text):
+To decide whether we assert result (T - a text):
 	update event description because "checking if result includes '[T]'";
-	decide on whether or not the event description matches the regular expression T;
+	if the event description matches the regular expression T, yes;
+	now the failure report is "Regular expression '[T]' was not found in the text:[paragraph break]'[the event description]'[line break]";
+	no.
 	
 To decide whether result does not include (T - a text):
 	update event description because "checking if result does not include '[T]'";
