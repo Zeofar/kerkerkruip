@@ -586,7 +586,7 @@ regular scheduling of Dreadful-Presence-Test:
 	prepare a test battle with the blood ape;
 	revive the zombie toad in the location;
 	
-Testing effects of player-presence: if we confirm that the dreadful presence of the player is 2, rule succeeds;
+Testing effects of player-presence: if we assert that the dreadful presence of the player is 2, rule succeeds;
 	
 To decide which object is the cowerer of (event - an outcome):
 	if event is ape-cower1 or event is ape-cower2:
@@ -2671,145 +2671,233 @@ Initial scheduling of israfel-slaying:
 Testing effects of israfel-slaying:
 	try smiting Israfel;
 	assert that the died count of israfel is the challenger's initial defeats + 1 with label "died count of Israfel".
+]
 
 Section - Damage Text
 
-damage-text is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+damage-text	0	1	restarting for tests
+basic attack damage text	1	1	--	
+tense attack damage text	1	1	--
+divine-lightning text	1	1	--
+fragmentation damage text	1	1	--
 
 [Test every instance of the "inflict" phrase. If you add an invocation, please consider adding a test here.]
 
 Scenario when testing damage-text:
 	now Vast Staircase is testobject;
 
-damage-text testing is a test step. The first move of damage-text is damage-text testing.
-
-Initial scheduling of damage-text testing:
+Initial scheduling of basic attack damage text:
 	prepare a test battle with the reaper;
 	now the health of the player is 1000;
 	now the health of the reaper is 1000;
-	
-Testing effects of damage-text testing:
 	now the tension is 0;
-	Have the reaper do a dodge reaction to a 100 melee hit with result "(\n|^)You deal <1-9><0-9>* damage";
+	do the action of the reaper dodging a 100 melee hit by the player;
+	
+Testing effects of basic attack damage text: if we assert result "(\n|^)You deal <1-9><0-9>* damage", rule succeeds;
+
+Initial scheduling of tense attack damage text:
 	now the tension is 3;
-	Have the the reaper do a dodge reaction to a 100 melee hit with result "\+ 1 \(tension\)", checking damage;
-	clear event description;
-	say Divine lightning strikes the player;
-	assert result "(\n|^)A ball of lightning shoots from the sky, doing <3-7> damage to you"; [fails currently, but if it didn't, we might want another test for when the damage was reduced]
-	now the reusable item is a random fragmentation grenade;
-	clear event description;
-	have a fragmentation event in the location with the reusable item by the player;
-	assert result "<2-5> damage to the Reaper; and <2-5> damage to you";
-	[skip fragmentation in other rooms because no damage text is printed]
+	capture damage text; [TODO: reset capture mode when "make possible?" or "scheduling?" - done but possibly not done right]
+	do the action of the reaper dodging a 100 melee hit by the player.
+
+Testing effects of tense attack damage text: if we assert result "\+ 1 \(tension\)", rule succeeds.
+
+regular scheduling of divine-lightning text: say Divine lightning strikes the player;
+testing effects of divine-lightning text: if we assert result "(\n|^)A ball of lightning shoots from the sky, doing <3-7> damage to you", rule succeeds.
+	
+regular scheduling of fragmentation damage text: have a fragmentation event in the location with a random fragmentation grenade by the player.
+testing effects of fragmentation damage text: if we assert result "<2-5> damage to the Reaper; and <2-5> damage to you", rule succeeds.
+
+[skip fragmentation in other rooms because no damage text is printed]
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+dodge-thorns damage text	1	1
+lion-block damage text	1	1
+death-scroll damage text	1	1
+anti-purification damage text	1	1
+aite-statue damage text	1	1
+
+Regular scheduling of dodge-thorns damage text:
 	now the player wears the armour of thorns;
 	now the blood magic level of the armour of thorns is 1;
-	have the player do a dodge reaction to a 100 melee hit by the reaper with result "(\n|^)The armour of thorns scratches the Reaper for 1 damage.";
+	do the action of dodging a 100 melee hit by the reaper.
+
+Testing effects of dodge-thorns damage text: if we assert result "(\n|^)The armour of thorns scratches the Reaper for 1 damage.", rule succeeds.
+
+Regular scheduling of lion-block damage text:
 	now the player wears the lion's shield;
-	now the defence of the player is 50;
-	have the player do a block reaction to a 0 melee hit by the reaper with result "(\n|^)The lion on the shield strikes out, and bites the Reaper for 2 damage.";
+	do the action of blocking a 0 melee hit by the reaper.
+	
+Testing effects of lion-block damage text: if we assert result "(\n|^)The lion on the shield strikes out, and bites the Reaper for 2 damage.", rule succeeds.
+
+Regular scheduling of death-scroll damage text:
 	Now the reusable item is a random scroll of death;
 	now the player carries the reusable item;
-	clear event description;
-	try reading the reusable item;
-	assert result "(\n|^)A wave of unholy energy is released, dealing <3-6> damage to the Reaper; and <3-6> damage to you.";
-	[not sure how we could trigger an unholy wave in another room, but it wouldn't print anything anyway]
+	try reading the reusable item.
+	
+Testing effects of death-scroll damage text: if we assert result "(\n|^)A wave of unholy energy is released, dealing <3-6> damage to the Reaper; and <3-6> damage to you.", rule succeeds.
+
+[not sure how we could trigger an unholy wave in another room, but it wouldn't print anything anyway]
+
+Regular scheduling of anti-purification damage text:
 	now the player worships Chton;
 	now the player carries the vial of purification;
-	clear event description;
-	try drinking the vial of purification;
-	assert result "(\n|^)Chton prevents the vial of purification from doing its work; but your attempt at escaping undeath did not amuse him. A wave of extreme cold racks your body, dealing 15 damage!";
+	try drinking the vial of purification.
+	
+Testing effects of anti-purification damage text: if we assert result "(\n|^)Chton prevents the vial of purification from doing its work; but your attempt at escaping undeath did not amuse him. A wave of extreme cold racks your body, dealing 15 damage!", rule succeeds.
+
+Regular scheduling of aite-statue damage text:
 	extract the player to the Temple of Aite;
-	clear event description;
-	try climbing the statue of Aite;
-	assert result "(\n|^)You cut yourself as soon as you touch the statue. The weapons deal 3 damage.";
+	try climbing the statue of Aite.
+	
+Testing effects of aite-statue damage text: if we assert result "(\n|^)You cut yourself as soon as you touch the statue\. The weapons deal 3 damage\.", rule succeeds.
+	
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+abyss-wave damage text	1	1
+chain-smack damage text	1	1
+bomb-power damage text	1	1
+
+Initial scheduling of abyss-wave damage text:
 	prepare a test battle with the abyss of the soul;
-	clear event description;
-	try the abyss of the soul pulsating;
-	assert result "(\n|^)The abyss of the soul pulsates, sending out a wave of negative energy that deals <1-2> damage to you.";
+	try the abyss of the soul pulsating.
+	
+Testing effects of abyss-wave damage text: if we assert result "(\n|^)The abyss of the soul pulsates, sending out a wave of negative energy that deals <1-2> damage to you.", rule succeeds.
+
+Initial scheduling of chain-smack damage text:
 	prepare a test battle with the chain golem;
-	now the defence of the chain golem is 50;
+	now the body score of the player is -100;
 	now the melee of the player is 0;
 	now the health of the chain golem is 1000;
-	now the body score of the player is -100;
+	now the defence of the chain golem is 50;
 	now the concentration of the chain golem is 3;
-	clear event description;
-	try attacking the chain golem;
-	assert result "(\n|^)You attempt to duck under the whirling chains. You roll <0-9>+ \+ -100 \(body\) = -<0-9>+ against a target number of <0-9>+, failing the body check. One of the chains catches you with a loud smack, dealing 6 damage.";
+	try attacking the chain golem.
+
+[TODO: make sure attacking doesn't leave crap in the delayed actions table?]	
+Testing effects of chain-smack damage text: if we assert result "(\n|^)You attempt to duck under the whirling chains\. You roll <0-9>+ \+ -100 \(body\) = -<0-9>+ against a target number of <0-9>+, failing the body check\. One of the chains catches you with a loud smack, dealing 6 damage\.", rule succeeds.
+
+Regular scheduling of bomb-power damage text:
 	now the power of the bomb is granted;
 	now the health of the player is 0;
 	now the health of the chain golem is 1000;
-	clear event description;
-	have an event of the chain golem killing the player;
-	assert result "(\n|^)Your body explodes vehemently as you throw yourself at the chain golem, but you only deal 5 damage instead of the 1000 damage you needed to deal.";
-	now the health of the player is 1000;
+	have an event of the chain golem killing the player.
+	
+Testing effects of bomb-power damage text: if we assert result "(\n|^)Your body explodes vehemently as you throw yourself at the chain golem, but you only deal 5 damage instead of the 1000 damage you needed to deal.", rule succeeds.
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+tentacle-hold no damage text	1	1
+tentacle-attack wounding text	1	1
+tentacle-constrict damage text	1	1
+
+Initial scheduling of tentacle-hold no damage text:
 	prepare a test battle with the tentacle;
 	now the hit protection of the player is 1;
 	[make sure the tentacle "holds on to you" when the attack does no damage]
-	have the player do a dodge reaction to a 100 melee hit by the tentacle with result "(\n|^)The giant tentacle deals<^\n>+ 0 damage but holds on to you.";
-	check damage of the player with 1000 health after "deals";
+	do the action of dodging a 100 melee hit by the tentacle.
+
+Testing effects of tentacle-hold no damage text: if we assert "The giant tentacle deals" to the player a total of 0 damage "but holds on to you\.", rule succeeds.
+	
+Initial scheduling of tentacle-attack wounding text:
 	now the tentacle does not grapple the player;
 	now the tension is 3;
-	[Make sure the tentacle can produce a normal damage message]
-	have the player do a dodge reaction to a 100 melee hit by the tentacle with result "(\n|^)The giant tentacle deals 0 \+ <^=>+ = \d+ damage, wounding you to \d+ health\.";
-	check damage of the player with 1000 health after "deals"; [somewhat redundant here]
-	clear event description;
-	try the tentacle tentacle-constricting;
-	assert result "(\n|^)The giant tentacle tightens its muscles, dealing 1 damage to you";
-	check damage of the player with 1000 health after "dealing";
-	clear event description;
+	do the action of dodging a 100 melee hit by the tentacle.
+	
+Testing effects of tentacle-attack wounding text:
+	assert result "(\n|^)The giant tentacle deals 0 \+ <^=>+ = \d+ damage, wounding you to \d+ health\.";
+	check damage of the player with 1000 health after "deals";
+	rule succeeds.
+
+Initial scheduling of tentacle-constrict damage text: try the tentacle tentacle-constricting;
+Testing effects of tentacle-constrict damage text: if we assert "The giant tentacle tightens its muscles, dealing" to the player a total of 1 damage "to you", rule succeeds.
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+thorns-launch damage text	1	1
+israfel-burn damage text	1	1
+isra-burn damage text	1	1
+
+Regular scheduling of thorns-launch damage text: 
 	now brambles strength is 1;
-	launch the thorns;
-	assert result "(\n|^)Thorns shoot towards everyone, dealing 1 damage to the giant tentacle; and 1 damage to you\.";
-	check damage of the player with 1000 health after "to the giant tentacle; and";
-	prepare a test battle with israfel;
-	[TODO: try with heat damage resistance]
-	have israfel do no reaction to a 100 melee hit with result "(\n|^)Israfel's flames burn you for 3 damage\.";
-	check damage of the player with 1000 health after "burn you for";
+	launch the thorns.
+
+Testing effects of thorns-launch damage text: if we assert "Thorns shoot towards everyone, dealing 1 damage to the giant tentacle; and" to the player a total of 1 damage "to you\.", rule succeeds.
+	
+Initial scheduling of israfel-burn damage text:
+	prepare a test battle with Israfel;
+	do the action of Israfel waiting for a 100 melee hit by the player.
+	
+Testing effects of israfel-burn damage text:
+	if we assert 3 damage to the player after "Israfel's flames burn you for", rule succeeds.
+	
+initial scheduling of isra-burn damage text:
 	try israfel israfel-splitting;
-	have isra do no reaction to a 100 melee hit with result "(\n|^)Isra's flames burn you for 2 damage\.";
-	check damage of the player with 1000 health after "burn you for";
-	clear event description;
-	deal 3 points of Aite-damage to the player on behalf of the player;
-	assert result "(\n|^)A huge <a-w>+ bursts out of the ground, skewering you for 3 damage!";
-	check damage of the player with 1000 health after "skewering you for";
+	do the action of isra waiting for a 100 melee hit by the player.
+	
+Testing effects of isra-burn damage text: if we assert 2 damage to the player after "Isra's flames burn you for", rule succeeds.
+
+[TODO: check damage and damage description in one phrase?]
+	
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+aite-spike damage text	1	1
+chton-wave damage text	1	1
+sul-sacrifice damage text	1	1
+deathly-scroll damage text	1	1
+downstairs damage text	1	1
+bees damage text	1	1
+
+Regular scheduling of Aite-spike damage text: deal 3 points of Aite-damage to the player on behalf of the player.
+Testing effects of Aite-spike damage text: if we assert 3 damage to the player after "A huge <a-w>+ bursts out of the ground, skewering you for", rule succeeds.
+	
+Regular scheduling of chton-wave damage text:
 	now the reusable item is a random scroll of ghoulification;
 	now the player carries the reusable item;
 	try reading the reusable item;
 	now the health of Isra is 1000;
 	clear event description;
-	have Chton intervene on behalf of the player;
-	[TODO: necromantic damage reduction?]
-	assert result "(\n|^)Chton suddenly sends a wave of unholy energy through the room, dealing <3-6> damage to Fell; and <3-6> damage to Isra\.";
-	check damage of Isra with 1000 health after "to Fell; and";
+	have Chton intervene on behalf of the player.
+
+Testing effects of chton-wave damage text: if we assert "Chton suddenly sends a wave of unholy energy through the room, dealing <3-6> damage to Fell; and" to Isra any damage "to Isra\.", rule succeeds.
+
+[TODO: necromantic damage reduction?]
+
+Regular scheduling of sul-sacrifice damage text:
 	extract the player to the temple of Sul;
 	now the player does not worship chton;
 	clear event description;
 	try sacrificing;
-	assert result "(\n|^)Sul abhors the undead! Divine wrath strikes you instantly, dealing 10 damage\.";
-	check damage of the player with 1000 health after "dealing";
+	
+Testing effects of sul-sacrifice damage text: if we assert 10 damage to the player after "Sul abhors the undead! Divine wrath strikes you instantly, dealing", rule succeeds.
+
+Regular scheduling of deathly-scroll damage text:
 	now the player carries the vial of purification;
 	try drinking the vial of purification;
 	now the player worships Sul;
-	now the player carries the reusable item; [scroll of ghoulfication]
+	now the player carries the reusable item; [scroll of ghoulfication TODO: we should already have it]
 	clear event description;
 	try reading the reusable item;
-	assert result "(\n|^)Before you finish reading it, the scroll burns up in your hands! Sul is not amused by your defiant behaviour, and deals 10 damage to you\.";
-	check damage of the player with 1000 health after "deals";
+
+Testing effects of deathly-scroll damage text: if we assert "Before you finish reading it, the scroll burns up in your hands! Sul is not amused by your defiant behaviour, and deals" to the player a total of 10 damage "to you\.", rule succeeds.
+
+Regular scheduling of downstairs damage text:
 	extract the player to vast staircase;
 	clear event description;
-	try direction-jumping down;
-	assert result "(\n|^)With a loud smack, you land in [the room down from Vast Staircase], receiving <1-9> damage\.";
-	check damage of the player with 1000 health after "receiving";
+	try direction-jumping down.
 	
-bees-damage-text is a test step.
-
-Initial scheduling of bees-damage-text:
+Testing effects of downstairs damage text: if we assert described damage to the player with 1000 health after "With a loud smack, you land in [the room down from Vast Staircase], receiving", rule succeeds.
+	
+Initial scheduling of bees damage text:
 	move the swarm of bees to the location;
-	now the health of the player is 1000;
-	make everyone wait;
+	compel the action of waiting;
 	
-Testing effects of bees-damage-text:
-	assert result "The swarm of bees attacks <^\n>+, dealing <1-3> damage\.";
+Testing effects of bees damage text: if we assert result "The swarm of bees attacks <^\n>+, dealing <1-3> damage\.", rule succeeds.
+
+[
+	
 	
 [TODO: tests for all damage modifier rules]
 [TODO: test damage effects, e.g. fragmentation grenade exploding in another room]

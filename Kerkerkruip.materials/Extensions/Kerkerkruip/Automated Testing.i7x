@@ -461,7 +461,17 @@ Chapter - Persistent data
 The file of test transcript is called "testtranscript".
 
 The event description is a text that varies.
+The damage description is a text that varies.
 [globals to cut down on block copying, which is slow]
+
+The capture mode is a number that varies.
+
+To capture whole events: now the capture mode is 0.
+To decide whether capturing whole events: decide on whether or not the capture mode is 0.
+
+To capture damage text: now the capture mode is 1.
+To decide whether capturing damage text: decide on whether or not the capture mode is 1.
+
 The transcription reason is a text that varies. 
 transcription reason reporting mode is a number that varies.
 
@@ -600,14 +610,18 @@ To record a test attempt:
 		now failure messages entry is "";
 	increment the total entry;
 
-To record a/-- failure report of/-- (msg - a text):
+To record a/-- failure:
 	choose row with test set of primary outcome in Table of Test Results;	
 	increment the assertion failures count;
-	increment the failures entry;
-	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], assertion [the test assertion count]: [msg][paragraph break]";
-	now the failure messages entry is the substituted form of "[failure messages entry][new message]";
+	increment the failures entry;	
+	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], assertion [the test assertion count]: [the failure report][paragraph break]";
 	log the new message;
+	now the failure messages entry is the substituted form of "[failure messages entry][new message]";
 	now the failure report is "";
+	
+To record a/-- failure report of/-- (msg - a text):
+	now the failure report is msg;
+	record a failure;
 	
 To say grand test summary:
 	let grand test total be 0;
@@ -1014,6 +1028,7 @@ To schedule (the event - an outcome):
 	[transcribe "DEBUG: scheduling [event]";]
 	if event is a test step:
 		now the scheduled event is event;
+		capture whole events;
 	make the event testable;
 	if the antecedent of event is boring lack of results or the antecedent of event is just-succeeded:
 		now the outcome described is the event;
@@ -1242,50 +1257,33 @@ The assertion failures count is a number variable.
 
 To decide whether we assert result (T - a text):
 	update event description because "checking if result includes '[T]'";
-	if the event description matches the regular expression T, yes;
-	now the failure report is "Regular expression '[T]' was not found in the text:[paragraph break]'[the event description]'[line break]";
+	if capturing damage text:
+		if the damage description matches the regular expression T, yes;
+		now the failure report is "Regular expression '[T]' was not found in damage text:[paragraph break]'[the damage description]'[line break]";
+	otherwise:
+		if the event description matches the regular expression T, yes;
+		now the failure report is "Regular expression '[T]' was not found in the text:[paragraph break]'[the event description]'[line break]";
 	no.
 	
 To decide whether we assert absence of result (T - a text):
 	update event description because "checking if result does not include '[T]'";
-	unless the event description matches the regular expression T, yes;
-	now the failure report is "Regular expression '[T]' should not have been found in the text:[paragraph break]'[the event description]'[line break]";
+	if capturing damage text:
+		unless the damage description matches the regular expression T, yes;
+		now the failure report is "Regular expression '[T]' was not found in damage text:[paragraph break]'[the damage description]'[line break]";
+	otherwise:
+		unless the event description matches the regular expression T, yes;
+		now the failure report is "Regular expression '[T]' was not found in the text:[paragraph break]'[the event description]'[line break]";
 	no.
 
-To decide whether result does not include (T - a text):
-	update event description because "checking if result does not include '[T]'";
-	decide on whether or not not (the event description matches the regular expression T);
-
-[ Assert that two values are the same ]
-To assert that/-- (A - a value) is (B - a value):
-	assert that A is B with label "value";
-	
-To assert that/-- (A - a value) is (B - a value) with label (T - an indexed text):
-	record a test attempt;
-	unless A is B:
-		Let error_msg be an indexed text;
-		now error_msg is "Expected [T]: [B], Got: [A][line break]";
-		record a failure report of error_msg;
-
-To decide whether we confirm that/-- (A - a value) is (B - a value):
-	unless A is B:
-		now the failure report is "Expected value for [the outcome described]: [B], Got: [A]";
-	decide on whether or not A is B;
-	
-To assert (T - a text) based on (C - a truth state):
-	record a test attempt;
-	unless C is true:
-		record a failure report of T;
-
 To assert result (pattern - a text):
-	update event description because "testing for result '[pattern]'";
-	assert that the event description includes pattern;
+	record a test attempt;
+	unless we assert result pattern, record a failure;
 	
 To assert absence of result (pattern - a text):
-	update event description because "testing for absence of '[pattern]'";
-	assert that the event description does not include pattern;
+	record a test attempt;
+	unless we assert absence of result pattern, record a failure;
 	
-To assert that the (description - a text) includes (pattern - a text):
+[To assert that the (description - a text) includes (pattern - a text):
 	record a test attempt;
 	unless the description matches the regular expression pattern:
 		Let error_msg be an indexed text;
@@ -1298,6 +1296,32 @@ To assert that the (description - a text) does not include (pattern - a text):
 		Let error_msg be an indexed text;
 		now error_msg is "Regular expression '[pattern]' should not have been found in the text:[paragraph break]'[the description]'[line break]";
 		record a failure report of error_msg;
+
+To decide whether result does not include (T - a text):
+	update event description because "checking if result does not include '[T]'";
+	decide on whether or not not (the event description matches the regular expression T);
+]
+
+[ Assert that two values are the same ]
+To assert that/-- (A - a value) is (B - a value):
+	assert that A is B with label "value";
+	
+To assert that/-- (A - a value) is (B - a value) with label (T - an indexed text):
+	record a test attempt;
+	unless A is B:
+		Let error_msg be an indexed text;
+		now error_msg is "Expected [T]: [B], Got: [A][line break]";
+		record a failure report of error_msg;
+
+To decide whether we assert that/-- (A - a value) is (B - a value):
+	unless A is B:
+		now the failure report is "Expected value for [the outcome described]: [B], Got: [A]";
+	decide on whether or not A is B;
+	
+To assert (T - a text) based on (C - a truth state):
+	record a test attempt;
+	unless C is true:
+		record a failure report of T;
 
 To assert that (N - a number) is between (A - a number) and (B - a number) with label (L - a text):
 	assert "[L] [N] is not between [A] and [B]" based on whether or not N is at least A and N is at most B;
@@ -1603,15 +1627,15 @@ To decide what number is the calculated value of (T - a text):
 	otherwise:
 		decide on the final total.
 
-The damage description is a text variable.
+[Checking damage is a truth state that varies;
 
-To check damage of (guy - a person) with (previous health - a number) health after (preamble - a text):
-	assert result "[preamble](\s*\d*<^\n>+) damage";
-	now the damage description is the text matching subexpression 1;
-	Let the value be the calculated value of the damage description;
-	assert that (previous health - health of guy) is value with label "damage to [guy]"; 
-	[set things up for the next test]
-	now the health of guy is previous health;
+First before dealing attack damage when checking damage is true (this is the start capturing damage description rule):
+	give no transcription reason;
+	update the event description;	
+
+Last after dealing attack damage when checking damage is true (this is the finish capturing damage description rule):
+	now the damage description is "[the captured text]";
+	clear event description;]
 
 Section - Test Arena and Battle Phrases
 
@@ -1647,7 +1671,7 @@ The original attacker weapon is an object that varies.
 
 To decide what person is the compelled actor: decide on the actor part of the compelled action;
 
-[TODO: extract text for attack roll and attack damage if requested]
+[TODO: extract text for reaction, attack roll and attack damage if requested]
 
 [TODO: use the compelled action instead of reactor/reaction]
 To do (reaction - a stored action) for/-- a (strength - a number) melee hit by (aggressor - a person):
@@ -1678,14 +1702,65 @@ Regular scheduling of combat hit:
 
 Testing effects of combat hit:
 	Let reaction be the action name part of the compelled action;
+	Let saved mode be the capture mode;
+	capture whole events;
 	If the reaction is the parrying action:
 		assert result "\(defender parrying\)";
 	otherwise if the reaction is the dodging action:
 		assert result "\(defender dodging\)";
 	otherwise if the reaction is the blocking action:
 		assert result "\(blocking\)"; [watch out - no message if block bonus is 0];
+	now the capture mode is the saved mode;
+	if capturing damage text, check damage of the compelled actor with 1000 health after "\n[The compelled attacker] [deal]";
 	rule succeeds;
+
+to decide whether we assert (prefix - a text) to (guy - a person) any damage (suffix - a text):
+	Let the actual damage be 1000 - health of guy;
+	now the health of guy is 1000;
+	capture whole events;
+	assert result "[prefix](\s*\d*<^\n>+) damage\s+[suffix]";
+	capture damage text;
+	now the damage description is the text matching subexpression 1;
+	Let the value be the calculated value of the damage description;
+	unless the actual damage is the value:
+		now failure report is "damage to [guy] is [actual damage], but damage description adds up to [the value]";
+		no;
+	yes.
+		
+to decide whether we assert (prefix - a text) to (guy - a person) a total of (expected damage - a number) damage (suffix - a text):
+	Let the actual damage be 1000 - health of guy;
+	unless we assert prefix to guy any damage suffix:
+		no;
+	unless actual damage is expected damage:
+		now failure report is "damage to [guy] is [value], but we expected [expected damage]";
+		no;
+	yes.
 	
+to decide whether we assert (expected damage - a number) damage to (guy - a person) after (preamble - a text):
+	Let the actual damage be 1000 - health of guy;
+	unless we assert described damage to guy with 1000 health after preamble, no;
+	unless actual damage is expected damage:
+		now failure report is "damage to [guy] is [value], but we expected [expected damage]";
+		no;
+	yes.
+	
+To decide whether we assert described damage to (guy - a person) with (previous health - a number) health after (preamble - a text):
+	Let the actual damage be previous health - health of guy;
+	now the health of guy is 1000; [set things up for the next test]
+	capture whole events;
+	assert result "[preamble](\s*\d*<^\n>+) damage";
+	capture damage text;
+	now the damage description is the text matching subexpression 1;
+	Let the value be the calculated value of the damage description;
+	unless the actual damage is the value:
+		now failure report is "damage to [guy] is [actual damage], but damage description adds up to [the value]";
+		no;
+	yes.
+	
+To check damage of (guy - a person) with (previous health - a number) health after (preamble - a text):
+	record a test attempt;
+	unless we assert described damage to guy with (previous health) health after preamble, record a failure.
+
 [To test (guy - a person) doing a/-- (reaction - a reaction-type) to a/-- (strength - a number) melee hit by (aggressor - a person) with result (outcome - a text) in (likelihood - a number) out of (total tries - a number) attempts, checking damage:
 	if combat hit is untested:
 		reset after-combat-hit;
