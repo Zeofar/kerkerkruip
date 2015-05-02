@@ -3363,7 +3363,7 @@ unintended-success	0	0	100	--
 wait-a-turn	1	0	2	--
 jump-a-turn	1	0	2	--
 
-[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail. More-impossible should stall silently - i.e. no mention of it being tested ever happens (TODO: is this a mistake?)]
+[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail.]
 
 [Definition: outcome-behavior is enabled:
 	decide on whether or not the number of filled rows in Table of Test Set Queue is 1. [only runs when it's the only test]

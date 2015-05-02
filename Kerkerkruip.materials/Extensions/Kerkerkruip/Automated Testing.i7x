@@ -507,7 +507,8 @@ Definition: an outcome (called event) is relevant:
 
 To say current test description:
 	unless the scheduled event is boring lack of results:
-		say  "[if the primary outcome is not boring lack of results][primary outcome], [scheduled event] attempt [attempt count of the scheduled event] turn [the turn count], ";
+		if the primary outcome is not boring lack of results:
+			say  "[primary outcome], [scheduled event][if the outcome described is not the scheduled event], [the outcome described][end if] attempt [attempt count of the outcome described] turn [the turn count], ";
 		if there is a relevant achieved outcome:
 			say "achieved [the list of relevant achieved outcomes] | ";
 		if there is a relevant failed outcome:
