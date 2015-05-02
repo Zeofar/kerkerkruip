@@ -413,105 +413,101 @@ testing effects for tentacle-dig-retreat:
 	assert one hit by tentacle;
 	assert "the player should be grappled" based on whether or not the player is grappled by the tentacle;
 	assert that the location of the player is the location of the tentacle;
-	
+]
 
 Section - Insane Drakul
 
-insane-drakul is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+insane-drakul	0	1	restarting for tests
+drakul-mild-concentration	1	1	--
+drakul-med-concentration	1	1	--
+drakul-max-concentration	1	1	--
+Driving Drakul insane	1	1	--
+insane-mild-concentration	1	1	--
+insane-med-concentration	1	1	--
+insane-max-concentration	1	1	--
 
-A scenario rule when testing insane-drakul:
+Scenario for insane-drakul:
 	Now drakul's lifeblood is bannedobject;
 	Now drakul is testobject;
-	Now staff of insanity is testobject;
 	
-A test play when testing insane-drakul:
-	try butterflying;
-	try ramboing;
+Initial scheduling of insane-drakul:
 	now the mind score of the player is 100;  
 	extract the player to the location of drakul;
-	now the player carries staff of insanity;
+	equip the player with the staff of insanity;
 	while the size of the staff of insanity is less than medium:
 		increase the size of the staff of insanity;
-	try readying staff of insanity;
-	clear the event description because "setting up test play";
-	try Drakul concentrating;
-	assert result "Drakul smiles a little wider";
-	try Drakul concentrating;
-	assert result "'There is no need to fear me,' Drakul says as he concentrates more deeply\.";
-	try Drakul concentrating;
-	assert result "Drakul attains the highest state of concentration. 'It feels so good to be alive!'";
-	
-Driving Drakul insane is a test step. The first move of insane-drakul is driving Drakul insane.   
+		
+Regular scheduling of an outcome (called event):
+	if event is drakul-mild-concentration or event is drakul-med-concentration or event is drakul-max-concentration or event is insane-mild-concentration or event is insane-med-concentration or event is insane-max-concentration:
+		try Drakul concentrating;
+		
+Testing effects of drakul-mild-concentration: if we assert result "Drakul smiles a little wider", rule succeeds.
 
-Choosing a player action when testing driving drakul insane:
-	generate the action of attacking drakul;
+Testing effects of drakul-med-concentration: if we assert result "'There is no need to fear me,' Drakul says as he concentrates more deeply\.", rule succeeds.
 
-After taking a player action when the scheduled event is driving drakul insane:
-	now the health of Drakul is 100;
-	
-Testing effects of driving drakul insane:
-	succeed on result "Drakul goes insane"
-	
-insane drakul statements is a test step.
+Testing effects of drakul-max-concentration: if we assert result "Drakul attains the highest state of concentration. 'It feels so good to be alive!'", rule succeeds.
 
-Initial scheduling of insane drakul statements:
+Regular scheduling of driving drakul insane: do the action of Drakul waiting for a 100 melee hit by the player.
+Testing effects of driving drakul insane: if we assert result "Drakul goes insane", rule succeeds.
+	
+Initial scheduling of insane-mild-concentration:
 	if there is a held achievement of Blood never lies in the Table of Held Achievements:
 		do nothing;
 		[this causes a glk error:
 		choose row with held achievement of Blood never lies in the Table of Held Achievements;
 		blank out the whole row;]
 	now the concentration of drakul is 0;
-	clear the event description;
-	try Drakul concentrating;
-	assert result "Drakul smiles a little wider";
-	try Drakul concentrating;
-	assert result "'An insane vampire always tells the truth\. And I tell you: You should fear me!' Drakul says as he concentrates more deeply.";
-	try Drakul concentrating;
-	assert result "Drakul attains the highest state of concentration\. 'It feels so good to be alive - but I am undead!'";
-
-After taking a player action when the scheduled event is insane drakul statements:
-	compel the action of drakul waiting;
 	
-[some of these appear too unlikey to happen within 100 iterations. Increase iterations?]
+Testing effects of insane-mild-concentration: if we assert result "Drakul smiles a little wider", rule succeeds.
+
+Testing effects of insane-med-concentration: if we assert result "'An insane vampire always tells the truth\. And I tell you: You should fear me!' Drakul says as he concentrates more deeply.", rule succeeds.
+
+Testing effects of insane-max-concentration: if we assert result "Drakul attains the highest state of concentration\. 'It feels so good to be alive - but I am undead!'", rule succeeds.
 
 Table of Outcomes (continued)
-outcome	maximum attempts	antecedent
-drakul statement	200	--
-drakul identity	--	drakul statement
-simple drakul identity	--	drakul identity
-drakul conditional	--	drakul statement
-double conditional	--	drakul conditional
-nested conditionals	--	double conditional
-nested belief	200	drakul statement
-lifeblood-hinting	--	drakul statement
-lifeblood-location	--	lifeblood-hinting
-vampire-turning-hinting	--	drakul statement
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+drakul statement	1	1	200	--
+drakul identity	1	0	--	drakul statement
+simple drakul identity	1	0	--	drakul identity
+drakul conditional	1	0	--	drakul statement
+double conditional	1	0	--	drakul conditional
+nested conditionals	1	0	--	double conditional
+nested belief	1	0	200	drakul statement
+lifeblood-hinting	1	0	--	drakul statement
+lifeblood-location	1	0	--	lifeblood-hinting
+vampire-turning-hinting	1	0	--	drakul statement
+Drakul suicide	1	1	--	--
 
-Testing effects of insane drakul statements:
-	if waiting for compelled action, make no decision;
-	achieve drakul statement on result "Drakul says, '(<^'\n>*)";
-	now the event description is the text matching subexpression 1;
-	achieve drakul identity on result "I am .+ (vampire|insane)";
-	achieve simple drakul identity based on whether or not not (the event description matches the regular expression "not|someone who|, and|, or"); [TODO: test/achieve on absence of result]
-	achieve drakul conditional on result "^If .*,";
-	achieve double conditional on result "I would give you";
-	achieve nested conditionals on result ", if|, and|, or";;
-	achieve nested belief on result "I believe that I believe";
-	achieve lifeblood-hinting on result "a vial of my lifeblood\b";
-	achieve lifeblood-location on result "I am carrying| is in | can be found | is currently unreachable, ";
-	achieve vampire-turning-hinting on result "\bI intend to vanquish Malygris after I make you my vampire-slave\b|\byou will never be my vampire-slave\b";
+Regular scheduling of drakul statement: try Drakul waiting.
+
+Testing effects of drakul statement:
+	if we assert result "Drakul says, '(<^'\n>*)":
+		now the event description is the text matching subexpression 1;
+		rule succeeds.
+
+testing effects of drakul identity: if we assert result "I am .+ (vampire|insane)", rule succeeds.
+testing effects of simple drakul identity: if we assert absence of result "not|someone who|, and|, or", rule succeeds.
+testing effects of drakul conditional: if we assert result "^If .*,", rule succeeds.
+testing effects of double conditional: if we assert result "I would give you", rule succeeds.
+testing effects of nested conditionals: if we assert result ", if|, and|, or", rule succeeds.
+testing effects of nested belief: if we assert result "I believe that I believe", rule succeeds.
+testing effects of lifeblood-hinting: if we assert result "a vial of my lifeblood\b", rule succeeds.
+testing effects of lifeblood-location: if we assert result "I am carrying| is in | can be found | is currently unreachable, ", rule succeeds.
+testing effects of vampire-turning-hinting: if we assert result "\bI intend to vanquish Malygris after I make you my vampire-slave\b|\byou will never be my vampire-slave\b", rule succeeds.
+
 	[this doesn't compile:
 	assert "Blood never lies achievement should be held" based on whether not there is a held achievement of Blood never lies in the Table of Held Achievements;]
-
-Drakul suicide is a test step.
 
 Initial scheduling of drakul suicide:
 	now the health of drakul is 1;
 	now the melee of drakul is 100;
-	clear the event description;
 	try drakul hitting drakul;
-	assert result "drains his own blood, a small vial";
 	
+Testing effects of drakul suicide: if we assert result "drains his own blood, a small vial", rule succeeds.
+
+[	
 Section - Enemies should always start out awake in Arena of the Fallen
 
 Sleeping Fallen is a test set.
@@ -2685,6 +2681,8 @@ fragmentation damage text	1	1	--
 
 [Test every instance of the "inflict" phrase. If you add an invocation, please consider adding a test here.]
 
+[TODO: test #384 - glass cannon weapon damage bonus]
+
 Scenario when testing damage-text:
 	now Vast Staircase is testobject;
 
@@ -3365,7 +3363,7 @@ unintended-success	0	0	100	--
 wait-a-turn	1	0	2	--
 jump-a-turn	1	0	2	--
 
-[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail.]
+[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail. More-impossible should stall silently - i.e. no mention of it being tested ever happens (TODO: is this a mistake?)]
 
 [Definition: outcome-behavior is enabled:
 	decide on whether or not the number of filled rows in Table of Test Set Queue is 1. [only runs when it's the only test]

@@ -409,8 +409,8 @@ at 197:
 To resolve dependents of (event - an outcome):
 	if the state of the event is outcome-failed or the event timed out:
 		if the event has unresolved dependents:
-			Repeat with item running through dependent outcomes:
-				if item is not resolved:
+			Repeat with item running through outcomes:
+				if item is not resolved and item depends on event:
 					[if the event failed, dependents fail silently. If the event succeeded, they fail noisily]
 					if state of the event is outcome-achieved, assert "[item] ([success count of item]/[attempt count of item]) stalled because [event] timed out after [attempt count of event - 1] attempt[s]" based on false;
 					now state of item is outcome-failed;
@@ -614,7 +614,7 @@ To record a/-- failure:
 	choose row with test set of primary outcome in Table of Test Results;	
 	increment the assertion failures count;
 	increment the failures entry;	
-	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], assertion [the test assertion count]: [the failure report][paragraph break]";
+	let new message be "Failure for test: [the primary outcome], step: [the scheduled event], [if the outcome described is not the scheduled event][the outcome described], [end if]assertion [the test assertion count]: [the failure report][paragraph break]";
 	log the new message;
 	now the failure messages entry is the substituted form of "[failure messages entry][new message]";
 	now the failure report is "";
@@ -769,7 +769,6 @@ testing effects rules are an outcome based rulebook.
 
 Section - Controlling Outcomes
 
-The dependency test outcome is an outcome that varies. The dependency test outcome is boring lack of results.
 The dependency test root is an outcome that varies. The dependency test root is boring lack of results.
 
 [The phrase below returns true if another outcome depends on the event, and also sets the dependency test outcome so we can use the "dependent" adjective
@@ -785,22 +784,25 @@ When scheduling happens, everything in the "trunk" will be manually made possibl
 ]
 
 To decide whether (event - an outcome) has unresolved dependents:
-	now the dependency test outcome is the event;
-	decide on whether or not there is a currently dependent outcome.
+	repeat with item running through outcomes:
+		if item currently depends on event, yes;
+	no.
 	
-Definition: an outcome (called event) is dependent:
+To decide whether (event - an outcome) depends on (blocker - an outcome):
 	Let candidate be the event;
 	while candidate is not boring lack of results:
 		now candidate is the antecedent of the candidate;
 		[We don't check for cyclical dependencies. Beware!]
-		if candidate is the dependency test outcome:
+		if candidate is blocker:
 			decide yes;
 	decide no.
 	
-Definition: an outcome (called event) is currently dependent:	if the dependency test outcome is preset:
-		if event is possible and event is dependent, yes;
+To decide whether (event - an outcome) currently depends on (blocker - an outcome):
+	unless event depends on blocker, no;
+	if the blocker is preset:
+		decide on whether or not event is possible;
 	otherwise:
-		if event is not resolved and event is dependent, yes;
+		decide on whether or not event is not resolved;
 	
 To decide what number is the calculated maximum attempts of (event - an outcome):
 	unless maximum attempts of event is 0:
@@ -929,34 +931,39 @@ Definition: boring lack of results is resettable: no; [or yes?]
 Definition: an outcome (called event) is resettable:
 	if event is not the scheduled event, no;
 	if event is not resolved, no;
-	now the dependency test outcome is event;
-	[transcribe "DEBUG: is [event] resettable?";]
 	repeat with item running through outcomes:
-		if item is currently dependent, no;
+		if item currently depends on event:
+			no;
 		if item is not restarting for tests and item is preset:
 			if item is already scheduled, no;
 			if item is possible, no;
 	[if there is a pending not test set outcome that is not restarting for tests, [TODO: fix this hack!] no;]
 	yes;
 	
+[This phrase determines if an outcome should be scheduled before resetting or rescheduling the scheduled event. It may not necessarily be schedulable right now (for that we use "immediately schedulable")]
+
 To decide whether (event - an outcome) needs scheduling:
 	if event is not unscheduled, no;
+	[transcribe "DEBUG: does [event] need scheduling?";]
 	if event is not the scheduled event:
 		if event is a test step, no;
 		if event is a test set, no;
-		if the antecedent of the event is not just-succeeded, no;
-	if event is not a test set and the test set of event is not the primary outcome, no; [this includes presets, which are scheduled manually or by antecedent]
+		Let blocker be the antecedent of the event;
+		While blocker is not boring lack of results:
+			if blocker is just-tested, no; [we need a rescheduling so the antecedent can be just-succeeded]
+			now blocker is the antecedent of blocker; 
+	if [event is not a test set and - redundant?] the test set of event is not the primary outcome, no; [this includes presets, which are scheduled manually or by antecedent]
 	if event is resolved and not (event has unresolved dependents), no;
 	yes.
 
 Definition: an outcome (called event) is reschedulable:
-	[transcribe "DEBUG: is [event] reschedulable? [state of event] [outcome condition of event]";]
 	unless event is already tested, no;
-	Now the dependency test outcome is event;
 	Repeat with item running through outcomes:
-		if item is dependent:
-			if item is already scheduled, no;
-			if item needs scheduling, no;
+		if item depends on event:
+			if item is already scheduled:
+				no;
+			if item is immediately schedulable:
+				no;
 		otherwise if item is preset:
 			if item is already scheduled:
 				no;
@@ -969,9 +976,8 @@ To reset (event - boring lack of results):
 To reset (event - an outcome):
 	if event is the scheduled event:
 		[transcribe "DEBUG: reset [event], which is the scheduled event";]
-		now the dependency test outcome is the event;
 		repeat with item running through outcomes:
-			if item is dependent:
+			if item depends on event:
 				reset item;
 			if item is preset and item is resolved and item is not restarting for tests: [why not reset restarting for tests here? I think it causes too many restarts]
 				reset item;
@@ -987,10 +993,9 @@ To reset (event - an outcome):
 
 To prepare (event - an outcome) for rescheduling:
 	report an iteration because "rescheduling [event] -";
-	now the dependency test outcome is event;
 	repeat with item running through outcomes:
-		if item is preset or item is dependent, now item is unscheduled;
-	now the dependency test outcome is unscheduled;
+		if item is preset or item depends on event, now item is unscheduled;
+	now the event is unscheduled;
 			
 Definition: an outcome (called event) is already scheduled if it is scheduled for immediate testing or it is scheduled for later testing;
 Definition: an outcome (called event) is already tested if it is just-tested or it is just-succeeded;
@@ -999,14 +1004,18 @@ Definition: boring lack of results is immediately schedulable: no.
 
 Definition: an outcome (called event) is immediately schedulable:
 	unless event needs scheduling, no;
+	if the antecedent of the event is not preset and antecedent of the event is not just-succeeded, no;
 	Let the blocker be event;
 	While the blocker is not boring lack of results:
-		if blocker is already scheduled, no;
+		if blocker is already scheduled:
+			no;
+		otherwise if blocker is not just-succeeded:
+			if blocker is the antecedent of the event and blocker is not preset, no;
 		now blocker is the antecedent of blocker;
 	if event is resettable, no;
 	if a preset outcome is scheduled for later testing, no;
-	Repeat with dependent running through outcomes:
-		if dependent is already scheduled and the antecedent of dependent is the event, no;
+	Repeat with dependent running through already scheduled outcomes:
+		if the antecedent of dependent is the event, no;
 	yes;
 		
 Definition: an outcome (called event) is immediately testable:
@@ -1036,8 +1045,9 @@ To schedule (the event - an outcome):
 		now the event is scheduled for immediate testing;
 		if attempt count of the event is 0:
 			now rescheduling is false;
-			if the event is the scheduled event, log "  next step:  [the scheduled event]";
-			clear event description; [this also happens when rescheduling, under "report an iteration"]
+			if the event is the scheduled event:
+				log "  next step:  [the scheduled event]";
+				clear event description; [this also happens when rescheduling, under "report an iteration"]
 			follow the initial scheduling rules for the event;
 		follow the regular scheduling rules for the event;
 	otherwise if the antecedent of the event is preset or the antecedent of the event is immediately schedulable:
@@ -1063,7 +1073,7 @@ To continue scheduling:
 		[transcribe "DEBUG: continue scheduling [the list of immediately schedulable outcomes]";]
 		Repeat with event running through immediately schedulable outcomes:
 			schedule event;
-		[transcribe "DEBUG: continue testing [the list of immediately testable outcomes]";]
+		[transcribe "DEBUG: continue scheduling, immediately testable: [the list of immediately testable outcomes]";]
 		Repeat with event running through immediately testable outcomes:
 			test effects of event;
 			if event is just-succeeded, now repeat is true;
@@ -1080,12 +1090,14 @@ To continue scheduling:
 
 To test effects of (event - an outcome):
 	Now the outcome described is event;
-	update event description because "testing effects of [event] -";
+	give no transcription reason;
+	update event description;
 	follow the testing effects rules for the event;
 	let success be whether or not the rule succeeded;
-	if event is the scheduled event:
-		update event description because "done testing effects of [event] -";
+	let resolution be whether or not the event is resolved;
 	test the event against success;
+	if resolution is false or success is false, transcribe "tested effects of [if success is true][current test description] - success[otherwise][the outcome described] - no success[end if]";
+	[update event description because "done testing effects of [event] -";]
 	[todo: make dependents unscheduled?]
 
 Before taking a player action when done testing is false (this is the test event effects rule):
