@@ -8,30 +8,33 @@ Include Automated Testing by Kerkerkruip.
 
 Chapter - Tests
 
-[
 Section - Aite Champions vs Bat
 
-Aite champions vs bat is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+aite champions vs bat	0	1	restarting for tests
+player-targeted	1	0	--
+spike-flyer	1	0	player-targeted
+player-missed	1	0	player-targeted
+player-damaged	1	0	player-targeted
+bat crashing into spike	1	0	player-damaged
+bat avoiding huge spike	1	0	player-missed
+bat avoiding gigantic spike	1	0	player-missed	
+Arena-tormentor-enslaving	1	0	--
+arena-tormentor-damaged	1	0	arena-tormentor-enslaving
+arena-tormentor-killed	1	0	arena-tormentor-enslaving
+tormentor-killed-only-once	1	1	arena-tormentor-killed
 
-A scenario rule when testing Aite champions vs bat:
+Scenario rule for Aite champions vs bat:
 	now Bodmall is testobject;
 	now mindslug is testobject;
 	now Hall of Gods is testobject;
 	now Drakul's lifeblood is testobject;
 	now Temple of Chton is testobject;
-		
-[TODO: create randomized test plays
-attempt rulebook does something that might make the test qualify
-application rulebook check if the test applies and marks it as completed - or chooses which test to run based on attempt outcome
-assertion rulebook runs the test's assertions]
 	
-A test play when testing Aite champions vs bat:
-	say "DEBUG: updating monster statistics.";
+Regular scheduling of Aite champions vs bat:
 	[TODO: Why doesn't this interrupt text capture when doing it from the killing rules does?]
 	update the monster statistics;
-	assert "should be capturing text" based on whether or not text capturing is active;
-	[Answer? This line doesn't get captured, but it does get transcribed. Capturing gets interrupted by recording a test attempt]
-	say "This should be captured.";
 	now the player carries Drakul's lifeblood;
 	extract the player to the location of Bodmall;
 	have the player defeat Bodmall;
@@ -45,54 +48,52 @@ A test play when testing Aite champions vs bat:
 	have the player and the healer of aite fight in Arena of the Gods;
 	try drinking Drakul's lifeblood;
 	try turning bat;
-	Repeat with guy running through people in Arena of the Gods:
-		now the defence of guy is 100;
 
-Aite spike vs bat is a test step. The first move of Aite champions vs bat is aite spike vs bat.
-
-After taking a player action when the scheduled event is aite spike vs bat:
+regular scheduling of player-targeted:
 	repeat with guy running through people in the location:
-		now health of guy is 100;
-	
-Intervention possible when the scheduled event is aite spike vs bat:
+		now health of guy is 1000;
+	compel the action of waiting;
+		
+Intervention possible when testing player-targeted:
 	unless the main actor is the player and intervention-god is Aite, rule fails;
 	
-Intervention bonus when the scheduled event is aite spike vs bat:
+Intervention bonus when testing player-targeted:
 	if the main actor is the player, increase the intervention-bonus by 100;
 	
-Table of Outcomes (continued)
-outcome	antecedent
-player-targeted	--
-spike-flyer	player-targeted
-player-missed	player-targeted
-player-damaged	player-targeted
-bat crashing into spike	player-damaged
-bat avoiding huge spike	player-missed
-bat avoiding gigantic spike	player-missed	
+testing effects of player-targeted: if we assert result "bursts out of the ground<^[line break]>+ you", rule succeeds.
+testing effects of spike-flyer: if we assert result "bursts out of the ground in front of you", rule succeeds.
+testing effects of player-missed: if the health of the player is 1000, rule succeeds.
+testing effects of player-damaged: if the health of the player is less than 1000, rule succeeds.
+testing effects of bat crashing into spike: if we assert result "crash into", rule succeeds.
+testing effects of bat avoiding huge spike: if we assert result "huge <a-z>+ bursts out of the ground in front of you", rule succeeds.
+testing effects of bat avoiding gigantic spike: if we assert result "gigantic <a-z>+ bursts out of the ground in front of you", rule succeeds.
 
-testing effects of aite spike vs bat:
-	achieve player-targeted on result "bursts out of the ground<^[line break]>+ you";
-	achieve spike-flyer on result "bursts out of the ground in front of you";
-	achieve player-missed based on whether or not health of the player is 100;
-	achieve player-damaged based on whether or not the health of the player is less than 100;
-	achieve bat crashing into spike on result "crash into";
-	achieve bat avoiding huge spike on result "huge <a-z>+ bursts out of the ground in front of you";
-	achieve bat avoiding gigantic spike on result "gigantic <a-z>+ bursts out of the ground in front of you";
-				
-Arena-tormentor-enslaving is a test step.
-
-Choosing a player action when testing Arena-tormentor-enslaving:
-	generate the action of enslaving the tormentor of Aite.
+Initial scheduling of Arena-tormentor-enslaving:
+	now the health of the tormentor of Aite is the permanent health of the tormentor of Aite;
+	
+Regular scheduling of Arena-tormentor-enslaving:
+	now enslave-cooldown is 0;
+	compel the action of enslaving the tormentor of Aite.
 	
 testing effects of Arena-tormentor-enslaving:
 	assert result "will do your bidding";
-	assert result "ball of lightning .* damage to the tormentor of Aite";
-	if the tormentor of Aite is alive:
-		assert result "The tormentor of Aite prostrates herself. 'I beg for your mercy, O great Aite,' she prays. Then she rises to fight you again!";
-		assert "tormentor should oppose the player" based on whether or not the tormentor of Aite opposes the player;
-	otherwise:
-		assert result ", killing her";
+	if we assert result "ball of lightning .* damage to the tormentor of Aite", rule succeeds.
+	
+Testing effects of Arena-tormentor-damaged:
+	if the tormentor of Aite is not alive, make no decision;
+	assert "tormentor should oppose the player" based on whether or not the tormentor of Aite opposes the player;
+	if we assert result "The tormentor of Aite prostrates herself. 'I beg for your mercy, O great Aite,' she prays. Then she rises to fight you again!", rule succeeds;
+	
+testing effects of Arena-tormentor-killed:
+	if the tormentor of Aite is dead, rule succeeds;
 
+testing effects of tormentor-killed-only-once:
+	assert result ", killing her";
+	if we assert absence of result "killing her.*killing her", rule succeeds.
+		
+[TODO: killing message should only happen once]
+
+[
 Section - Enslaving the Defender
 
 Defender-enslaving is a test set.

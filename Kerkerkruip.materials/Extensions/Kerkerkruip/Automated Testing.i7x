@@ -862,7 +862,8 @@ Definition: An outcome (called event) is preset:
 	decide on whether or not event is less than the first test set.
 	
 To report an iteration because (reason - a text):
-	transcribe and stop capturing text because reason;
+	clear event description because reason;
+	stop capturing text;
 	say " .[run paragraph on]";
 	start capturing text;
 		
@@ -1097,7 +1098,7 @@ To test effects of (event - an outcome):
 	let success be whether or not the rule succeeded;
 	let resolution be whether or not the event is resolved;
 	test the event against success;
-	if resolution is false or success is false, transcribe "tested effects of [if success is true][current test description] - success[otherwise][the outcome described] - no success[end if]";
+	if resolution is false or success is false, transcribe "tested effects of [if success is true][current test description] - success[otherwise][the outcome described] ([success count of the outcome described]/[attempt count of the outcome described]) - no success[end if]";
 	[update event description because "done testing effects of [event] -";]
 	[todo: make dependents unscheduled?]
 
