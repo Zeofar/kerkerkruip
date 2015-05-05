@@ -8,11 +8,11 @@ Include Automated Testing by Kerkerkruip.
 
 Chapter - Tests
 
-Section - Aite Champions vs Bat
+Section - aite champions vs mindbat
 
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	antecedent
-aite champions vs bat	0	1	restarting for tests
+aite champions vs mindbat	0	1	restarting for tests
 player-targeted	1	0	--
 spike-flyer	1	0	player-targeted
 player-missed	1	0	player-targeted
@@ -25,14 +25,14 @@ arena-tormentor-damaged	1	0	arena-tormentor-enslaving
 arena-tormentor-killed	1	0	arena-tormentor-enslaving
 tormentor-killed-only-once	1	1	arena-tormentor-killed
 
-Scenario rule for Aite champions vs bat:
+Scenario rule for aite champions vs mindbat:
 	now Bodmall is testobject;
 	now mindslug is testobject;
 	now Hall of Gods is testobject;
 	now Drakul's lifeblood is testobject;
 	now Temple of Chton is testobject;
 	
-Regular scheduling of Aite champions vs bat:
+Regular scheduling of aite champions vs mindbat:
 	[TODO: Why doesn't this interrupt text capture when doing it from the killing rules does?]
 	update the monster statistics;
 	now the player carries Drakul's lifeblood;
@@ -90,68 +90,48 @@ testing effects of Arena-tormentor-killed:
 testing effects of tormentor-killed-only-once:
 	assert result ", killing her";
 	if we assert absence of result "killing her.*killing her", rule succeeds.
-		
-[TODO: killing message should only happen once]
 
-[
 Section - Enslaving the Defender
 
-Defender-enslaving is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+Defender-enslaving	1	1
+defender-re-enslaving	1	1
 
-A scenario rule when testing Defender-enslaving:
-	now Bodmall is testobject;
-	now mindslug is testobject;
-	now Hall of Gods is testobject;
-	now Temple of Sul is testobject;
-	block interventions;
-	
-A test play when testing Defender-enslaving:
-	try butterflying;
-	try meatboying;
-	extract the player to the location of Bodmall;
-	have the player defeat Bodmall;
-	extract the player to temple of Sul;
-	have the player sacrifice a random granted power;
-	assert that the favour of the player with Sul is 4;
-	extract the player to the location of the mindslug;
-	have the player defeat the mindslug;
-	now the mind score of the player is 1000;
-	extract the player to Hall of Gods;
-	have the player and the healer of aite fight in Arena of the Gods;
-	try smiting the tormentor of Aite;
-	try smiting the healer of Aite;
+initial scheduling of Defender-enslaving:
+	try turning human;
+	now the player worships Sul;
+	now the favour of the player is 4; [not sure if this is really important]
+	now the health of the healer of Aite is 0;
+	have an event of the player killing the healer of Aite;
 	now the health of Defender of Aite is 100;
+	clear event description;
 	
-Arena-defender-enslaving is a test step. The first move of Defender-enslaving is Arena-defender-enslaving. 
+regular scheduling of an outcome (called event):
+	if event is defender-enslaving or event is defender-re-enslaving:
+		now enslave-cooldown is 0;
+		compel the action of enslaving the defender of Aite.
 
-Choosing a player action when testing Arena-defender-enslaving:
-	generate the action of enslaving the defender of Aite.
-
-testing effects of Arena-defender-enslaving:
+testing effects of defender-enslaving:
 	assert result "will do your bidding";
 	assert result "ball of lightning .* damage to the defender of Aite";
 	assert result "The defender of Aite prostrates himself. 'I beg for your mercy, O great Aite,' he prays. Then he rises to fight you again!";
-	assert "the defender should oppose the player" based on whether or not the defender of Aite opposes the player;
+	if the defender of Aite opposes the player, rule succeeds;
 
-Arena-defender-re-enslaving is a test step. The next move of Arena-defender-enslaving is Arena-defender-re-enslaving.   
-
-Choosing a player action when testing Arena-defender-re-enslaving:
-	generate the action of enslaving the defender of Aite;
-
-Before taking a player action when Arena-defender-re-enslaving is the scheduled event:
+regular scheduling of defender-re-enslaving:
 	now the health of Defender of Aite is 1;
 	now the health of the player is 1;
 	now the permanent health of the player is 100;
-	now enslave-cooldown is 0;
 	
-testing effects of Arena-defender-re-enslaving:
+testing effects of defender-re-enslaving:
 	assert result "will do your bidding";
 	assert result "ball of lightning .* damage to the defender of Aite, killing him";
 	assert that the location is Hall of Gods;
 	assert result "receives the soul";
-	assert that the health of the player is 100;
-	assert "the defender of Aite should be off-stage" based on whether or not defender of Aite is off-stage. 
+	assert "the defender of Aite should be off-stage" based on whether or not defender of Aite is off-stage;
+	if the health of the player is 100, rule succeeds;
 
+[
 Section - Chton Champion vs Bat
 
 Chton champion vs bat is a test set.
@@ -3364,7 +3344,7 @@ unintended-success	0	0	100	--
 wait-a-turn	1	0	2	--
 jump-a-turn	1	0	2	--
 
-[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail.]
+[This is a meta-test. impossible-flip, more-impossible, after-first, wrong-success, and unintended-success should fail. Sometimes more-impossible never gets tested because impossible-flip never gives it a chance... I think that's probably ok either way]
 
 [Definition: outcome-behavior is enabled:
 	decide on whether or not the number of filled rows in Table of Test Set Queue is 1. [only runs when it's the only test]
