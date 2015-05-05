@@ -590,30 +590,6 @@ testing effects of a cower-counter outcome (called the event) (this is the cower
 initial scheduling of insane-player-cowering: now the player is insane.
 
 [
-Section - Controlling pipes
-
-Controlling pipes is a test set.
-
-Scenario when testing controlling pipes:
-	now Hall of Vapours is testobject;
-	
-Test play when testing controlling pipes:
-	extract the player to Hall of Vapours;
-	now pipes-open is true;
-	clear the event description;
-	try looking;
-	assert result "Several large pipes continuously spew forth vapours into this room\. A big wheel is attached";
-	try examining the pipes;
-	assert result " They are currently spewing vapours into the room\.";
-	try examining the wheel;
-	assert result "which are currently open\.";
-	try turning the wheel;
-	clear the event description;
-	try examining the pipes;
-	assert result " They are currently shut off\.";
-	try examining the wheel;
-	assert result "which are currently closed\.";
-
 [Section - Sul Champion vs Herm worshipper
 
 Sul Champion vs Herm worshipper is a test set.
@@ -3446,5 +3422,40 @@ Initial scheduling of agnostic-block:
 	do the action of blocking a 100 melee hit by the armadillo;
 	
 Testing effects of agnostic-block: if we assert absence of result "defender's shield too small", rule succeeds.
-		
+	
+Section - Controlling pipes
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+open-pipes	1	1
+x-open pipes	1	1
+x-open wheel	1	1
+x-closed pipes	1	1
+x-closed wheel	1	1
+
+Scenario for simple tests: now Hall of Vapours is testobject.
+	
+initial scheduling of open-pipes:
+	extract the player to Hall of Vapours;
+	now pipes-open is true;
+	try looking.
+	
+Testing effects of open-pipes: if we assert result "Several large pipes continuously spew forth vapours into this room\. A big wheel is attached", rule succeeds.
+
+regular scheduling of x-open pipes: try examining the pipes.
+testing effects of x-open pipes: if we assert result " They are currently spewing vapours into the room\.", rule succeeds.
+
+regular scheduling of x-open wheel: try examining the wheel.
+testing effects of x-open wheel: if we assert result "which are currently open\.", rule succeeds.
+
+initial scheduling of x-closed pipes:
+	try turning the wheel;
+	clear the event description;
+	
+regular scheduling of x-closed pipes: try examining the pipes.
+testing effects of x-closed pipes: if we assert result " They are currently shut off\.", rule succeeds.
+
+regular scheduling of x-closed wheel: try examining the wheel.
+testing effects of x-closed wheel: if we assert result "which are currently closed\.", rule succeeds.
+
 Test Sets ends here.
