@@ -486,35 +486,6 @@ Initial scheduling of drakul suicide:
 	
 regular scheduling of drakul suicide: try drakul hitting drakul.
 Testing effects of drakul suicide: if we assert result "drains his own blood, a small vial", rule succeeds.
-
-[	
-Section - Enemies should always start out awake in Arena of the Fallen
-
-Sleeping Fallen is a test set.
-
-Scenario when testing Sleeping Fallen:
-	now the blood ape is testobject;
-	now Entrance to the Arena is testobject;
-	now a random scroll of death is testobject;
-	
-To assert that (guy - a person) is asleep:
-	assert "[The guy] should be asleep" based on whether or not the guy is asleep;
-	
-To assert that (guy - a person) is awake:
-	assert "[The guy] should be awake" based on whether or not the guy is not asleep;
-	
-Test play when testing Sleeping Fallen:
-	now the blood ape is asleep;
-	extract the player to the location of the blood ape;
-	Let the snuffer be a random not off-stage scroll of death;
-	now the player carries the snuffer;
-	now the health of the blood ape is 1;
-	try reading the snuffer;
-	assert that the blood ape is asleep;;
-	assert "the blood ape should be dead" based on whether or not the blood ape is dead;
-	have the player and the blood ape fight in Arena of the Fallen;
-	assert that the blood ape is awake;
-]
 	
 Section - Dreadful Presence
 
@@ -3450,5 +3421,31 @@ Initial scheduling of died-count-test:
 Regular scheduling of died-count-test: try smiting Israfel.
 	
 Testing effects of died-count-test: if we assert that the died count of israfel is the challenger's initial defeats + 1 with label "died count of Israfel", rule succeeds.
+
+	
+Section - Enemies should always start out awake in Arena of the Fallen
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+sleeping fallen	1	1
+dead-fallen	1	1
+awake-in-fallen-arena	1	1
+
+Scenario when testing Simple Tests: now Entrance to the Arena is testobject.
+	
+initial scheduling of Sleeping Fallen:
+	now the player worships nothing;
+	now the favour of the player is 0;
+	prepare a test battle with the blood ape;
+	now the blood ape is asleep;
+	Now the reusable item is a random scroll of death;
+	now the health of the blood ape is 1;
+	
+Regular scheduling of Sleeping fallen: try reading the reusable item.
+Testing effects of sleeping fallen: if the blood ape is asleep, rule succeeds.
+Testing effects of dead-fallen: if the blood ape is dead, rule succeeds.
+
+initial scheduling of awake-in-fallen-arena: have the player and the blood ape fight in Arena of the Fallen.
+testing effects of awake-in-fallen-arena: if the blood ape is not asleep, rule succeeds.
 
 Test Sets ends here.
