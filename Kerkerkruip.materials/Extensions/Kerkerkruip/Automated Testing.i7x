@@ -583,8 +583,10 @@ The file of test set queue is called "testqueue"
 
 Table of Test Set Queue
 Random-Seed (number)	Unresolved Count (number)
-40	0
+0	0
 with 1 blank row
+
+To decide what number is the initial test random seed: decide on 46.
 
 To queue (T - an outcome):
 	make T testable;
@@ -592,7 +594,6 @@ To queue (T - an outcome):
 	unless there is an unresolved count entry:
 		now the unresolved count entry is 0;
 	increment the unresolved count entry;
-	Now the random-seed entry is 40. [TODO: set this manually if desired]
 	
 To queue all automated tests:
 	Repeat with T running through enabled outcomes:
@@ -1190,9 +1191,10 @@ First after showing the title screen (this is the run all tests rule):
 	
 The scenario rules are an outcome based rulebook.
 	
-A last startup rule (this is the keep using the xorshift generator for automated tests rule):
-	if done testing is false:
-		now the xorshift seed is the dungeon generation seed.
+this is the keep using the xorshift generator for automated tests rule:
+	say "[banner text]Dungeon seed: [dungeon generation seed in hexadecimal to 8 places][xorshift seed in hexadecimal to 4 places][line break]";
+
+The keep using the xorshift generator for automated tests rule substitutes for the show the banner with dungeon generation seed rule when done testing is false.
 
 [Prevent the status window from opening]	
 The check info panel capacity rule does nothing when done testing is false.
@@ -1237,14 +1239,22 @@ Regular scheduling of restarting for tests:
 	choose row 1 in Table of Test Set Queue;
 	transcribe "Unresolved count includes [the list of possible test set outcomes]";
 	now the unresolved count entry is the number of possible test set outcomes;
-	if the random-seed entry is not 0:
-		if the dungeon generation seed is 0:
-			increment the random-seed entry;
+	if the attempt count of the scheduled event is 0:
+		now the random-seed entry is the initial test random seed;
+		transcribe "initializing random seed to [the random-seed entry]";
+	otherwise:
+		if the xorshift seed is 0:
+			if the dungeon generation seed is 0:
+				increment the random-seed entry;
+				transcribe "incrementing random seed to [the random-seed entry]";
+			otherwise:
+				now the xorshift seed is the dungeon generation seed;
+				Let throwaway result be a random number from 1 to 2;
+				transcribe "advancing random seed to [the xorshift seed]";	
+				now the the random-seed entry is the xorshift seed;
 		otherwise:
-			now the xorshift seed is the dungeon generation seed;
-			Let throwaway result be a random number from 1 to 2;
-			transcribe "advancing random seed to [the xorshift seed]";	
-			now the the random-seed entry is the xorshift seed;
+			transcribe "saving xorshift seed [the xorshift seed]";
+			now the random-seed entry is the xorshift seed;
 	transcribe "restarting with random seed [random-seed entry] testing [if the primary outcome is possible][current test description][otherwise][the list of possible enabled outcomes][end if]";
 	save test outcomes;
 	write file of test set queue from Table of Test Set Queue;
@@ -1756,7 +1766,7 @@ to decide whether we assert (prefix - a text) to (guy - a person) a total of (ex
 	unless we assert prefix to guy any damage suffix:
 		no;
 	unless actual damage is expected damage:
-		now failure report is "damage to [guy] is [value], but we expected [expected damage]";
+		now failure report is "damage to [guy] is [actual damage], but we expected [expected damage]";
 		no;
 	yes.
 	
@@ -1764,7 +1774,7 @@ to decide whether we assert (expected damage - a number) damage to (guy - a pers
 	Let the actual damage be 1000 - health of guy;
 	unless we assert described damage to guy with 1000 health after preamble, no;
 	unless actual damage is expected damage:
-		now failure report is "damage to [guy] is [value], but we expected [expected damage]";
+		now failure report is "damage to [guy] is [actual damage], but we expected [expected damage]";
 		no;
 	yes.
 	

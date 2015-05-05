@@ -54,7 +54,8 @@ regular scheduling of player-targeted:
 		now health of guy is 1000;
 	compel the action of waiting;
 		
-Intervention possible when testing player-targeted:
+First intervention possible when testing aite champions vs mindbat:
+	unless testing player-targeted, rule fails;
 	unless the main actor is the player and intervention-god is Aite, rule fails;
 	
 Intervention bonus when testing player-targeted:
@@ -2199,28 +2200,26 @@ testing effects of other-fanatics-killing:
 	assert result "receives the soul";
 	assert absence of result "receives the soul.* receives the soul";
 	assert that the health of the player is the permanent health of the player with label "health of the player";
-
+]
 [TODO: test armadillo and reaper following]
 
 
 Section - Armadillo wandering
 
-armadillo-wandering is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+armadillo-wandering	0	1	restarting for tests
+armadillo-moved	1	0	--
 
-Scenario when testing armadillo-wandering:
-	now the ravenous armadillo is testobject;
+Scenario when testing armadillo-wandering: now the ravenous armadillo is testobject.
 
-waiting-for-armadillo-move is a test step. The first move of armadillo-wandering is waiting-for-armadillo-move.
+Armadillo-origin is a room that varies.
 
-armadillo-start is a room that varies.
+Initial scheduling of armadillo-moved: now armadillo-origin is the location of the ravenous armadillo.
+Regular scheduling of armadillo-moved: compel the action of waiting.
+Testing effects of armadillo-moved: if the location of the armadillo is not the armadillo-origin, rule succeeds.
 
-Initial scheduling of waiting-for-armadillo-move:
-	now armadillo-start is the location of the ravenous armadillo.
-	
-Testing effects of waiting-for-armadillo-move:
-	succeed based on whether or not the location of the armadillo is not armadillo-start.
-
-
+[
 Section - Unlocking - issue 243
 
 unlocking-behavior is a test set.
