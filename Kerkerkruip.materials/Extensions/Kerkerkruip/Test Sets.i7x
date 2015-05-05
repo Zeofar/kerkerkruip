@@ -105,7 +105,6 @@ initial scheduling of Defender-enslaving:
 	now the health of the healer of Aite is 0;
 	have an event of the player killing the healer of Aite;
 	now the health of Defender of Aite is 100;
-	clear event description;
 	
 regular scheduling of an outcome (called event):
 	if event is defender-enslaving or event is defender-re-enslaving:
@@ -484,8 +483,8 @@ testing effects of vampire-turning-hinting: if we assert result "\bI intend to v
 Initial scheduling of drakul suicide:
 	now the health of drakul is 1;
 	now the melee of drakul is 100;
-	try drakul hitting drakul;
 	
+regular scheduling of drakul suicide: try drakul hitting drakul.
 Testing effects of drakul suicide: if we assert result "drains his own blood, a small vial", rule succeeds.
 
 [	
@@ -2578,52 +2577,7 @@ when hitting with damage (done)
 hitting without damage (not done)
 vs chain golem, bodmall, and hand-to-hand attacker, and missing - (all started)]
 
-Section - Bug 351 - scroll cloning
 
-bug-351 is a test set.
-	
-knowledge-gaining is an item-reading test step. The first move of bug-351 is knowledge-gaining.
-
-Testing effects of knowledge-gaining:
-	clear event description;
-	find a healthy scroll;
-	update event description;
-	assert result "You have found a scroll";
-	Repeat with item running through scrolls enclosed by the player:
-		assert "The true name and obfuscated name of [item] should be different, but they are both '[true name of item]'" based on whether or not the true name of item is not the obfuscated name of item;
-	Repeat with item running through scrolls:
-		let item-name be the true name of item;
-		assert "The true name of [item] should not be obfuscated, but it is [true name of item], which is an obfuscated name'" based on whether or not item-name is a not obfuscated scroll name;
-
-Section - Bug 352 - exploded property
-
-bug-352 is a test set.
-
-throwing-352 is an item-throwing test step. The first move of bug-352 is throwing-352.
-
-Initial scheduling of throwing-352:
-	now the reusable item is a random smoke grenade.
-	
-Testing effects of throwing-352:
-	assert absence of result "Run-time problem"
-	
-Section - Died Counts
-
-died-count-test is a test set.
-
-[I don't think this bug ever comes up in play, but it happens in test battles]
-
-israfel-slaying is a test step. The first move of died-count-test is israfel-slaying.
-
-Initial scheduling of israfel-slaying:
-	now the challenger's initial defeats is the died count of Israfel;
-	move Isra to Entrance Hall;
-	revive Israfel in Entrance Hall;
-	prepare a test battle with israfel;
-	
-Testing effects of israfel-slaying:
-	try smiting Israfel;
-	assert that the died count of israfel is the challenger's initial defeats + 1 with label "died count of Israfel".
 ]
 
 Section - Damage Text
@@ -2646,13 +2600,12 @@ Scenario when testing damage-text:
 Initial scheduling of basic attack damage text:
 	prepare a test battle with the reaper;
 	now the health of the player is 1000;
-	now the health of the reaper is 1000;
 	now the tension is 0;
-	do the action of the reaper dodging a 100 melee hit by the player;
 	
-Testing effects of basic attack damage text: if we assert result "(\n|^)You deal <1-9><0-9>* damage", rule succeeds;
+Regular scheduling of basic attack damage text: do the action of the reaper dodging a 100 melee hit by the player.
+Testing effects of basic attack damage text: if we assert result "(\n|^)You deal <1-9><0-9>* damage", rule succeeds.
 
-Initial scheduling of tense attack damage text:
+Regular scheduling of tense attack damage text:
 	now the tension is 3;
 	capture damage text; [TODO: reset capture mode when "make possible?" or "scheduling?" - done but possibly not done right]
 	do the action of the reaper dodging a 100 melee hit by the player.
@@ -2716,10 +2669,8 @@ abyss-wave damage text	1	1
 chain-smack damage text	1	1
 bomb-power damage text	1	1
 
-Initial scheduling of abyss-wave damage text:
-	prepare a test battle with the abyss of the soul;
-	try the abyss of the soul pulsating.
-	
+Initial scheduling of abyss-wave damage text: prepare a test battle with the abyss of the soul.
+regular scheduling of abyss-wave damage text: try the abyss of the soul pulsating.
 Testing effects of abyss-wave damage text: if we assert result "(\n|^)The abyss of the soul pulsates, sending out a wave of negative energy that deals <1-2> damage to you.", rule succeeds.
 
 Initial scheduling of chain-smack damage text:
@@ -2728,9 +2679,9 @@ Initial scheduling of chain-smack damage text:
 	now the melee of the player is 0;
 	now the health of the chain golem is 1000;
 	now the defence of the chain golem is 50;
-	now the concentration of the chain golem is 3;
-	try attacking the chain golem.
-
+	now the concentration of the chain golem is 3.
+	
+regular scheduling of chain-smack damage text: try attacking the chain golem.
 [TODO: make sure attacking doesn't leave crap in the delayed actions table?]	
 Testing effects of chain-smack damage text: if we assert result "(\n|^)You attempt to duck under the whirling chains\. You roll <0-9>+ \+ -100 \(body\) = -<0-9>+ against a target number of <0-9>+, failing the body check\. One of the chains catches you with a loud smack, dealing 6 damage\.", rule succeeds.
 
@@ -2752,21 +2703,21 @@ Initial scheduling of tentacle-hold no damage text:
 	prepare a test battle with the tentacle;
 	now the hit protection of the player is 1;
 	[make sure the tentacle "holds on to you" when the attack does no damage]
-	do the action of dodging a 100 melee hit by the tentacle.
-
+	
+regular scheduling of tentacle-hold no damage text: do the action of dodging a 100 melee hit by the tentacle.
 Testing effects of tentacle-hold no damage text: if we assert "The giant tentacle deals" to the player a total of 0 damage "but holds on to you\.", rule succeeds.
 	
 Initial scheduling of tentacle-attack wounding text:
 	now the tentacle does not grapple the player;
 	now the tension is 3;
-	do the action of dodging a 100 melee hit by the tentacle.
 	
+regular scheduling of tentacle-attack wounding text: do the action of dodging a 100 melee hit by the tentacle.
 Testing effects of tentacle-attack wounding text:
 	assert result "(\n|^)The giant tentacle deals 0 \+ <^=>+ = \d+ damage, wounding you to \d+ health\.";
 	check damage of the player with 1000 health after "deals";
 	rule succeeds.
 
-Initial scheduling of tentacle-constrict damage text: try the tentacle tentacle-constricting;
+regular scheduling of tentacle-constrict damage text: try the tentacle tentacle-constricting;
 Testing effects of tentacle-constrict damage text: if we assert "The giant tentacle tightens its muscles, dealing" to the player a total of 1 damage "to you", rule succeeds.
 
 Table of Outcomes (continued)
@@ -2781,17 +2732,12 @@ Regular scheduling of thorns-launch damage text:
 
 Testing effects of thorns-launch damage text: if we assert "Thorns shoot towards everyone, dealing 1 damage to the giant tentacle; and" to the player a total of 1 damage "to you\.", rule succeeds.
 	
-Initial scheduling of israfel-burn damage text:
-	prepare a test battle with Israfel;
-	do the action of Israfel waiting for a 100 melee hit by the player.
+Initial scheduling of israfel-burn damage text: prepare a test battle with Israfel.
+regular scheduling of israfel-burn damage text: do the action of Israfel waiting for a 100 melee hit by the player.
+Testing effects of israfel-burn damage text: if we assert 3 damage to the player after "Israfel's flames burn you for", rule succeeds.
 	
-Testing effects of israfel-burn damage text:
-	if we assert 3 damage to the player after "Israfel's flames burn you for", rule succeeds.
-	
-initial scheduling of isra-burn damage text:
-	try israfel israfel-splitting;
-	do the action of isra waiting for a 100 melee hit by the player.
-	
+initial scheduling of isra-burn damage text: try israfel israfel-splitting.
+regular scheduling of isra-burn damage text: do the action of isra waiting for a 100 melee hit by the player.
 Testing effects of isra-burn damage text: if we assert 2 damage to the player after "Isra's flames burn you for", rule succeeds.
 
 [TODO: check damage and damage description in one phrase?]
@@ -3411,16 +3357,16 @@ Initial scheduling of too-small-block:
 	prepare a test battle with the armadillo;
 	now the player is medium;
 	equip the player with the wooden buckler;
-	do the action of blocking a 100 melee hit by the armadillo;
-
+	
+Regular scheduling of too-small-block: do the action of blocking a 100 melee hit by the armadillo.
 Testing effects of too-small-block: if we assert result "\+ 2 \(defender's shield too small\)", rule succeeds.
 	
 Initial scheduling of agnostic-block:
 	equip the player with the bulwark of faith;
 	now the player worships Sul;
 	now favour of the player is 1;
-	do the action of blocking a 100 melee hit by the armadillo;
 	
+Regular scheduling of agnostic-block: do the action of blocking a 100 melee hit by the armadillo.
 Testing effects of agnostic-block: if we assert absence of result "defender's shield too small", rule succeeds.
 	
 Section - Controlling pipes
@@ -3433,13 +3379,13 @@ x-open wheel	1	1
 x-closed pipes	1	1
 x-closed wheel	1	1
 
-Scenario for simple tests: now Hall of Vapours is testobject.
+Scenario for simple tests: now Hall of Vapours is testobject. [TODO: run scenario for ALL outcomes in the same test set?]
 	
 initial scheduling of open-pipes:
 	extract the player to Hall of Vapours;
 	now pipes-open is true;
-	try looking.
 	
+Regular scheduling of open-pipes: try looking.
 Testing effects of open-pipes: if we assert result "Several large pipes continuously spew forth vapours into this room\. A big wheel is attached", rule succeeds.
 
 regular scheduling of x-open pipes: try examining the pipes.
@@ -3448,14 +3394,61 @@ testing effects of x-open pipes: if we assert result " They are currently spewin
 regular scheduling of x-open wheel: try examining the wheel.
 testing effects of x-open wheel: if we assert result "which are currently open\.", rule succeeds.
 
-initial scheduling of x-closed pipes:
-	try turning the wheel;
-	clear the event description;
-	
+initial scheduling of x-closed pipes: try turning the wheel.
 regular scheduling of x-closed pipes: try examining the pipes.
 testing effects of x-closed pipes: if we assert result " They are currently shut off\.", rule succeeds.
 
 regular scheduling of x-closed wheel: try examining the wheel.
 testing effects of x-closed wheel: if we assert result "which are currently closed\.", rule succeeds.
+
+Section - Bug 351 - scroll cloning
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+bug-351-find	1	1
+bug-351-obsc-name	1	1
+bug-351-true-name	1	1
+
+regular scheduling of bug-351-find: find a healthy scroll.
+testing effects of bug-351-find: if we assert result "You have found a scroll", rule succeeds.
+
+testing effects of bug-351-obsc-name: 
+	Repeat with item running through scrolls enclosed by the player:
+		unless we assert "The true name and obfuscated name of [item] should be different, but they are both '[true name of item]'" based on whether or not the true name of item is not the obfuscated name of item, rule fails;
+	rule succeeds.
+	
+testing effects of bug-351-true-name:
+	Repeat with item running through scrolls:
+		let item-name be the true name of item;
+		unless we assert "The true name of [item] should not be obfuscated, but it is [true name of item], which is an obfuscated name'" based on whether or not item-name is a not obfuscated scroll name, rule fails;
+	rule succeeds.
+
+Section - Bug 352 - exploded property
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+throwing-352	1	1
+
+Initial scheduling of throwing-352: now the reusable item is a random smoke grenade.
+Regular scheduling of throwing-352: try throwing the reusable item.
+Testing effects of throwing-352: if we assert absence of result "Run-time problem", rule succeeds.
+	
+Section - Died Counts
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+died-count-test	1	1
+
+[I don't think this bug ever comes up in play, but it happens in test battles]
+
+Initial scheduling of died-count-test:
+	now the challenger's initial defeats is the died count of Israfel;
+	move Isra to Entrance Hall;
+	revive Israfel in Entrance Hall;
+	prepare a test battle with israfel;
+	
+Regular scheduling of died-count-test: try smiting Israfel.
+	
+Testing effects of died-count-test: if we assert that the died count of israfel is the challenger's initial defeats + 1 with label "died count of Israfel", rule succeeds.
 
 Test Sets ends here.

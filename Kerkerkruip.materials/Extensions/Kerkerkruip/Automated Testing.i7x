@@ -1047,10 +1047,9 @@ To schedule (the event - an outcome):
 		now the event is scheduled for immediate testing;
 		if attempt count of the event is 0:
 			now rescheduling is false;
-			if the event is the scheduled event:
-				log "  next step:  [the scheduled event]";
-				clear event description; [this also happens when rescheduling, under "report an iteration"]
+			if the event is the scheduled event, log "  next step:  [the scheduled event]";
 			follow the initial scheduling rules for the event;
+			if the event is the scheduled event, clear event description; [this also happens when rescheduling, under "report an iteration"]
 		follow the regular scheduling rules for the event;
 	otherwise if the antecedent of the event is preset or the antecedent of the event is immediately schedulable:
 		schedule the antecedent of the event;
@@ -1269,6 +1268,17 @@ The test assertion count is a number variable.
 The total assertion count is a number variable.
 The assertion failures count is a number variable.
 
+To decide whether we assert (T - a text) based on (result - a truth state):
+	update event description because "checking whether '[T]'";
+	if result is true, yes;
+	now the failure report is T;
+	no.
+	
+To decide whether we assert that/-- (A - a value) is (B - a value) with label (T - an indexed text):
+	if A is B, yes;
+	now the failure report is "Expected [T]: [B], Got: [A]";
+	no.
+	
 To decide whether we assert result (T - a text):
 	update event description because "checking if result includes '[T]'";
 	if capturing damage text:
