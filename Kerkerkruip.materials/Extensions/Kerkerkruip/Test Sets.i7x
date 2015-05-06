@@ -103,8 +103,7 @@ initial scheduling of Defender-enslaving:
 	try turning human;
 	now the player worships Sul;
 	now the favour of the player is 4; [not sure if this is really important]
-	now the health of the healer of Aite is 0;
-	have an event of the player killing the healer of Aite;
+	have the player defeat the healer of Aite;
 	now the health of Defender of Aite is 100;
 	
 regular scheduling of an outcome (called event):
@@ -131,58 +130,54 @@ testing effects of defender-re-enslaving:
 	assert "the defender of Aite should be off-stage" based on whether or not defender of Aite is off-stage;
 	if the health of the player is 100, rule succeeds;
 
-[
 Section - Chton Champion vs Bat
 
-Chton champion vs bat is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+Chton champion vs bat	0	1	restarting for tests
+herm-arena-bonus	1	1	--
+arena-vampire-joining	1	1	--
+herm-ally-summoning	1	1	--
+summoned-drakul-opponent	1	1	--
+chton-arena-cheating	1	1	--
 
-A scenario rule when testing Chton champion vs bat:
+scenario rule for Chton champion vs bat:
 	now Hall of Gods is testobject;
 	now Bodmall is testobject;
 	now Drakul's lifeblood is testobject;
 	now Temple of Herm is testobject;
-	now a random scroll of summoning is testobject;
+	now the reusable item is a random scroll of summoning;
 
-A test play when testing Chton champion vs bat:
-	try butterflying;
-	try meatboying;
+initial scheduling of herm-arena-bonus:
 	now the player carries Drakul's lifeblood;
-	let the item be a random not off-stage scroll of summoning;
-	now the player carries the item;
 	extract the player to the location of Bodmall;
 	have the player defeat Bodmall;
 	extract the player to temple of Herm;
 	have the player sacrifice a random granted power;
 	assert that the favour of the player with Herm is 4;
 	extract the player to Hall of Gods;
-	clear the event description;
-	have the player and Drakul fight in Arena of the Gods;
-	assert result "grants you 2 divine favour![line break][line break]Herm gifts you <^\n>+; and increases your hiding bonus to \+2\.[line break][line break]You are transported to the Arena of the Gods, where the angry Drakul awaits, preparing himself to"
-	
-arena-vampire-joining is a test step. The first move of Chton champion vs bat is arena-vampire-joining.   
 
-Choosing a player action when testing arena-vampire-joining:
-	generate the action of drinking Drakul's lifeblood;
+regular scheduling of herm-arena-bonus: have the player and Drakul fight in Arena of the Gods;
+testing effects of herm-arena-bonus: if we assert result "grants you 2 divine favour![line break][line break]Herm gifts you <^\n>+; and increases your hiding bonus to \+2\.[line break][line break]You are transported to the Arena of the Gods, where the angry Drakul awaits, preparing himself to", rule succeeds;
+	
+regular scheduling of arena-vampire-joining: compel the action of drinking Drakul's lifeblood.
+testing effects for arena-vampire-joining: if we assert result "You turn into a vampire, but your opponent doesn't care", rule succeeds.
 
 The summoned creature is an object that varies;
 
-testing effects for arena-vampire-joining:
-	assert result "You turn into a vampire, but your opponent doesn't care";
+regular scheduling of herm-ally-summoning:
 	update the combat status;
 	assert that the combat status is combat;
-	try reading a random scroll of summoning enclosed by the player;
+	try reading the reusable item;
 	now the summoned creature is a random visible undead not super-undead person who is not the player;
-	assert "summoned creature shouldn't oppose undead player" based on whether or not the summoned creature does not oppose the player;
-	assert "summoned creature should oppose drakul (unless Remko says this test is wrong)" based on whether or not the summoned creature opposes drakul;
+	
+testing effects of herm-ally-summoning: if the summoned creature does not oppose the player, rule succeeds.
+testing effects of summoned-drakul-opponent: if the summoned creature opposes drakul, rule succeeds.
 
-chton-arena-cheating is a test step. The next move of arena-vampire-joining is chton-arena-cheating.   
-
-Choosing a player action when testing chton-arena-cheating:
-	generate the action of smiting drakul.
-
-Before taking a player action when the scheduled event is chton-arena-cheating:
+Regular scheduling of chton-arena-cheating:
 	Now the health of the player is 1;
 	Now the permanent health of the player is 100;
+	compel the action of smiting drakul.
 	
 testing effects for chton-arena-cheating:
 	[should the lifeblood appear a second time just because drinking it removes it from play?]
@@ -192,7 +187,9 @@ testing effects for chton-arena-cheating:
 	assert result "transported back to the Hall of the Gods";
 	assert that the location of the summoned creature is Hall of Gods;
 	assert that drakul's lifeblood is in Hall of Gods;
-	
+	rule succeeds.
+
+[
 Section - Parting Shots
 
 parting shots is a test set.
