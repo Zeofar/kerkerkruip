@@ -2182,10 +2182,11 @@ Initial scheduling of armadillo-moved: now armadillo-origin is the location of t
 Regular scheduling of armadillo-moved: compel the action of waiting.
 Testing effects of armadillo-moved: if the location of the armadillo is not the armadillo-origin, rule succeeds.
 
-[
 Section - Unlocking - issue 243
 
-unlocking-behavior is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+unlocking-behavior	0	1	restarting for tests
 
 to assert that placement possibility is (allowable - a truth state) when (conditions - indexed text):
 	now basic game mode is false;
@@ -2203,7 +2204,7 @@ to assert that placement possibility is (allowable - a truth state) when (condit
 	[assert "The smoky blade should [if allowable is false]not [end if]be not-too-difficult" based on whether or not allowable is (whether or not the smoky blade is not-too-difficult);]
 	
 	
-Scenario when testing unlocking-behavior:
+Scenario for unlocking-behavior:
 	Let the saved seed be the dungeon generation seed;
 	now the dungeon generation seed is 0;
 	set difficulty to 0;
@@ -2233,7 +2234,7 @@ Scenario when testing unlocking-behavior:
 	enable advanced content;
 	assert that placement possibility is true when "in apprentice level when advanced content is enabled with a preset dungeon generation seed";
 
-
+[
 Section - bug 293 - Sensing Isra and Fell
 
 bug-293 is a test set
