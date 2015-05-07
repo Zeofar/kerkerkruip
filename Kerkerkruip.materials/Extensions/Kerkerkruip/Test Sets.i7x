@@ -893,38 +893,37 @@ testing effects of still-linking: if the healer of Aite is linked to the player,
 
 [not sure if this is testing the bug correctly]
 
-[	
 Section - Attempting to Maze Someone in Arena of the Gods
 
-challenger-mazing is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+challenger-mazing	0	1	restarting for tests
+axing-defender	1	1	--
 
-Scenario when testing challenger-mazing:
-	Now Bodmall is testobject;
+Scenario for challenger-mazing:
 	Now the minotaur is testobject;
 	Now temple of Herm is testobject;
 	Now Hall of Gods is testobject;
 
-Test play when testing challenger-mazing:
-	extract the player to the location of Bodmall;
-	try smiting Bodmall;
-	extract the player to the temple of Nomos;
-	have the player sacrifice a random granted power;
+initial scheduling of challenger-mazing:
+	now the player worships Nomos;
+	raise the favour of the player by 4;
 	extract the player to the location of the minotaur;
-	try smiting the minotaur;
-	try taking the minotaur's axe;
-	try readying the minotaur's axe;
+	have the player defeat the minotaur;
+	equip the player with the minotaur's axe;
 	extract the player to hall of gods;
 	have the player and the healer of aite fight in the arena of the gods;
-	Now Nomos bonus is true;
-	now the melee of the player is 100;
-	now the health of the defender of Aite is 100;
-	clear the event description;
-	try hitting the defender of aite;
+	
+regular scheduling of axing-defender: do the action of the defender of Aite waiting for a 100 melee hit by the player.
+
+testing effects of axing-defender:
 	assert result "you beat the defender of Aite's defence";
 	assert absence of result "You plan on challenging the defender of Aite in the maze";
 	assert result "Space and time begin to twist";
-	assert that the location is Arena of the Gods.
-	
+	assert that the location is Arena of the Gods;
+	rule succeeds.
+
+[
 Section - Banshees Gone Wild - bug 248
 
 banshees gone wild is a test set.
