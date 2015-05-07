@@ -557,36 +557,41 @@ testing effects of a cower-counter outcome (called the event) (this is the cower
 
 initial scheduling of insane-player-cowering: now the player is insane.
 
-[
-[Section - Sul Champion vs Herm worshipper
+Section - Sul Champion vs Herm worshipper
 
-Sul Champion vs Herm worshipper is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+Sul Champion vs Herm worshipper	0	1	restarting for tests
+player-defended-by-herm	1	0	--
+israfel-undamaged	1	0	--
+israfel-defended-by-sul	1	0	israfel-undamaged
+isra-undamaged	1	0	--
+isra-defended-by-sul	1	0	isra-undamaged
+
+[TODO: figure out actual probabilities of interventions]
 
 A scenario rule when testing Sul Champion vs Herm worshipper:
 	now Hall of Gods is testobject;
-	now Bodmall is testobject;
-	now Temple of Herm is testobject;
 
-A test play when testing Sul Champion vs Herm worshipper:
-	extract the player to the location of Bodmall;
-	try smiting Bodmall;
-	extract the player to Temple of Herm;
-	have the player sacrifice a random granted power;
-	extract the player to Hall of Gods;
+Regular scheduling of player-defended-by-herm: do the action of waiting for a 100 melee hit by Israfel.
+Testing effects of player-defended-by-herm: if we assert result "Herm bends space and time around you and Israfel, and you suddenly find yourself in the role of attacker!", rule succeeds.
+
+[TODO: check that a hit actually took place, try to produce a Herm intervention for another person]
+Initial scheduling of Sul Champion vs Herm worshipper:
+	now the player worships Herm;
+	raise the favour of the player by 4;
 	have the player and Israfel fight in Arena of the Gods;
-	now the melee of the player is 100;
-	now the melee of israfel is 100;
-	test israfel-defended-by-sul;
-	test player-defended-by-herm;
-	try israfel israfel-splitting;
-	test isra-defended-by-sul;
-	
-israfel-defended-by-sul is a randomized event;
 
-player-defended-by-herm is a randomized event;
+Regular scheduling of israfel-undamaged: do the action of israfel waiting for a 100 melee hit by the player.
+Testing effects of israfel-undamaged: if we assert 0 damage to israfel after "You deal", rule succeeds.
+Testing effects of israfel-defended-by-sul: if we assert result "\(Sul intervenes\)", rule succeeds.
 
-isra-defended-by-sul is a randomized event;]
+Initial scheduling of isra-undamaged: try Israfel israfel-splitting.
+Regular scheduling of isra-undamaged: do the action of Isra waiting for a 100 melee hit by the player.
+Testing effects of isra-undamaged: if we assert 0 damage to Isra after "You deal", rule succeeds.
+Testing effects of isra-defended-by-sul: if we assert result "\(Sul intervenes\)", rule succeeds.
 
+[
 Section - Bug 210
 
 bug-210 is a test set. 
