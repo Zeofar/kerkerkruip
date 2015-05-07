@@ -621,84 +621,48 @@ testing effects of reaction-mindslug-killing: if the mindslug is dead, rule succ
 
 testing effects of mindslug-soul-revival: if we assert result "The contemplative northern barbarian ends your life, with what seems to be a hint of sadness in his face.*As the mindslug dies, you feel its powerful intelligence absorbed into your own body", rule succeeds.
 		
-[
-
-Section - Sul's intervention
-
-sul-intervention-test is a test set [for issue #227].
-
-Scenario when testing sul-intervention-test:
-	now Temple of Sul is testobject;
-	now Bodmall is testobject;
-	now the swarm of daggers is testobject;
-	now the hall of mirrors is bannedobject; 
-	
-Test play when testing sul-intervention-test:
-	extract the player to the location of bodmall;
-	have the player defeat Bodmall;
-	extract the player to the temple of sul;
-	have the player sacrifice a random granted power;
-	now the swarm of daggers is not asleep;
-	extract the player to the location of the swarm of daggers;
-	now the melee of the swarm of daggers is 100;
-	clear the event description;
-	try the swarm of daggers hitting the player;
-	assert result "swarm of daggers deals";
-	assert absence of result "Programming error";
-	now the melee of the player is 100;
-	clear the event description;
-	try the player hitting the swarm of daggers;
-	assert result "You deal";
-	assert absence of result "Programming error";
-	[TODO: check frequency of intervention]
-
 Section - Reward in Arena of the Gods
 
-divine reward is a test set [for issue #228].
+[for issue #228]
 
-scenario when testing divine reward:
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+divine reward	0	1	restarting for tests
+isra-only-killing	1	1	--
+fell-also-killing	1	1	--
+
+scenario for divine reward:
 	now Temple of Nomos is testobject;
-	now Bodmall is testobject;
 	now Hall of Gods is testobject;
 	now the glass cannon is testobject;
 	block interventions;
 	
-Test play when testing divine reward:
-	now the player carries the glass cannon;
-	try readying the glass cannon;
+Initial scheduling of divine reward:
+	equip the player with the glass cannon;
 	now the defence of the player is 100;
-	extract the player to the location of bodmall;
-	have the player defeat Bodmall;
-	extract the player to temple of Nomos;
-	have the player sacrifice a random granted power;
-	assert that the favour of the player with Nomos is 4;
+	now the player worships Nomos;
+	raise the favour of the player by 4;
 	extract the player to Hall of Gods;
 	have the player and Israfel fight in Arena of the Gods;
 	now the health of the player is the permanent health of the player - 1;
 	try Israfel Israfel-splitting;
-	
-isra-only-killing is a test step. The first move of divine reward is isra-only-killing.   
 
-Choosing a player action when testing isra-only-killing:
-	generate the action of smiting isra.
-
-initial scheduling of isra-only-killing:
+Regular scheduling of isra-only-killing:
 	now fell is asleep;
+	compel the action of smiting isra.
 
-testing effects of a test step (called the current move) when testing divine reward:
-	assert "Nomos counter should be zero on [the current move]" based on whether or not the nomos counter is zero;
-	assert "Nomos bonus should be false on [the current move]" based on whether or not the nomos bonus is false;
+first testing effects of an outcome (called the current move) when testing divine reward:
+	assert "Nomos counter should be zero on [the outcome described]" based on whether or not the nomos counter is zero;
+	assert "Nomos bonus should be false on [the outcome described]" based on whether or not the nomos bonus is false;
 
 testing effects of isra-only-killing:
 	assert "Isra should be dead" based on whether or not Isra is dead;
 	assert "Fell should be alive" based on whether or not Fell is not dead;
 	assert "The player should not be healed" based on whether or not the health of the player is less than the permanent health of the player;
 	assert absence of result "Nomos receives .* and fully heals you";
+	rule succeeds.
 
-fell-also-killing is a test step. The next move of isra-only-killing is fell-also-killing.   
-
-Choosing a player action when testing fell-also-killing:
-	generate the action of smiting fell.
+regular scheduling of fell-also-killing: compel the action of smiting fell.
 
 testing effects of fell-also-killing:
 	assert that the location is Hall of Gods;
@@ -707,7 +671,9 @@ testing effects of fell-also-killing:
 	assert that the health of the player is the permanent health of the player;
 	assert "the glass cannon should still be carried" based on whether or not the player carries the glass cannon;
 	assert "the glass cannon should still be readied" based on whether or not the glass cannon is readied;
+	rule succeeds.
 	
+[
 Section - Temporary Blood Magic from Nomos
 
 temporary Nomos blood magic is a test set.
@@ -3075,6 +3041,39 @@ Testing effects of holy-damage:
 	now the concentration of the rotting corpse is 3;
 	have the player do no reaction to a 100 melee hit by the rotting corpse with result "x 0% \(no means of attack\)", checking damage;
 	
+[TODO: add this check to sul interventions:
+	
+Section - Sul's intervention
+
+sul-intervention-test is a test set [for issue #227].
+
+Scenario when testing sul-intervention-test:
+	now Temple of Sul is testobject;
+	now Bodmall is testobject;
+	now the swarm of daggers is testobject;
+	now the hall of mirrors is bannedobject; 
+	
+Test play when testing sul-intervention-test:
+	extract the player to the location of bodmall;
+	have the player defeat Bodmall;
+	extract the player to the temple of sul;
+	have the player sacrifice a random granted power;
+	now the swarm of daggers is not asleep;
+	extract the player to the location of the swarm of daggers;
+	now the melee of the swarm of daggers is 100;
+	clear the event description;
+	try the swarm of daggers hitting the player;
+	assert result "swarm of daggers deals";
+	assert absence of result "Programming error";
+	now the melee of the player is 100;
+	clear the event description;
+	try the player hitting the swarm of daggers;
+	assert result "You deal";
+	assert absence of result "Programming error";
+	[TODO: check frequency of intervention]
+
+]
+
 slave-attacking is a test step.
 
 Initial scheduling of slave-attacking:

@@ -232,6 +232,8 @@ Last general damage multiplier rule (this is the smiting overrides damage multip
 		if the global attacker is smiter:
 			say "(reset to 100 by smiting) [run paragraph on]";
 			now total damage is 100;
+			
+[TODO: make whitespace work with all damage possibilities]
 
 Ramboing is an action applying to nothing. Understand "rambo" as ramboing.
 
