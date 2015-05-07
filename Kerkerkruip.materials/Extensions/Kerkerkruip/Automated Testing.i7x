@@ -329,6 +329,7 @@ A Standard AI rule for the compelled attacker when testing compelling an attack 
 	try the compelled attacker attacking (the actor part of the compelled action);
 	test compelling an attack against true;
 	schedule compelling a reaction;
+	rule succeeds.
 		
 A Standard AI rule for a person (called P) when testing compelling a reaction (this is the compel a reaction rule):
 	unless the actor part of the compelled action is P and P is at-React:
@@ -336,7 +337,7 @@ A Standard AI rule for a person (called P) when testing compelling a reaction (t
 	try the compelled action;
 	forget the compelled action;
 	test compelling a reaction against true;
-	rule succeeds;
+	rule succeeds.
 
 A Standard AI rule for a person (called P) when testing compelling an action (this is the compel an action rule):
 	unless the actor part of the compelled action is P and P is at-Act:
@@ -345,7 +346,7 @@ A Standard AI rule for a person (called P) when testing compelling an action (th
 	try the compelled action;
 	forget the compelled action;
 	test compelling an action against true;
-	rule succeeds;
+	rule succeeds.
 	
 A Standard AI rule for a person (called P) (this is the suppress actions rule):
 	if suppress npc action is true:
@@ -595,7 +596,7 @@ Random-Seed (number)	Unresolved Count (number)
 0	0
 with 1 blank row
 
-To decide what number is the initial test random seed: decide on 49.
+To decide what number is the initial test random seed: decide on 50.
 
 To queue (T - an outcome):
 	make T testable;

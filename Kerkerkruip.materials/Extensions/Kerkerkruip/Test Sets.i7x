@@ -620,44 +620,8 @@ regular scheduling of reaction-mindslug-killing: compel the action of reading th
 testing effects of reaction-mindslug-killing: if the mindslug is dead, rule succeeds.
 
 testing effects of mindslug-soul-revival: if we assert result "The contemplative northern barbarian ends your life, with what seems to be a hint of sadness in his face.*As the mindslug dies, you feel its powerful intelligence absorbed into your own body", rule succeeds.
-
-[	
-Section - Dream of Sleeping
-
-dream-of-sleeping-test is a test set.
-
-Scenario when testing dream-of-sleeping-test:
-	now the dream of sleeping is current-test-dream;
-	now the reusable item is a random morphean grenade;
-	
-Sleeping-dream-dreaming is an item-throwing test step. The first move of dream-of-sleeping-test is sleeping-dream-dreaming.
-
-Initial scheduling of sleeping-dream-dreaming:
-	Now Malygris is asleep;
-
-Sleeping-dream-waking is a test step. The next move of sleeping-dream-dreaming is sleeping-dream-waking.   
-
-Choosing a player action when testing sleeping-dream-waking:
-	generate the action of exiting.
-
-testing effects of sleeping-dream-waking:
-	assert result "Malygris standing over you";
-	assert that Malygris is awake;
-	assert that the concentration of Malygris is 2;
-	assert "the player should be just-woken" based on whether or not the player is just-woken;
-	
-Waiting-for-Malygris-attack is a test step. The next move of sleeping-dream-waking is waiting-for-Malygris-attack. 
-
-Initial scheduling of waiting-for-Malygris-attack:
-	now the health of the player is 1000;
-	compel the action of Malygris attacking the player;
 		
-testing effects of waiting-for-Malygris-attack:
-	if waiting for player reaction, make no decision;
-	assert result "defender was asleep";
-	assert "the player should not be just-woken anymore" based on whether or not the player is not just-woken;
-		
-	
+[
 Section - Healer of Aite Healing
 
 aite-healing is a test set.
@@ -3445,5 +3409,48 @@ Testing effects of dead-fallen: if the blood ape is dead, rule succeeds.
 
 initial scheduling of awake-in-fallen-arena: have the player and the blood ape fight in Arena of the Fallen.
 testing effects of awake-in-fallen-arena: if the blood ape is not asleep, rule succeeds.
+
+Section - Dream of Sleeping
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+sleeping-dream-dreaming	1	1
+sleeping-dream-waking	1	1
+malygris-missing-sleeper	1	1
+still-sleepy	1	1
+malygris-hitting-sleeper	1	1
+slapped-awake	1	1
+
+Initial scheduling of sleeping-dream-dreaming:
+	now the dream of sleeping is current-test-dream;
+	now the reusable item is a random morphean grenade;
+	Now Malygris is asleep;
+	extract the player to Entrance Hall, making sure it is unoccupied.
+	
+regular scheduling of sleeping-dream-dreaming: compel the action of throwing the reusable item.
+testing effects of sleeping-dream-dreaming: if the player is the untroubled sleeper, rule succeeds.
+
+regular scheduling of sleeping-dream-waking: compel the action of exiting.
+testing effects of sleeping-dream-waking:
+	assert result "Malygris standing over you";
+	assert "Malygris should be awake" based on whether or not Malygris is not asleep;
+	assert that the concentration of Malygris is 2;
+	assert "the player should be just-woken" based on whether or not the player is just-woken;
+	rule succeeds.
+	
+Initial scheduling of Malygris-missing-sleeper:
+	now the health of the player is 1000;
+	now the defence of the player is 50;
+	now the melee of Malygris is 0;
+	
+regular scheduling of Malygris-missing-sleeper: compel the action of waiting as a reaction to Malygris.
+		
+testing effects of malygris-missing-sleeper: if we assert result "defender was asleep<^\n>+Malygris does not overcome your defence rating", rule succeeds.
+testing effects of still-sleepy: if the player is just-woken, rule succeeds.
+
+initial scheduling of Malygris-hitting-sleeper: now the melee of Malygris is 100.
+regular scheduling of Malygris-hitting-sleeper: compel the action of waiting as a reaction to Malygris.
+testing effects of Malygris-hitting-sleeper: if we assert result "Malygris deals<^\n>+ \+ 2 \(defender was asleep\)", rule succeeds.
+testing effects of slapped-awake: if the player is not just-woken, rule succeeds.
 
 Test Sets ends here.
