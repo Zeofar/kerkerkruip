@@ -622,42 +622,7 @@ testing effects of reaction-mindslug-killing: if the mindslug is dead, rule succ
 testing effects of mindslug-soul-revival: if we assert result "The contemplative northern barbarian ends your life, with what seems to be a hint of sadness in his face.*As the mindslug dies, you feel its powerful intelligence absorbed into your own body", rule succeeds.
 		
 [
-Section - Healer of Aite Healing
 
-aite-healing is a test set.
-	
-healer-not-healing is an npc-enabling test step. The first move of aite-healing is healer-not-healing.
-	
-Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-healer-healing-player	""	0	20
-
-Initial scheduling of healer-not-healing:
-	prepare a test battle with the healer of Aite, inviting groups;
-	Repeat with guy running through people:
-		now the defence of guy is 100;
-	decrease the health of the player by 3;
-	make healer-healing-player possible;
-	
-[TODO: permit/enable action, like compelling an action in that it uses outcomes to make sure it's happened, but it doesn't specify which action]
-
-testing combat round of the healer of aite when testing healer-not-healing:
-	fail healer-healing-player based on whether or not the injury of the player is less than 3;
-		
-healer-healing-defender is an npc-enabling test step. The next move of healer-not-healing is healer-healing-defender.
-
-Initial scheduling of healer-healing-defender:
-	decrease the health of the healer of aite by 3;
-	decrease the health of the defender of aite by 4;
-	
-testing effects of healer-healing-defender:
-	succeed based on whether or not the injury of defender of Aite is less than 4 within 20 attempts;
-		
-healer-healing-self is an npc-enabling test step. The next move of healer-healing-defender is healer-healing-self. 
-
-testing effects of healer-healing-self:
-	succeed based on whether or not the injury of healer of Aite is less than 3;
-			
 Section - Sul's intervention
 
 sul-intervention-test is a test set [for issue #227].
@@ -3454,4 +3419,35 @@ regular scheduling of Malygris-hitting-sleeper: compel the action of waiting as 
 testing effects of Malygris-hitting-sleeper: if we assert result "Malygris deals<^\n>+ \+ 2 \(defender was asleep\)", rule succeeds.
 testing effects of slapped-awake: if the player is not just-woken, rule succeeds.
 
+Section - Healer of Aite Healing
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+healer-not-healing-player	20	20	--	--
+healer-healing-defender	1	0	20	--
+healer-still-injured	1	1	--	healer-healing-defender
+healer-healing-self	1	0	20	--
+
+Initial scheduling of healer-not-healing-player:
+	prepare a test battle with the healer of Aite, inviting groups;
+	Repeat with guy running through people in the location:
+		now the defence of guy is 50;
+		now the melee of guy is 0;
+		now the health of guy is the permanent health of guy;
+	decrease the health of the player by 3;
+	
+regular scheduling of the scheduled event: [does not apply to dependents]
+	if the scheduled event is at least healer-not-healing-player and the scheduled event is at most healer-healing-self:
+		wait for the healer of Aite to act freely.
+	
+testing effects of healer-not-healing-player: if the injury of the player is at least 3, rule succeeds.
+		
+Initial scheduling of healer-healing-defender:
+	decrease the health of the healer of aite by 3;
+	decrease the health of the defender of aite by 4;
+	
+testing effects of healer-healing-defender: if the injury of defender of Aite is less than 4, rule succeeds.
+testing effects of healer-still-injured: if the injury of healer of Aite is at least 3, rule succeeds.
+testing effects of healer-healing-self: if the injury of healer of Aite is less than 3, rule succeeds.
+			
 Test Sets ends here.
