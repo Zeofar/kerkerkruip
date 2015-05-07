@@ -179,17 +179,24 @@ For taking a player action when testing compelling an action (this is the compel
 	schedule taking a turn;
 
 For taking a player action when testing compelling a reaction (this is the compel player reaction rule):
-	unless the actor part of the compelled action is the player and the player is at-react, make no decision;
-	generate the compelled action;
-	forget the compelled action;
-	test compelling a reaction against true;
-	schedule taking a turn;
+	if the actor part of the compelled action is the player and the player is at-react:
+		generate the compelled action;
+		forget the compelled action;
+		test compelling a reaction against true;
+	otherwise:
+		transcribe "[combat state of the player] player waits until [the compelled attacker] attacks";
+		generate the action of waiting;
+	schedule taking a turn.
 
 For taking a player action when testing compelling an attack (this is the compel player attack rule):
-	unless the compelled attacker is the player and the player is at-act, make no decision;
-	generate the action of attacking (the actor part of the compelled action);
-	test compelling an attack against true;
-	schedule compelling a reaction;
+	if the compelled attacker is the player and the player is at-act:
+		generate the action of attacking (the actor part of the compelled action);
+		test compelling an attack against true;
+		schedule compelling a reaction;
+	otherwise:
+		transcribe "[combat state of the player] player waits until [the compelled attacker] can be compelled to attack";
+		generate the action of waiting;
+		schedule taking a turn.
 	
 The player combat round action rule is listed first in the for taking a player action rulebook.
 The compel player action rule is listed before the player combat round action rule in the for taking a player action rulebook.
@@ -210,7 +217,9 @@ to say moving-description:
 	say "finding a route from [the location] to [the location-to-go]";
 	
 to say compelled-attack:
-	say "an attack by [the compelled attacker] against [the actor part of the compelled action]";
+	[say "an attack by [the compelled attacker] against [the actor part of the compelled action]";]
+	say "compelling an attack";
+[TODO: make this text stay dynamic]
 
 to say compelled-reaction:
 	say "[the compelled action] in reaction to [the compelled attacker]"
@@ -586,7 +595,7 @@ Random-Seed (number)	Unresolved Count (number)
 0	0
 with 1 blank row
 
-To decide what number is the initial test random seed: decide on 47.
+To decide what number is the initial test random seed: decide on 49.
 
 To queue (T - an outcome):
 	make T testable;

@@ -591,40 +591,37 @@ Regular scheduling of isra-undamaged: do the action of Isra waiting for a 100 me
 Testing effects of isra-undamaged: if we assert 0 damage to Isra after "You deal", rule succeeds.
 Testing effects of isra-defended-by-sul: if we assert result "\(Sul intervenes\)", rule succeeds.
 
-[
+
 Section - Bug 210
 
-bug-210 is a test set. 
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-210	0	1	restarting for tests
+reaction-mindslug-killing	1	1	--
+mindslug-soul-revival	1	1	reaction-mindslug-killing
 
-A scenario rule when testing bug-210:
-	now the reusable item is a random scroll of death;
+scenario for bug-210: now the reusable item is a random scroll of death.
 
-A test play when testing bug-210:
+Initial scheduling of bug-210:
 	prepare a test battle with the mindslug, inviting groups;
 	now the health of the mindslug is 1;
 	now the weapon damage bonus of the claymore is 100;
-	now the melee of fafhrd is 100;
+	now the melee of Fafhrd is 100;
+	
+Testing effects of bug-210:
 	assert "fafhrd should carry the claymore" based on whether or not fafhrd carries the claymore;
 	assert "the claymore should be readied" based on whether or not the claymore is readied;
 	assert "fafhrd should only have one weapon readied" based on whether or not the number of readied weapons enclosed by fafhrd is 1;
 	
-Initial scheduling of reaction-mindslug-killing:
-	compel the action of fafhrd attacking the player;
+regular scheduling of reaction-mindslug-killing: compel the action of reading the reusable item as a reaction to fafhrd.
 	
-reaction-mindslug-killing is a test step. The first move of bug-210 is reaction-mindslug-killing.
+[TODO: make sure the mindslug is alive before the reaction?]
 
-Choosing a player reaction when reaction-mindslug-killing is the scheduled event:
-	assert "the mindslug should be alive" based on whether or not the mindslug is alive;
-	generate the action of reading the reusable item;
-	rule succeeds;
+testing effects of reaction-mindslug-killing: if the mindslug is dead, rule succeeds.
 
-testing effects of reaction-mindslug-killing:
-	if waiting for player reaction, make no decision;
-	assert "the mindslug should be dead" [succeed] based on whether or not the mindslug is dead;
-	if the mindslug is dead:
-		assert result "The contemplative northern barbarian ends your life, with what seems to be a hint of sadness in his face";
-		assert result "As the mindslug dies, you feel its powerful intelligence absorbed into your own body";
-	
+testing effects of mindslug-soul-revival: if we assert result "The contemplative northern barbarian ends your life, with what seems to be a hint of sadness in his face.*As the mindslug dies, you feel its powerful intelligence absorbed into your own body", rule succeeds.
+
+[	
 Section - Dream of Sleeping
 
 dream-of-sleeping-test is a test set.
