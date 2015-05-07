@@ -854,41 +854,46 @@ testing effects of bonus-surviving-attack:
        if waiting for player reaction, make no decision;
        assert "the player should be damaged" based on whether or not the health of the player < 1000;
        check that the malleus is fed;
+]
 
 Section - bug 234
 
-bug-234 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+bug-234	0	1	--	restarting for tests
+link-holy-sword	1	1	--	--
+no-holy-sword-link	1	1	--	link-holy-sword
+still-linking	1	0	20	--
 
-Scenario when testing bug-234:
+Scenario for bug-234:
 	Now Israfel is testobject;
 	Now the swarm of daggers is testobject;
 	Now temple of Herm is testobject;
 	Now Hall of Gods is testobject;
 	
-Test play when testing bug-234:
+initial scheduling of bug-234:
 	extract the player to the location of Israfel;
-	try smiting israfel;
+	have the player defeat israfel;
 	extract the player to the location of the swarm of daggers;
-	try smiting the swarm of daggers;
+	have the player defeat the swarm of daggers;
 	extract the player to temple of herm;
 	have the player sacrifice the power of the daggers;
 	extract the player to Hall of Gods;
 	now the health of the player is 1000;
 	have the player and the healer of Aite fight in Arena of the Gods;
-	[also test bug 235]
-	clear the event description;
-	try linking the holy sword;
-	assert result "You can only link to persons";
-	assert absence of result "You forge a spiritual link";
 
-still-linking is a test step. The first move of bug-234 is still-linking.
+[also test bug 235]
 
-Choosing a player action when testing still-linking:
-	Generate the action of linking the healer of Aite.
+regular scheduling of link-holy-sword: try linking the holy sword.
+testing effects of link-holy-sword: if we assert result "You can only link to persons", rule succeeds.
+testing effects of no-holy-sword-link: if we assert absence of result "You forge a spiritual link", rule succeeds.
 
-testing effects of still-linking:
-	succeed based on whether or not the healer of Aite is linked to the player within 20 attempts.
-	
+regular scheduling of still-linking: compel the action of linking the healer of Aite.
+testing effects of still-linking: if the healer of Aite is linked to the player, rule succeeds.
+
+[not sure if this is testing the bug correctly]
+
+[	
 Section - Attempting to Maze Someone in Arena of the Gods
 
 challenger-mazing is a test set.
