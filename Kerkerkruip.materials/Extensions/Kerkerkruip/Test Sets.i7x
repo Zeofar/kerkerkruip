@@ -1465,10 +1465,6 @@ testing effects of no-placed-treasure-packs:
 
 Section - bug 244
 
-[This test is not catching the bug I saw. I have no idea how to reproduce it.]
-[TODO: roll this into another dungeon generation test set]
-
-
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	antecedent
 bug-244	1	0	map-generation-tests
