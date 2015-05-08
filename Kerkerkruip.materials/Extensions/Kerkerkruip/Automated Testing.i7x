@@ -650,6 +650,8 @@ To say grand test summary:
 				now remaining outcome tests is the remainder;
 	if the remaining outcome tests is at least 1:
 		say "; [number of not preset possible outcomes] outcome[s] to be tested up to [remaining outcome tests] more times" ;
+		
+[TODO: square these numbers with 'requeueable' count?]
 
 To decide whether there are test results to display:
 	decide on whether or not the number of filled rows in Table of Test Results is at least 1;
@@ -849,7 +851,7 @@ To find test sets:
 		if item is a test set, now the first test set is item;
 	while the primary outcome is boring lack of results and item is not boring lack of results:
 		[increment after, because the primary outcome could be the first test set]
-		if item is a possible test set, now the primary outcome is item;
+		if item is requeueable, now the primary outcome is item;
 		now item is the outcome after item;
 	while the next test set is boring lack of results and item is not boring lack of results:
 		if item is a test set, now the next test set is item;
@@ -1070,7 +1072,7 @@ To schedule (the event - an outcome):
 To decide which outcome is the test step after (event - an outcome):
 	Now event is the outcome after event;
 	While event is not boring lack of results:
-		if event is a test set and event is possible:
+		if event is requeueable:
 			decide on event;
 		if event is a test step and the primary outcome is not boring lack of results:
 			if the test set of event is the primary outcome:
@@ -1150,6 +1152,12 @@ The file of noninteractive tests is called "noninteractivetests".
 
 The run the unit tests rule is listed before the load achievements rule in the before showing the title screen rules.
 
+Definition: an outcome is requeueable:
+	unless it is a test set, no;
+	if it is possible, yes;
+	if it is untested, no;
+	decide on whether or not it has unresolved dependents.
+	
 Before showing the title screen (this is the run the unit tests rule):
 	now allowing screen effects is true;
 	if the file of test set queue exists:
@@ -1247,11 +1255,11 @@ To start the/-- next test:
 Regular scheduling of restarting for tests:
 	write file of test results from Table of Test Results;
 	choose row 1 in Table of Test Set Queue;
-	transcribe "Unresolved count includes [the list of possible test set outcomes]";
-	now the unresolved count entry is the number of possible test set outcomes;
+	transcribe "Unresolved count includes [the list of requeueable outcomes]";
+	now the unresolved count entry is the number of requeueable outcomes;
 	if the attempt count of the scheduled event is 0:
 		now the random-seed entry is the initial test random seed;
-		transcribe "initializing random seed to [the random-seed entry]";
+		transcribe "initializing random seed to [the random-seed entry] for [the scheduled event]";
 	otherwise:
 		if the xorshift seed is 0:
 			if the dungeon generation seed is 0:
@@ -1265,7 +1273,7 @@ Regular scheduling of restarting for tests:
 		otherwise:
 			transcribe "saving xorshift seed [the xorshift seed]";
 			now the random-seed entry is the xorshift seed;
-	transcribe "restarting with random seed [random-seed entry] testing [if the primary outcome is possible][current test description][otherwise][the list of possible enabled outcomes][end if]";
+	transcribe "restarting with random seed [random-seed entry] testing [if the primary outcome is requeueable][current test description][otherwise][the list of requeueable outcomes][end if]";
 	save test outcomes;
 	write file of test set queue from Table of Test Set Queue;
 	if file of save data exists:

@@ -441,6 +441,9 @@ To place (a - a room) next to (b - a room):
 				change the way exit of b to a;
 				let reverse be the opposite of way;
 				change the reverse exit of a to b;
+				[TODO: a is only normally placed if b is normally placed
+				actually the safest way would probably be to do a final pass after
+				the map is complete, checking which placed rooms have a route to Entrance Hall - anything that doesn't becomes secretly placed at that point.]
 				mark a as normally placed;
 				if generation info is true, say "* Placed [a] [way] of [b].[line break][run paragraph on]".
 			

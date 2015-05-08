@@ -897,15 +897,16 @@ Section - Attempting to Maze Someone in Arena of the Gods
 
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	antecedent
-challenger-mazing	0	1	restarting for tests
+mazing-tests	0	1	restarting for tests
 axing-defender	1	1	--
 
-Scenario for challenger-mazing:
+Scenario for mazing-tests:
 	Now the minotaur is testobject;
-	Now temple of Herm is testobject;
 	Now Hall of Gods is testobject;
-
-initial scheduling of challenger-mazing:
+	now the overmind is testobject;
+	now the hall of mirrors is bannedobject;
+	
+initial scheduling of mazing-tests:
 	now the player worships Nomos;
 	raise the favour of the player by 4;
 	extract the player to the location of the minotaur;
@@ -922,6 +923,19 @@ testing effects of axing-defender:
 	assert result "Space and time begin to twist";
 	assert that the location is Arena of the Gods;
 	rule succeeds.
+
+Section - At-react after getting mazed - bug 210
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts
+overmind-mazing	1	1
+overmind-maze-reset	1	1
+
+initial scheduling of overmind-mazing: extract the player to the location of the overmind.
+regular scheduling of overmind-mazing: compel the action of the overmind waiting as a reaction to the player.
+testing effects of overmind-mazing: if the location is Maze, rule succeeds.
+testing effects of overmind-maze-reset: if the combat state of the overmind is at-inactive, rule succeeds.
+	
 
 [
 Section - Banshees Gone Wild - bug 248
@@ -1407,47 +1421,20 @@ Testing effects of no-new-blessed:
 	assert "The Blessed Grenade should be off-stage" based on whether or not the blessed grenade is off-stage;
 	if we assert result "the Blessed Grenade drops on the ground", rule succeeds;
 	
-[
 
-Section - At-react after getting mazed - bug 210
-
-maze-resetting is a test set.
-
-Scenario when testing maze-resetting:
-	now the minotaur is testobject;
-	now the overmind is testobject;
-	now the hall of mirrors is bannedobject;
-	
-Test play when testing maze-resetting:
-	extract the player to the location of the minotaur;
-	try smiting the minotaur;
-	try taking the minotaur's axe;
-	assert "the minotaur's axe should be carried" based on whether or not the minotaur's axe is carried;
-	try readying the minotaur's axe;
-	assert "the minotaur's axe should be readied" based on whether or not the minotaur's axe is readied;
-	now the defence of the player is 100;
-	now the melee of the player is 100;
-
-overmind-meeting is a extracting hiding-reveal test step. The first move of maze-resetting is overmind-meeting. The location-target of overmind-meeting is the overmind.
-
-overmind-mazing is a test step.   
-
-Choosing a player action when testing overmind-mazing:
-	generate the action of attacking the overmind.
-	
-testing effects of overmind-mazing:
-	assert that the combat state of the overmind is at-inactive.
-	
 Section - bug 262
 
 [this bug will not happen with normal testobject placement, so this is a bit of a gamble]
-[TODO: create testing dungeon generation rulebook. save the table of outcomes to a file and continue the test if any of them are open]
 
-bug-262 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+map-generation-tests	0	1	200	restarting for tests
+bug-262	1	0	--	map-generation-tests
+no-placed-treasure-packs	5	5	--	bug-262
 
-Scenario when testing bug-262:
+Scenario for map-generation-tests:
 	now generation info is true;
-	now every secretly placeable room is bannedobject;
+[	now every secretly placeable room is bannedobject;
 	
 First creating the map rule when testing bug-262:
 	now every secretly placeable room is testobject;
@@ -1456,22 +1443,47 @@ First dungeon finish rule:
 	repeat with pack running through not non-treasure things:
 		repeat with item running through things enclosed by pack:
 			now the valuation of item is the valuation of pack;
+			
+TODO: figure out what all that crap is for
+	]
 	
+[TODO: merge with other dungeon generation tests]
+
 Definition: a room is secret-treasure-stash if it is Mausoleum or it is Hidden Treasury or it is Elemental Plane of Smoke Storage.
 
-Test play when testing bug-262:
-	if portal of smoke is not placed and hidden treasury is not placed and mausoleum is not placed:
-		log "no treasure-containing secret rooms to test for bug 262, but testing anyway!";
-	let something to test be false;
+testing effects of bug-262:
+	unless portal of smoke is placed or hidden treasury is placed or mausoleum is placed, make no decision;
 	repeat with place running through secret-treasure-stash rooms:
-		if place encloses a not non-treasure thing:
-			now something to test is true;
-			break;
-	unless something to test is true:
-		log "no treasure in any secretly placed rooms, but testing anyway";
-	Repeat with item running through treasure packs:
-		assert "[The item] should be off-stage, but it is in [the holder of the item][if holder of the item is not a room] (in [location of the item])" based on whether or not item is off-stage;
+		if place encloses a not non-treasure thing, rule succeeds.
 
+testing effects of no-placed-treasure-packs:
+	Repeat with item running through treasure packs:
+		if item is not off-stage:
+			now the failure report is "[The item] should be off-stage, but it is in [the holder of the item][if holder of the item is not a room] (in [location of the item])";
+			rule fails;
+	rule succeeds.
+
+Section - bug 244
+
+[This test is not catching the bug I saw. I have no idea how to reproduce it.]
+[TODO: roll this into another dungeon generation test set]
+
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-244	1	0	map-generation-tests
+mausoleum-secret	5	5	bug-244
+
+testing effects of bug-244 (this is the mausoleum must be secret rule):
+	if the mausoleum is not placed, rule fails;
+	let the path be the best route from Entrance Hall to the mausoleum;
+	if the path is a direction, rule fails;
+	rule succeeds.
+	
+[Finally found the cause of bug 244! The mausoleum could become connected to a secretly placed room. That made things kind of complicated!]
+Testing effects of mausoleum-secret: if the mausoleum is secretly placeable, rule succeeds;
+
+[
 Section - bug 245
 
 bug-245 is a test set.
@@ -2014,33 +2026,6 @@ testing effects of sleepy-slaying:
 	assert result "fog of sleep";
 	assert that the player is fully alert.
 ]
-
-Section - bug 244
-
-[This test is not catching the bug I saw. I have no idea how to reproduce it.]
-[TODO: roll this into another dungeon generation test set]
-
-
-Table of Outcomes (continued)
-outcome	likelihood	minimum attempts	antecedent
-bug-244	0	20	restarting for tests
-mausoleum-placed	20	20	bug-244
-mausoleum-secret	20	20	bug-244
-
-
-Scenario for bug-244:
-	now generation info is true;
-	now the rarity of the mausoleum is 0;
-
-Map approval rule when testing bug-244 (this is the only approve secret mausoleum maps rule):
-	if the mausoleum is not placed:
-		rule fails;
-	let the path be the best route from Entrance Hall to the mausoleum;
-	if the path is a direction:
-		rule fails;
-	
-Testing effects of mausoleum-placed: if the mausoleum is placed, rule succeeds;
-Testing effects of mausoleum-secret: if the mausoleum is secretly placeable, rule succeeds;
 
 [	
 Section - Bug 301 Redux
