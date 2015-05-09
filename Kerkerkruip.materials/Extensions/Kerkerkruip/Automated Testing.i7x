@@ -386,7 +386,7 @@ To resolve (event - an outcome):
 		now the upper bound is the target + tolerance;
 		now the lower bound is the target - tolerance;
 		if likelihood of the event is at least 1 and lower bound is less than 1:
-			say "Programming error: I don't think this code should be needed.";
+			transcribe "WARNING: Had to reset lower bound of [event] from [lower bound] to 1 - upper bound=[upper bound] target=[target] tolerance=[tolerance] attempt count=[attempt count of event]";
 			now lower bound is 1;
 		if the success count of the event is at least lower bound and the success count of the event is at most upper bound:
 			now the state of event is outcome-achieved;
