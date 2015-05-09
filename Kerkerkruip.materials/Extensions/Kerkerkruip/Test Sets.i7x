@@ -1506,7 +1506,7 @@ malygris-heal-max is a number that varies.
 Regular scheduling of malygris-healing:
 	[Malygris heal power]
 	now malygris-heal-max is (heal power of Malygris) * 60 / (heal cooldown of Malygris);
-	if the heal cooldown of Malygris is at least 1:
+	if the heal power of Malygris is at least 1:
 		say "* Malygris can heal [malygris-heal-max divided by 60] and [remainder after dividing malygris-heal-max by 60] 60ths per turn[line break]";
 		
 Testing effects of malygris-healing: if malygris-heal-max is at least 1, rule succeeds.
