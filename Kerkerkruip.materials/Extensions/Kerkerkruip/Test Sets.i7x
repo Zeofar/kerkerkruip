@@ -1428,14 +1428,14 @@ Section - bug 262
 
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	maximum attempts	antecedent
-map-generation-tests	0	1	200	restarting for tests
-bug-262	1	0	--	map-generation-tests
+generation-tests	0	1	--	restarting for tests
+bug-262	1	0	--	generation-tests
 no-placed-treasure-packs	5	5	--	bug-262
 
-Scenario for map-generation-tests:
+Scenario for generation-tests:
 	now generation info is true;
-[	now every secretly placeable room is bannedobject;
-	
+
+[		
 First creating the map rule when testing bug-262:
 	now every secretly placeable room is testobject;
 	
@@ -1466,9 +1466,9 @@ testing effects of no-placed-treasure-packs:
 Section - bug 244
 
 Table of Outcomes (continued)
-outcome	likelihood	minimum attempts	antecedent
-bug-244	1	0	map-generation-tests
-mausoleum-secret	5	5	bug-244
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+bug-244	1	0	200	generation-tests
+mausoleum-secret	5	5	--	bug-244
 
 testing effects of bug-244 (this is the mausoleum must be secret rule):
 	if the mausoleum is not placed, rule fails;
@@ -1478,6 +1478,57 @@ testing effects of bug-244 (this is the mausoleum must be secret rule):
 	
 [Finally found the cause of bug 244! The mausoleum could become connected to a secretly placed room. That made things kind of complicated!]
 Testing effects of mausoleum-secret: if the mausoleum is secretly placeable, rule succeeds;
+
+Section - Starting Kits
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+malygris-healing	1	20	--	generation-tests
+too-much-malygris-healing	0	5	--	malygris-healing
+got-addicts-amulet	2	64	256	generation-tests
+cursed-addicts-amulet	2	2	--	got-addicts-amulet	
+got-shield	1	20	--	generation-tests
+wearing-shield	5	5	--	got-shield
+compassion-placed	1	0	--	generation-tests
+fafhrd-placed	1	0	--	generation-tests
+sword-of-light-owner	10	10	10	compassion-placed
+claymore-owner	10	10	10	fafhrd-placed
+
+Scenario for generation-tests (this is the tempt kerkerkruip to make shimmer copies rule):
+	now the gilded rapier is testobject;
+	now the gorgeous dagger is testobject;
+	now the evil dagger is testobject;
+	now Metastasio's hat is testobject;
+	set difficulty to 1;
+
+malygris-heal-max is a number that varies.
+
+Initial scheduling of malygris-healing:
+	[Malygris heal power]
+	let malygris-heal-max be (heal power of Malygris) * 60 / (heal cooldown of Malygris);
+	if malygris-heal-max is at least 1:
+		say "* Malygris can heal [malygris-heal-max divided by 60] and [remainder after dividing malygris-heal-max by 60] 60ths per turn[line break]";
+		
+Testing effects of malygris-healing: if malygris-heal-max is at least 1, rule succeeds.
+Testing effects of too-much-malygris-healing:
+	if malygris-heal-max is greater than (60 times 3):
+		now the failure report is "[malygris-heal-max divided by 60] and [remainder after dividing malygris-heal-max by 60] 60ths is too much healing for Malygris";
+		rule succeeds.
+
+Testing effects of got-shield: if the player has a shield, rule succeeds.
+Testing effects of wearing-shield: if the player wears a shield, rule succeeds.
+
+Testing effects of got-addicts-amulet: if the player wears the addict's amulet, rule succeeds.
+Testing effects of cursed-addicts-amulet: if the addict's amulet is cursed, rule succeeds.
+Testing effects of compassion-placed: if the angel of compassion is denizen, rule succeeds.
+Testing effects of sword-of-light-owner: if the original owner of the sword of light is the angel of compassion, rule succeeds.
+Testing effects of fafhrd-placed: if fafhrd is denizen, rule succeeds.
+Testing effects of claymore-owner: if the original owner of the claymore is fafhrd, rule succeeds.
+
+[TODO: we have removed shimmering. Test stolen weapon behavior in arenas]
+
+	[TODO: starting kit items should match the player's size?]
+	[TODO: check ownership/starting kits in Arena of the Gods and Arena of the Fallen]
 
 [
 Section - bug 245
@@ -1794,65 +1845,6 @@ Testing effects of imp-stashing:
 	succeed based on whether or not the imp's loot is in the lair of the imp within 2 attempts;
 	
 
-Section - Starting Kits
-
-starting-kits-test is a test set.
-
-Scenario when testing starting-kits-test:
-	now generation info is true;
-	now the gilded rapier is testobject;
-	now the gorgeous dagger is testobject;
-	now the evil dagger is testobject;
-	now Metastasio's hat is testobject;
-	set difficulty to 1;
-	[assert "the addict's amulet should start off cursed" based on whether or not the addict's amulet is cursed;]
-	
-malygris-heal-max is a number that varies.
-
-
-[TODO: make tests that can save outcomes and restart the game]
-
-To say malygris-heal-max-message:
-	say "[malygris-heal-max divided by 60] and [remainder after dividing malygris-heal-max by 60] 60ths is too much healing for Malygris";
-	
-Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts	maximum attempts	antecedent
-malygris-healing	""	1	20	--	--
-too-much-malygris-healing	"[malygris-heal-max-message]"	0	5	--	--
-shimmering-player-item	""	0	30	--	--
-got-addicts-amulet	""	2	64	256	--
-cursed-addicts-amulet	""	2	2	--	got-addicts-amulet	
-got-shield	""	1	20	--	--
-wearing-shield	""	5	5	--	got-shield
-compassion-placed	""	1	0	--	--
-fafhrd-placed	""	1	0	--	--
-sword-of-light-owner	""	10	10	10	compassion-placed
-claymore-owner	""	10	10	10	fafhrd-placed
-
-Generation test when testing starting-kits-test:
-	[Malygris heal power]
-	let max healing be (heal power of Malygris) * 60 / (heal cooldown of Malygris);
-	if max healing is greater than malygris-heal-max:
-		now malygris-heal-max is max healing;
-	if max healing is at least 1:
-		say "* Malygris can heal [max healing divided by 60] and [remainder after dividing max healing by 60] 60ths per turn[line break]";
-	achieve malygris-healing based on whether or not max healing is at least 1;
-	fail too-much-malygris-healing based on whether or not (max healing) is greater than (60 times 3);
-	[no shimmer weapons]
-	[We place all of the player's possible starting kit items in the dungeon, tempting the starting kit rules to make shimmer-copies. But it must resist the temptation!]
-	Repeat with item running through things enclosed by the player:
-		fail shimmering-player-item based on whether or not the item is shimmering;
-	Let item be a random shield had by the player;
-	achieve got-shield based on whether or not item is a shield;
-	test wearing-shield against whether or not item is a shield worn by the player;
-	test got-addicts-amulet against whether or not the player wears the addict's amulet;
-	test cursed-addicts-amulet against whether or not the addict's amulet is cursed;
-	test compassion-placed against whether or not the angel of compassion is denizen;
-	test sword-of-light-owner against whether or not the original owner of the sword of light is the angel of compassion;
-	test fafhrd-placed against whether or not fafhrd is denizen;
-	test claymore-owner against whether or not the original owner of the claymore is fafhrd;
-	[TODO: starting kit items should match the player's size?]
-	[TODO: check ownership/starting kits in Arena of the Gods and Arena of the Fallen]
 	
 Section - Bloodlust - issue 279
 
@@ -2685,11 +2677,11 @@ damage-modifier-testing is an extracting test step. The first move of damage-mod
 Definition: a room is precarious if it is Bridge of Doom or it is the Vast Staircase.
 
 Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts	maximum attempts	antecedent
-death-blessing	""	1	15	100	--
-death-curse	""	1	20	133	--
-blessing-reset	""	1	2	10	death-blessing
-curse-reset	""	1	2	10	death-curse
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+death-blessing	1	15	100	--
+death-curse	1	20	133	--
+blessing-reset	1	2	10	death-blessing
+curse-reset	1	2	10	death-curse
 
 Initial scheduling of damage-modifier-testing:
 	equip Miranda with nunchucks;

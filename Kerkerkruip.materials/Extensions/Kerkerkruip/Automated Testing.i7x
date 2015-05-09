@@ -38,12 +38,6 @@ Section - Outcomes
 [TODO: put all outcomes in a table and save it to a file. Then we can restart the game repeatedly and use outcomes to generate statistics about dungeon generation]
 An outcome is a kind of value. Some outcomes are defined by the Table of outcomes.
 
-To say (result - an outcome):
-	if the description of the result is not empty:
-		say "[description of the result]";
-	otherwise:
-		say "[the result]";
-		
 outcome state is a kind of value. The outcome states are outcome-untested, outcome-possible, outcome-failed, and outcome-achieved.
 
 Definition: an outcome is resolved if the state of it is at least outcome-failed.
@@ -77,9 +71,9 @@ dependency - determines whether the next outcome should be tested. do not set di
 ]
 
 Table of Outcomes
-outcome	description	attempt count	success count	likelihood (number)	minimum attempts (number)	maximum attempts (number)	maximum tolerance (number)	state (outcome state)	antecedent (outcome)
-boring lack of results	""	0	0	0	1	1	0	outcome-untested	boring lack of results
-restarting for tests	""	0	0	1	1	1	0	--	--
+outcome		attempt count	success count	likelihood (number)	minimum attempts (number)	maximum attempts (number)	maximum tolerance (number)	state (outcome state)	antecedent (outcome)
+boring lack of results	0	0	0	1	1	0	outcome-untested	boring lack of results
+restarting for tests	0	0	1	1	1	0	--	--
 
 Section - Outcome Persistence
 
@@ -87,7 +81,6 @@ The file of test outcomes is called "testoutcomes"
 
 To save test outcomes:
 	Repeat through Table of Outcomes:
-		now the description entry is the description of the outcome entry;
 		now the attempt count entry is the attempt count of the outcome entry;
 		now the success count entry is the success count of the outcome entry;
 		now the likelihood entry is the likelihood of the outcome entry;
@@ -102,7 +95,6 @@ To load test outcomes:
 	unless file of test outcomes exists, stop;
 	Read file of test outcomes into table of outcomes;
 	Repeat through table of outcomes:
-		[skip description entry]
 		if there is an attempt count entry, now the attempt count of the outcome entry is the attempt count entry;
 		if there is a success count entry, now the success count of the outcome entry is the success count entry;
 		if there is a likelihood entry, now the likelihood of the outcome entry is the likelihood entry;
@@ -178,6 +170,9 @@ For taking a player action when testing compelling an action (this is the compel
 		generate the action of waiting;
 	schedule taking a turn;
 
+To say (event - compelling an action):
+	say "compelling [the compelled action]"; 
+
 For taking a player action when testing compelling a reaction (this is the compel player reaction rule):
 	if the actor part of the compelled action is the player and the player is at-react:
 		generate the compelled action;
@@ -213,26 +208,24 @@ To decide which room is the action-destination of (current move - a test step):
 
 A test step can be extracting.]
 
-to say moving-description:
-	say "finding a route from [the location] to [the location-to-go]";
+to say (event - moving towards the destination):
+	say "moving from [the location] towards [the location-to-go]";
 	
-to say compelled-attack:
-	[say "an attack by [the compelled attacker] against [the actor part of the compelled action]";]
-	say "compelling an attack";
-[TODO: make this text stay dynamic]
+to say (event - compelling an attack):
+	say "compelling [the compelled attacker] to attack [the actor part of the compelled action]";
 
-to say compelled-reaction:
-	say "[the compelled action] in reaction to [the compelled attacker]"
+to say (event - compelling a reaction):
+	say "compelling [the compelled action] as a reaction to [the compelled attacker]"
 
 Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-taking a turn	""	1	0
-moving towards the destination	"[moving-description]"	1	0
-compelling an attack	"[compelled-attack]"	1	0
-compelling an action	"[the compelled action]"	1	0
-compelling a reaction	"[compelled-reaction]"	1	1
-free combat round	""	1	0
-free npc action	""	1	0
+outcome	likelihood	minimum attempts
+taking a turn	1	0
+moving towards the destination	1	0
+compelling an attack	1	0
+compelling an action	1	0
+compelling a reaction	1	1
+free combat round	1	0
+free npc action	1	0
 
 Definition: an outcome is schedule-blocking if it is at least taking a turn and it is at most free npc action.
 
@@ -289,7 +282,6 @@ To compel (the desired action - a stored action):
 	transcribe "compelling [the desired action][if the guy is asleep] and waking up [the guy]";
 	now the guy is not asleep;
 	Now the compelled action is the desired action;
-	Now the description of compelling an action is "[the compelled action]"; 
 	schedule compelling an action; [this should automatically stop and wait for a turn]
 	
 To compel (the desired action - a stored action) as a reaction to (guy - a person):
@@ -642,12 +634,7 @@ To say grand test summary:
 		now grand test total is grand test total plus total entry;
 		now grand test failures is grand test failures plus failures entry;
 	say "[grand test total] test[s] in [number of filled rows in Table of Test Results] set[s], [grand test failures] failure[s]";
-	Let the remaining outcome tests be 0;
-	Repeat with event running through possible outcomes:
-		if the test set of event is the primary outcome:
-			Let remainder be maximum attempts of event - attempt count of event;
-			if remainder is greater than the remaining outcome tests:
-				now remaining outcome tests is the remainder;
+	Let the remaining outcome tests be the maximum attempts of the primary outcome - attempt count of the primary outcome;
 	if the remaining outcome tests is at least 1:
 		say "; [number of not preset possible outcomes] outcome[s] to be tested up to [remaining outcome tests] more times" ;
 		
@@ -821,10 +808,13 @@ To decide whether (event - an outcome) currently depends on (blocker - an outcom
 To decide what number is the calculated maximum attempts of (event - an outcome):
 	unless maximum attempts of event is 0:
 		decide on the maximum attempts of event;
+	Let max be 100;
 	if minimum attempts of event is 1:
-		decide on 1;
-	otherwise:
-		decide on 100;
+		now max is 1;
+	repeat with item running through outcomes:
+		if item depends on event and the maximum attempts of item is greater than max:
+			now max is the maximum attempts of item;
+	decide on max;
 	
 To make (event - an outcome) testable:
 	if event is untested:
@@ -1189,6 +1179,11 @@ First after showing the title screen (this is the run all tests rule):
 	if done testing is true, make no decision;
 	transcribe and stop capturing because "restarting with";
 	now allowing screen effects is false;
+	[TODO: handle interaction between test config file and scenario]
+	start capturing text;
+	test restarting for tests against true;
+	Now the primary outcome is the test step after restarting for tests; [setting the primary outcome TODO: integrate with 'find test sets']
+	now the scheduled event is the primary outcome;
 	Choose row 1 in Table of Test Set Queue;
 	if the random-seed entry is not 0:
 		log "Seeding random number generator and dungeon generation with [random-seed entry]";
@@ -1198,12 +1193,6 @@ First after showing the title screen (this is the run all tests rule):
 	Repeat through Table of Test Results:
 		if failures entry > 0:
 			log "  [failures entry] failures in [test set entry]";
-	[TODO: handle interaction between test config file and scenario]
-	start capturing text;
-	test restarting for tests against true;
-	Now the primary outcome is the test step after restarting for tests; [setting the primary outcome TODO: integrate with 'find test sets']
-	now the scheduled event is the primary outcome;
-	showme the primary outcome;
 	schedule taking a turn;
 	follow the scenario rules for the primary outcome;
 	
@@ -1714,9 +1703,12 @@ To prepare a test battle with (guy - a person), inviting groups:
 			remove the old enemy from play;
 	Generate the action of challenging guy in Test Arena;
 	
+To say (event - combat hit):
+	say "doing [the compelled action] for a [melee of compelled attacker] hit by [the compelled attacker]".
+	
 Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-combat hit	"[The compelled action] for a [melee of compelled attacker] hit by [compelled attacker]"	1	1
+outcome	likelihood	minimum attempts
+combat hit	1	1
 
 The original defender weapon is an object that varies.
 The original attacker weapon is an object that varies.
