@@ -163,16 +163,13 @@ testing effects of herm-arena-bonus: if we assert result "grants you 2 divine fa
 regular scheduling of arena-vampire-joining: compel the action of drinking Drakul's lifeblood.
 testing effects for arena-vampire-joining: if we assert result "You turn into a vampire, but your opponent doesn't care", rule succeeds.
 
-The summoned creature is an object that varies; [TODO: use the monster summoned instead?]
-
 regular scheduling of herm-ally-summoning:
 	update the combat status;
 	assert that the combat status is combat;
 	try reading the reusable item;
-	now the summoned creature is a random visible undead not super-undead person who is not the player;
 	
-testing effects of herm-ally-summoning: if the summoned creature does not oppose the player, rule succeeds.
-testing effects of summoned-drakul-opponent: if the summoned creature opposes drakul, rule succeeds.
+testing effects of herm-ally-summoning: if the monster summoned does not oppose the player, rule succeeds.
+testing effects of summoned-drakul-opponent: if the monster summoned opposes drakul, rule succeeds.
 
 Regular scheduling of chton-arena-cheating:
 	Now the health of the player is 1;
@@ -185,7 +182,7 @@ testing effects for chton-arena-cheating:
 	assert result "receives the blood";
 	assert that the health of the player is 33;
 	assert result "transported back to the Hall of the Gods";
-	assert that the location of the summoned creature is Hall of Gods;
+	assert that the location of the monster summoned is Hall of Gods;
 	assert that drakul's lifeblood is in Hall of Gods;
 	rule succeeds.
 
