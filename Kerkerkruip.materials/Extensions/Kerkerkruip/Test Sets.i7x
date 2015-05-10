@@ -163,7 +163,7 @@ testing effects of herm-arena-bonus: if we assert result "grants you 2 divine fa
 regular scheduling of arena-vampire-joining: compel the action of drinking Drakul's lifeblood.
 testing effects for arena-vampire-joining: if we assert result "You turn into a vampire, but your opponent doesn't care", rule succeeds.
 
-The summoned creature is an object that varies;
+The summoned creature is an object that varies; [TODO: use the monster summoned instead?]
 
 regular scheduling of herm-ally-summoning:
 	update the combat status;
@@ -1589,150 +1589,140 @@ testing effects of bodmall-bleeding:
 	assert "bodmall should be at-inactive, but she is [combat state of bodmall]" based on whether or not bodmall is at-inactive;
 	rule succeeds.
 
-[
 Section - Maze Moving
 
 [Moving around in the maze - check that all people have 0 concentration and are at-inactive. Check that the right thing happens when retreating or running from an opponent in the maze. Maybe check grenade-throwing effects in the maze]
 
-[TODO: get rid of act count from this - this is the last test to use it]
+[TODO: what if we flee a summoned creature but not towards the sound?]
 
-To assert that (item - a thing) is located in (place - a room):
-	assert "[The item] should be in [place], but [they] is in [location of item]" based on whether or not the location of item is place.
-	
-To assert that (guy - a person) has (N - a number) levels of concentration:
-	assert "[The guy] has [concentration of guy] levels of concentration, but [they] should have [N] levels" based on whether or not concentration of guy is N.
-	
-maze-moving is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+maze-moving	0	1	restarting for tests
+getting-mazed	1	0	--
+mazed-player-inactive	1	1	getting-mazed
+mazing-minotaur-inactive	1	1	getting-mazed
+mazing-minotaur-staged	1	1	getting-mazed
+no-maze-sound-yet	1	1	getting-mazed
+mazing-minotaur-damage	1	1	getting-mazed
+directionless-throwing	1	1	--
+fast-throwing-failure	1	1	directionless-throwing
+inconsequential-throwing	1	1	directionless-throwing
+meta-throwing-test	1	1	--
 
-Scenario when testing maze-moving:
+Scenario for maze-moving:
 	now the minotaur is testobject;
 	now the hall of mirrors is bannedobject;
 	now the reusable item is a random flash grenade;
 	
-minotaur-meeting is a hidden-traveling extracting hiding-reveal test step. The first move of maze-moving is minotaur-meeting. The location-target of minotaur-meeting is the minotaur.
-
-Initial scheduling of minotaur-meeting:
-	now the health of the player is 1000;
-	now the defence of the player is 0;
-	
-getting-mazed is a test step.
-
 Initial scheduling of getting-mazed:
-	compel the action of the minotaur attacking the player.
-
-Testing effects of getting-mazed:
-	succeed on result "minotaur deals";
-	if waiting for resolution, make no decision;
-	assert that the location is Maze;
-	assert "the player should be at-inactive, but [regarding the player][they] [are] [combat state of the player]" based on whether or not the player is at-inactive;
-	assert "the minotaur should be at-inactive, but he is [combat state of the minotaur]" based on whether or not the minotaur is at-inactive;
-	assert that the minotaur is located in maze-waiting-room;
-	assert that maze-sound is northwest;
+	now the health of the player is 1000;
+	extract the player to the location of the minotaur;
 	
-directionless-throwing is a test step.
+regular scheduling of getting-mazed: compel the action of exposing as a reaction to the minotaur.
 
-Choosing a player action when testing directionless-throwing:
-	generate the action of throwing the reusable item to north;
-
-Testing effects of directionless-throwing:
-	assert result "There is no point throwing grenades into twisty little passages";
-	assert "Trying to throw things in the maze should not take time" based on whether or not the take no time boolean is true;
-	assert "[the reusable item] should be carried" based on whether or not the reusable item is carried.
+Testing effects of getting-mazed: if the location is Maze, rule succeeds.
+Testing effects of mazed-player-inactive: if the player is at-inactive, rule succeeds.
+Testing effects of mazing-minotaur-inactive: if the minotaur is at-inactive, rule succeeds.
+Testing effects of mazing-minotaur-staged: if we assert that the location of the minotaur is maze-waiting-room, rule succeeds.
+Testing effects of no-maze-sound-yet: if maze-sound is northwest, rule succeeds.
+Testing effects of mazing-minotaur-damage: if we assert result "minotaur deals", rule succeeds.
 	
-sound-finding is a test step.   
+Regular scheduling of directionless-throwing: try throwing the reusable item to north.
+Testing effects of directionless-throwing: if we assert result "There is no point throwing grenades into twisty little passages", rule succeeds.
+testing effects of fast-throwing-failure: if the take no time boolean is true, rule succeeds.
+testing effects of inconsequential-throwing: if the reusable item is carried, rule succeeds.
 
-Choosing a player action when testing sound-finding:
-	generate the action of going north.
-
-Testing effects of sound-finding:
-	succeed based on whether or not maze-sound is a cardinal direction.
-			
-maze-summoning is an item-reading test step.
-
-Initial scheduling of maze-summoning:
-	now the the reusable item is a random scroll of summoning;
-	now the player carries the reusable item;
+regular scheduling of meta-throwing-test: remove the reusable item from play.
+testing effects of meta-throwing-test: unless the reusable item is carried, rule succeeds.
 	
-Testing effects of maze-summoning:
-	assert result "[a monster summoned] appears before you"
-	
-A test step can be sound-following.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+sound-finding	1	0	--
+maze-summoning	1	1	--
+summoned-fleeing	1	1	--
+summoned-hits	1	1	summoned-fleeing
+summoned-followed	1	1	summoned-fleeing
+arrived-at-minotaur	1	1	summoned-fleeing
 
-summoned-fleeing is a sound-following test step.
+To assert that everyone is unconcentrated:
+	Repeat with guy running through people in the location:
+		assert that the concentration of guy is 0 with label "concentration of [guy]".
+
+regular scheduling of sound-finding: compel the action of going north.
+Testing effects of sound-finding: if maze-sound is a cardinal direction, rule succeeds.
+
+Initial scheduling of maze-summoning: now the the reusable item is a random scroll of summoning.
+regular scheduling of maze-summoning: try reading the reusable item.
+Testing effects of maze-summoning: if we assert result "[a monster summoned] appears before you", rule succeeds.
 
 Initial scheduling of summoned-fleeing:
 	now the concentration of the player is 3;
 	now the concentration of the monster summoned is 3;
 	
-Choosing a player action when testing a sound-following test step:
-	generate the action of going maze-sound;
+regular scheduling of summoned-fleeing: try going maze-sound.
 
-Definition: a person is not-yet-active if the act count of it is 0.
+[Definition: a person is not-yet-active if the act count of it is 0.]
 
-First combat round rule when testing summoned-fleeing:
-	update event description;
-	if every person who is not the player is not-yet-active:
-		assert result "You flee through the tunnels, quickly losing all sense of direction.[line break][line break][The monster summoned] follows you towards the sound.";
-		if the monster summoned is non-attacker:
-			assert 0 hits by the monster summoned;
-		otherwise:
-			assert 1 hit by the monster summoned;
-	if the act count of the main actor is 0:
+testing effects of summoned-fleeing: if we assert result "You flee through the tunnels, quickly losing all sense of direction.[line break][line break][The monster summoned] follows you towards the sound.", rule succeeds.
+
+testing effects of summoned-hits:
+	assert that everyone is unconcentrated;
+	let expected hits be 1;
+	if the monster summoned is non-attacker:
+		now expected hits is 0;
+	if we assert that the hitting count of the monster summoned is the expected hits, rule succeeds.
+	[if the act count of the main actor is 0: TODO: what is the point of this?
 		[this assertion can interrupt the event description]
-		assert that the main actor has 0 levels of concentration;
-	clear event description;
+		assert that the main actor has 0 levels of concentration;]
 
-testing effects of summoned-fleeing:
-	assert that the monster summoned is located in the maze;
-	assert that the minotaur is located in the maze;
-	if the act count of the monster summoned is 0:
-		assert that the monster summoned has 0 levels of concentration;
-	if the act count of the minotaur is 0:
-		assert that the minotaur has 0 levels of concentration;
+testing effects of summoned-followed: if we assert that location of the monster summoned is the maze, rule succeeds.
+testing effects of arrived-at-minotaur: if we assert that the location of the minotaur is the maze, rule succeeds.
 
-multiple-fleeing is a test step.   
-
-Choosing a player action when testing multiple-fleeing:
-	generate the action of going north.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+multiple-fleeing	1	0	--
+summoned-staged	1	1	multiple-fleeing
+minotaur-staged	1	1	multiple-fleeing
+minotaur-parting-shot	1	1	multiple-fleeing
+multiple-sound-seeking	1	0	--
+multiple-staged	1	1	multiple-sound-seeking
+first-rejoining	1	1	--
+one-staged	1	1	first-rejoining
+first-maze-smiting	1	1	--
+maze-peace	1	1	first-maze-smiting
 
 Initial scheduling of multiple-fleeing:
 	now the concentration of the minotaur is 3;
 	now the concentration of the monster summoned is 3;
-	
+
+regular scheduling of multiple-fleeing: try going north.
+
 Testing effects of multiple-fleeing:
-	assert that the minotaur has 0 levels of concentration;
-	assert that the monster summoned has 0 levels of concentration;
-	assert that the minotaur is located in maze-waiting-room;
-	assert that the monster summoned is located in maze-waiting-room;
-	assert 1 hit by the minotaur;
+	assert that everyone is unconcentrated;
+	if we assert absence of result "follows you", rule succeeds.
 	
-multiple-sound-seeking is a test step.   
+testing effects of minotaur-staged: if the location of the  minotaur is maze-waiting-room, rule succeeds.
+testing effects of summoned-staged: if the location of the monster summoned is maze-waiting-room, rule succeeds.
+testing effects of minotaur-parting-shot: if we assert that the hitting count of the minotaur is 1, rule succeeds.
+	
+regular scheduling of multiple-sound-seeking: compel the action of going north.
 
-Choosing a player action when testing multiple-sound-seeking:
-	generate the action of going north.
-
-Testing effects of multiple-sound-seeking:
-	succeed based on whether or not the maze-sound is a cardinal direction;
-	if waiting for resolution, make no decision;
-	assert that the number of people in maze-waiting-room is 2;
+Testing effects of multiple-sound-seeking: if the maze-sound is a cardinal direction, rule succeeds.
+testing effects of multiple-staged: if we assert that the number of people in maze-waiting-room is 2, rule succeeds.
 		
-first-rejoining is a sound-following test step.
-
-Testing effects of first-rejoining:
-	assert that the number of people in maze-waiting-room is 1;
-	assert that the number of people in maze [including the player] is 2;
+regular scheduling of first-rejoining: compel the action of going maze-sound.
+Testing effects of first-rejoining: if we assert that the number of people in maze [including the player] is 2, rule succeeds.
+testing effects of one-staged: if we assert that the number of people in maze-waiting-room is 1, rule succeeds.
 	
-first-maze-smiting is a test step.
-
-Choosing a player action when testing first-maze-smiting:
+regular scheduling of first-maze-smiting:
 	now opposition test subject is the player;
 	Let the enemy be a random opposer person enclosed by the location;
-	generate the action of smiting the enemy.
+	compel the action of smiting the enemy.
 	
-Testing effects of first-maze-smiting:
-	assert that the player is located in the maze;
-	assert that the combat status is peace.
+Testing effects of first-maze-smiting: if we assert that the location of the player is the maze, rule succeeds.
+Testing effects of maze-peace: if we assert that the combat status is peace, rule succeeds.
 
+[
 Section - Hiding Penalites
 
 hiding-penalties is a test set.
