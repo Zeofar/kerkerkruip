@@ -1075,7 +1075,7 @@ The fuligin cloak is cloth.
 The description of the fuligin cloak is "Fuligin, the colour that is darker than black. Wearing this powerful cloak allows you to become hidden and sneak through the dungeon undetected. It also makes you somewhat resistant to radiant damage.".
 
 Every turn when the player wears the fuligin cloak (this is the blend into shadows rule):
-	update the combat status;
+	update the combat status; [TODO: is this safe? "hate is present" might be safer]
 	if combat status is peace:
 		if the player is not hidden and the player is alive and the player is the main actor:
 			hide.

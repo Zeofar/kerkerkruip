@@ -1483,8 +1483,8 @@ Section - Starting Kits
 
 Table of Outcomes (continued)
 outcome	likelihood	minimum attempts	maximum attempts	antecedent
-malygris-healing	1	20	--	generation-tests
-too-much-malygris-healing	0	5	--	malygris-healing
+malygris-healing	1	5	--	generation-tests
+too-much-malygris-healing	0	10	--	malygris-healing
 got-addicts-amulet	2	64	256	generation-tests
 cursed-addicts-amulet	2	2	--	got-addicts-amulet	
 got-shield	1	20	--	generation-tests
@@ -1530,66 +1530,66 @@ Testing effects of claymore-owner: if the original owner of the claymore is fafh
 	[TODO: starting kit items should match the player's size?]
 	[TODO: check ownership/starting kits in Arena of the Gods and Arena of the Fallen]
 
-[
 Section - bug 245
 
-bug-245 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-245	0	1	restarting for tests
+ape-growing	1	0	--
+ape-smiting	1	1	--
+bodmall-meeting	1	0	--
+bodmall-attack	1	1	--
+bodmall-reaction	1	1	bodmall-attack
+bodmall-bleeding	1	1	bodmall-attack
 
-Scenario when testing bug-245:
+Scenario for bug-245:
 	now the blood ape is testobject;
 	now bodmall is testobject;
 	now the hall of mirrors is bannedobject;
 	
 Initial scheduling of ape-growing:
+	extract the player to the location of the blood ape;
 	now the defence of the player is 0;
-	now the health of the player is 1000;
 	now the melee of the player is 100;
 	
-ape-growing is a extracting hidden-traveling hiding-reveal test step. The first move of bug-245 is ape-growing. The location-target of ape-growing is the blood ape. 
+regular scheduling of ape-growing: do the action of the player waiting for a 100 melee hit by the blood ape.
+testing effects of ape-growing: if the size of the blood ape is greater than medium, rule succeeds.
 
-[TODO:  a 100-melee hit phrase right here would cut through the crap]
-testing effects of ape-growing:
-	succeed based on whether or not the size of the blood ape is greater than medium;
-	if waiting for resolution, compel the action of the blood ape attacking the player;
-	
-Choosing a player reaction when testing ape-growing:
-	generate the action of exposing;
-	rule succeeds.
+regular scheduling of ape-smiting: compel the action of smiting the blood ape.
+testing effects of ape-smiting: if the power of the ape is granted, rule succeeds.
 
-ape-smiting is a test step.   
-
-Choosing a player action when testing ape-smiting:
-	generate the action of smiting the blood ape;
-
-testing effects of ape-smiting:
-	assert "the power of the ape should be granted" based on whether or not the power of the ape is granted;
-
-bodmall-meeting is a hidden-traveling extracting hiding-reveal test step. The location-target of bodmall-meeting is bodmall.
-
-Initial scheduling of bodmall-meeting:
+initial scheduling of bodmall-meeting:
 	now the health of bodmall is 1000;
 	now bodmall is not asleep;
+	extract the player to the location of Bodmall.
+regular scheduling of bodmall-meeting: compel the action of waiting.
+testing effects of bodmall-meeting: rule succeeds.
 	
-bodmall-bleeding is a test step.   
+regular scheduling of bodmall-attack: compel the action of attacking bodmall.
+testing effects of bodmall-attack: rule succeeds.
 
-Table of Outcomes (continued)
-outcome	description	likelihood	minimum attempts
-bodmall-reaction	""	1	100
+regular scheduling of bodmall-reaction: now bodmall-reaction is scheduled for later testing.
+testing effects of bodmall-reaction:
+	if Bodmall is at-react, rule succeeds.
 
-Choosing a player action when testing bodmall-bleeding:
-	generate the action of attacking bodmall.
-
-Before Bodmall doing something when testing bodmall-bleeding:
-	[TODO: keep counting outcomes even after they're achieved -
-	then we can do a normal "achieve" instead of "test"]
-	test bodmall-reaction against whether or not Bodmall is at-react;
+A standard AI rule for a person (called P) when testing bodmall-attack (this is the make sure Bodmall reacts rule):
+	if P is Bodmall:
+		now bodmall-reaction is scheduled for immediate testing;
+		test effects of bodmall-reaction;
 	
+First combat round rule when testing bodmall-attack and bodmall-reaction is achieved (this is the bodmall should only react once rule):
+	assert that the combat state of Bodmall is at-inactive with label "combat state of bodmall". 
+	
+The make sure Bodmall reacts rule is listed before the compel an attack rule in the standard AI rules.
+The bodmall should only react once rule is listed before test combat round of previous main actor rule in the combat round rules.
+
 testing effects of bodmall-bleeding:
 	assert "the player should now be bigger than medium, but [regarding the player][they] [are] [size of the player]" based on whether or not the size of the player is greater than medium;
-	assert that the success count of bodmall-reaction is 1 with label "number of times Bodmall reacted";
+	[assert that the success count of bodmall-reaction is 1 with label "number of times Bodmall reacted"; [how do we test this?]]
 	assert "bodmall should be at-inactive, but she is [combat state of bodmall]" based on whether or not bodmall is at-inactive;
-	reset bodmall-reaction;
+	rule succeeds.
 
+[
 Section - Maze Moving
 
 [Moving around in the maze - check that all people have 0 concentration and are at-inactive. Check that the right thing happens when retreating or running from an opponent in the maze. Maybe check grenade-throwing effects in the maze]

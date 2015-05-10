@@ -386,7 +386,6 @@ To resolve (event - an outcome):
 		now the upper bound is the target + tolerance;
 		now the lower bound is the target - tolerance;
 		if likelihood of the event is at least 1 and lower bound is less than 1:
-			transcribe "WARNING: Had to reset lower bound of [event] from [lower bound] to 1 - upper bound=[upper bound] target=[target] tolerance=[tolerance] attempt count=[attempt count of event]";
 			now lower bound is 1;
 		if the success count of the event is at least lower bound and the success count of the event is at most upper bound:
 			now the state of event is outcome-achieved;
@@ -588,7 +587,7 @@ Random-Seed (number)	Unresolved Count (number)
 0	0
 with 1 blank row
 
-To decide what number is the initial test random seed: decide on 54.
+To decide what number is the initial test random seed: decide on 55.
 
 To queue (T - an outcome):
 	make T testable;
@@ -1120,7 +1119,7 @@ A first combat round rule (this is the test combat round of previous main actor 
 		now the act-outcome of the main actor is scheduled for immediate testing;
 		continue scheduling;
 	if a person is scheduled to act freely:
-		clear event description because "completed combat round of [the main actor]";
+		clear event description;
 		Repeat with guy running through scheduled to act freely people:
 			if the location of guy is not the location:
 				assert "[act-outcome of guy] can't be tested because [guy] is not here" based on false;
