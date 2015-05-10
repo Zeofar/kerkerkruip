@@ -1487,7 +1487,7 @@ malygris-healing	1	5	--	generation-tests
 too-much-malygris-healing	0	10	--	malygris-healing
 got-addicts-amulet	2	64	256	generation-tests
 cursed-addicts-amulet	2	2	--	got-addicts-amulet	
-got-shield	1	20	--	generation-tests
+got-shield	1	8	--	generation-tests
 wearing-shield	5	5	--	got-shield
 compassion-placed	1	0	--	generation-tests
 fafhrd-placed	1	0	--	generation-tests
