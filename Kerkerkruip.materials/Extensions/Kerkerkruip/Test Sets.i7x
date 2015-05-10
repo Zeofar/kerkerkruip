@@ -191,13 +191,13 @@ Section - Parting Shots
 
 parting shots is a test set.
 
-A scenario rule when testing parting shots:
+A scenario rule for parting shots:
 	now israfel is testobject;
 	now mindslug is testobject;
 	now armadillo is testobject;
 	now fuligin cloak is testobject;
 
-A test play when testing parting shots:
+A test play for parting shots:
 	force the fuligin cloak to work;
 	try butterflying;
 	Travel sneakily to the location of the mindslug;
@@ -207,8 +207,8 @@ mindslug-hiding-check is a hiding-check test step. The first move of parting sho
 
 mindslug-hidden-retreat is a hiding-check test step.   
 
-Choosing a player action when testing mindslug-hidden-retreat:
-	generate the action of retreating.
+regular scheduling of mindslug-hidden-retreat:
+	compel the action of retreating.
 	
 Before taking a player action when mindslug-hidden-retreat is the scheduled event:
 	assert that the mindslug is in the location;
@@ -227,8 +227,8 @@ mindslug-hidden-runner is a hiding-check test step.
 initial scheduling of mindslug-hidden-runner:
 	extract the player to the location of the mindslug;
 	
-Choosing a player action when testing mindslug-hidden-runner:
-	generate the action of going way-to-get-back.
+regular scheduling of mindslug-hidden-runner:
+	compel the action of going way-to-get-back.
 	
 testing effects for mindslug-hidden-runner:
 	assert zero hits by mindslug;
@@ -242,8 +242,8 @@ Initial scheduling for mindslug-reveal:
 
 mindslug-retreat is a test step.  The next move of mindslug-reveal is mindslug-retreat.   
 
-Choosing a player action when testing mindslug-retreat:
-	generate the action of retreating.
+regular scheduling of mindslug-retreat:
+	compel the action of retreating.
 
 Before taking a player action [or reaction] when mindslug-retreat is the scheduled event:
 	now mindslug presses the player;
@@ -265,8 +265,8 @@ Initial scheduling of mindslug-runner:
 	extract the player to the location of the mindslug;
 	now retreat location is the location of the mindslug;
 
-Choosing a player action when testing mindslug-runner:
-	generate the action of going the way-to-get-back;
+regular scheduling of mindslug-runner:
+	compel the action of going the way-to-get-back;
 	
 testing effects for mindslug-runner:
 	assert result "run past your enemies";
@@ -289,8 +289,8 @@ Initial scheduling of fell-freezing:
 		
 frozen-fell-fleeing is a test step.   
 
-Choosing a player action when testing frozen-fell-fleeing:
-	generate the action of retreating.
+regular scheduling of frozen-fell-fleeing:
+	compel the action of retreating.
 
 testing effects of frozen-fell-fleeing:
 	assert that israfel-reuniting-initiator is Fell with label "the reuniting initiator";
@@ -321,9 +321,9 @@ unfrozen-fell-fleeing is a test step.
 Initial scheduling of unfrozen-fell-fleeing:
 	compel the action of fell waiting; [TODO: see if it works without this line now that npc-suppressing is the default]
 	
-Choosing a player action when testing unfrozen-fell-fleeing:
+regular scheduling of unfrozen-fell-fleeing:
 	forget the compelled action; [TODO: this should be ok to delete too, as above]
-	generate the action of retreating.
+	compel the action of retreating.
 
 initial scheduling of unfrozen-fell-fleeing:
 	now fell presses the player;
@@ -335,14 +335,14 @@ Section - Retreating from the Tentacle
 
 tentacle-grab is a test set.
 
-Scenario when testing tentacle-grab:
+Scenario for tentacle-grab:
 	Now the giant tentacle is testobject;
 	now the fuligin cloak is testobject;
 	now the hall of mirrors is bannedobject;
 	Now the pickaxe is testobject;
 	Now every not connectable room is bannedobject; [the bridge of doom stops digging]
 	
-A test play when testing tentacle-grab:
+A test play for tentacle-grab:
 	now the player carries the pickaxe;
 	try butterflying;
 	Travel sneakily to the location of the tentacle;
@@ -354,8 +354,8 @@ Tentacle-reveal is a hiding-reveal test step. The next move of tentacle-hiding-c
 
 tentacle-retreat is a test step.  The next move of tentacle-reveal is tentacle-retreat.   
 
-Choosing a player action when testing tentacle-retreat:
-	generate the action of retreating.
+regular scheduling of tentacle-retreat:
+	compel the action of retreating.
 
 Before taking a player action when testing tentacle-grab:
 	if the player is at-react:
@@ -380,8 +380,8 @@ tentacle-dig-retreat is a test step. The next move of tentacle-retreat is tentac
 initial scheduling for tentacle-dig-retreat:
 	now the tentacle does not grapple the player;
 	
-choosing a player action when testing tentacle-dig-retreat:
-	generate the action of digging a random diggable direction.
+regular scheduling of tentacle-dig-retreat:
+	compel the action of digging a random diggable direction.
 	
 testing effects for tentacle-dig-retreat:
 	assert result "magically create a tunnel";
@@ -567,7 +567,7 @@ isra-defended-by-sul	1	0	isra-undamaged
 
 [TODO: figure out actual probabilities of interventions]
 
-A scenario rule when testing Sul Champion vs Herm worshipper:
+A scenario rule for Sul Champion vs Herm worshipper:
 	now Hall of Gods is testobject;
 
 Regular scheduling of player-defended-by-herm: do the action of waiting for a 100 melee hit by Israfel.
@@ -675,7 +675,7 @@ Section - Temporary Blood Magic from Nomos
 
 temporary Nomos blood magic is a test set.
 	
-Scenario when testing temporary Nomos blood magic:
+Scenario for temporary Nomos blood magic:
 	now Bodmall is testobject;
 	now the jumping bomb is testobject;
 	now the swarm of daggers is testobject;
@@ -697,7 +697,7 @@ To decide what number is the chance of (guy - a person) remaining concentrated:
 	now the global defender is previous defender;
 	decide on the remain concentrated chance.
 	
-Test play when testing temporary Nomos blood magic:
+Test play for temporary Nomos blood magic:
 	now every room is not rust-spored;
 	now the health of the player is 1000;
 	now the defence of the player is 50;
@@ -739,8 +739,8 @@ Test play when testing temporary Nomos blood magic:
 	
 second-gown-feeding is a hidden-traveling test step. The first move of temporary Nomos blood magic is second-gown-feeding.   
 
-Choosing a player action when testing second-gown-feeding:
-	generate the action of feeding the gown of the red court.
+regular scheduling of second-gown-feeding:
+	compel the action of feeding the gown of the red court.
 
 testing effects of second-gown-feeding:
 	assert that the blood magic level of the gown of the red court is 2;
@@ -794,8 +794,8 @@ Testing effects of daggers-meeting:
 
 nomos-bonus-examining is a test step.   
 
-Choosing a player action when testing nomos-bonus-examining:
-	Generate the action of examining the swarm of daggers.
+regular scheduling of nomos-bonus-examining:
+	compel the action of examining the swarm of daggers.
 
 Initial scheduling of nomos-bonus-examining:
 	now the nomos bonus is true;
@@ -805,8 +805,8 @@ Testing effects of nomos-bonus-examining:
 
 malleus-bonus-attacking is a hidden-traveling test step.   
 
-Choosing a player action when testing malleus-bonus-attacking:
-	Generate the action of turning human. 
+regular scheduling of malleus-bonus-attacking:
+	compel the action of turning human. 
 
 [turning human is not acting fast, but a rule sets the take no time boolean for it. This will be too late to stop the nomos bonus from changing our action]
 
@@ -832,7 +832,7 @@ testing effects of malleus-bonus-attacking:
 early-feeding is a test step.
 
 initial scheduling of early-feeding:
-       generate the action of feeding the malleus maleficarum.
+       compel the action of feeding the malleus maleficarum.
 
 testing effects of early-feeding:
        check that the malleus is fed.
@@ -946,13 +946,13 @@ To set the tension to (N - a number):
 	transcribe "Setting tension to [N]";
 	now the tension is N;
 		
-Scenario when testing banshees gone wild:
+Scenario for banshees gone wild:
 	now Hall of Raging Banshees is testobject;
 	now the blood ape is testobject;
 	now the reaper is testobject;
 	now a random scroll of death is testobject;
 	
-Test play when testing banshees gone wild:
+Test play for banshees gone wild:
 	Now the reusable item is a random scroll of death;
 	swap the occupants of the location of the blood ape and the Hall of Raging Banshees;
 	travel sneakily to Hall of Raging Banshees;
@@ -972,9 +972,9 @@ testing effects of waiting-for-banshees:
 
 banshee-fleeing is a  hidden-traveling test step. The next move of waiting-for-banshees is banshee-fleeing.
 
-Choosing a player action when testing banshee-fleeing:
+regular scheduling of banshee-fleeing:
 	Let the way be the best route from the location to the retreat location;
-	generate the action of going the way.
+	compel the action of going the way.
 
 testing effects of banshee-fleeing:
 	assert "we should no longer be in Hall of the Raging Banshees" based on whether or not the location is not Hall of Raging Banshees;
@@ -987,9 +987,9 @@ Initial scheduling for banshee-returning:
 	extract the reaper to the location [to keep the tension from dissipating];
 	set the tension to 10.
 	
-Choosing a player action when testing banshee-returning:
+regular scheduling of banshee-returning:
 	Let the way be the best route from the location to the hall of raging banshees;
-	generate the action of going the way;
+	compel the action of going the way;
 
 testing effects of banshee-returning:
 	assert "Tension should be at least 10" based on whether or not the tension is at least 10;
@@ -1015,12 +1015,12 @@ Initial scheduling of reaction-ape-killing:
 	compel the action of the blood ape attacking the player;
 	
 Choosing a player reaction when reaction-ape-killing is the scheduled event:
-	generate the action of reading the reusable item;
+	compel the action of reading the reusable item;
 		
-Choosing a player action when testing reaction-ape-killing:
+regular scheduling of reaction-ape-killing:
 	if waiting for player reaction, make no decision;
 	Let the way be the best route from the location to the retreat location;
-	generate the action of going the way;
+	compel the action of going the way;
 
 testing effects of reaction-ape-killing:
 	if waiting for player reaction, make no decision;
@@ -1032,7 +1032,7 @@ Section - Remembering Text
 
 remembering-text is a test set.
 
-Scenario when testing remembering-text:
+Scenario for remembering-text:
 	now Bodmall is testobject;
 	now the minotaur is testobject;
 	now the angel of compassion is testobject;
@@ -1062,7 +1062,7 @@ last creating the map rule when testing remembering-text (this is the force Arca
 	
 The place all secret testobject rooms rule is listed after the force Arcane Vault to be secretly placed rule in the creating the map rules;
 	
-Test play when testing remembering-text:
+Test play for remembering-text:
 	Now every room is not rust-spored;
 	Let the item be a random not off-stage scroll of mapping;
 	Now the player carries the item;
@@ -1077,16 +1077,16 @@ Test play when testing remembering-text:
 	
 nothing-to-remember is a test step. The first move of remembering-text is nothing-to-remember.   
 
-Choosing a player action when testing nothing-to-remember:
-	Generate the action of remembering. 
+regular scheduling of nothing-to-remember:
+	compel the action of remembering. 
 
 testing effects of nothing-to-remember:
 	assert result "You have not yet explored:\n( - the <a-w>+ exit of the entrance hall \(where you currently are\)\n)+\nYou have visited the following rooms: the entrance hall \(here\)\.\n\nTip:"
 	
 dumb-sensing is a test step.   
 
-Choosing a player action when testing dumb-sensing:
-	Generate the action of sensing;
+regular scheduling of dumb-sensing:
+	compel the action of sensing;
 
 testing effects of dumb-sensing:
 	assert "Powerless sensing should not take time" based on previously-fast;
@@ -1095,8 +1095,8 @@ A test step can be psy-scroll-reading;
 
 early-psycholocation is a psy-scroll-reading test step.
 
-choosing a player action when testing a psy-scroll-reading test step:
-	generate the action of reading the reusable item;
+regular scheduling of a psy-scroll-reading test step:
+	compel the action of reading the reusable item;
 	
 testing effects of psy-scroll-reading test step:
 	[TODO: text that sensing takes no time]
@@ -1105,8 +1105,8 @@ testing effects of psy-scroll-reading test step:
 
 unexplored-sensing is a test step.   
 
-Choosing a player action when testing unexplored-sensing:
-	Generate the action of sensing.
+regular scheduling of unexplored-sensing:
+	compel the action of sensing.
 
 testing effects of unexplored-sensing:
 	Repeat with the enemy running through {swarm of daggers, blood ape, demon of rage, angel of compassion, minotaur, bodmall, malygris}:
@@ -1123,8 +1123,8 @@ testing effects of unexplored-sensing:
 	
 remembering-daggers is a hidden-traveling test step.  The location-target of remembering-daggers is the swarm of daggers.
 
-Choosing a player action when testing remembering-daggers:
-	Generate the action of remembering.
+regular scheduling of remembering-daggers:
+	compel the action of remembering.
 		
 testing effects of remembering-daggers:
 	assert result "You have visited the following rooms:.*You have seen the following creatures in these locations:.*- the swarm of daggers \(level 1\) in [the location] \(where you currently are\)"
@@ -1165,8 +1165,8 @@ Initial scheduling of middle-psycholocating:
 
 partial-explored-sensing is a hidden-traveling test step.   
 
-Choosing a player action when testing partial-explored-sensing:
-	Generate the action of sensing.
+regular scheduling of partial-explored-sensing:
+	compel the action of sensing.
 
 testing effects of partial-explored-sensing:
 	assert result "the soul of the swarm of daggers here with you, like an aura like sharpened steel[line break]";
@@ -1193,25 +1193,25 @@ testing effects of moving-malygris:
 		make no decision;
 	assert result "Malygris suddenly teleports away";
 	
-[First choosing a player action when testing moving-malygris:
+[First regular scheduling of moving-malygris:
 	if the location of Malygris is not the location:
 		make no decision;
 	if the fuligin cloak is worn:
 		make no decision;
-	generate the action of waiting;]
+	compel the action of waiting;]
 	
 remembering-malygris is a test step.   
 
-Choosing a player action when testing remembering-malygris:
-	Generate the action of remembering.
+regular scheduling of remembering-malygris:
+	compel the action of remembering.
 
 testing effects of remembering-malygris:
 	assert result "You have seen the following creatures in these locations:.*You have also seen Malygris, but you don't know where he is now"
 	
 remembering-lost-plural is a test step.   
 
-Choosing a player action when testing remembering-lost-plural:
-	Generate the action of remembering.
+regular scheduling of remembering-lost-plural:
+	compel the action of remembering.
 
 Initial scheduling of remembering-lost-plural:
 	now the last-seen-location of the swarm of daggers is null-room.
@@ -1234,8 +1234,8 @@ testing effects of dungeon-clearing:
 	
 Malygris-only-remembering is a test step.   
 
-Choosing a player action when testing malygris-only-remembering:
-	generate the action of remembering.
+regular scheduling of malygris-only-remembering:
+	compel the action of remembering.
 
 testing effects of Malygris-only-remembering:
 	assert absence of result "You have seen the following creatures in these locations";
@@ -1243,8 +1243,8 @@ testing effects of Malygris-only-remembering:
 	
 slow-sensing is a test step.   
 
-Choosing a player action when testing slow-sensing:
-	generate the action of sensing.
+regular scheduling of slow-sensing:
+	compel the action of sensing.
 
 Initial scheduling of slow-sensing:
 	assert "psycholocation should be inactive" based on whether or not psycholocation is inactive;
@@ -1269,8 +1269,8 @@ testing effects of exploring-everywhere:
 	
 remembering-everything-reachable is a test step.   
 
-Choosing a player action when testing remembering-everything-reachable:
-	generate the action of remembering.
+regular scheduling of remembering-everything-reachable:
+	compel the action of remembering.
 
 testing effects of remembering-everything-reachable:
 	assert result "All locations have been explored";
@@ -1290,8 +1290,8 @@ Initial scheduling for explored-psycholocating:
 
 malygris-sensing is a test step.   
 
-Choosing a player action when testing malygris-sensing:
-	generate the action of sensing.
+regular scheduling of malygris-sensing:
+	compel the action of sensing.
 
 Initial scheduling of malygris-sensing:
 	[make sure psycholocating works even when remembering doesn't]
@@ -1303,17 +1303,17 @@ testing effects of malygris-sensing:
 
 map-reading is a test step.
 
-choosing a player action when testing map-reading:
+regular scheduling of map-reading:
 	Let M be a random scroll of mapping carried by the player;
-	generate the action of reading M;
+	compel the action of reading M;
 	
 testing effects of map-reading:
 	assert result "a complete floor plan of the dungeon of Kerkerkruip imprints itself on your mind"
 	
 map-remembering is a test step.   
 
-Choosing a player action when testing map-remembering:
-	generate the action of remembering.
+regular scheduling of map-remembering:
+	compel the action of remembering.
 
 testing effects of map-remembering:
 	Assert that the number of secretly placed rooms is 2;
@@ -1334,8 +1334,8 @@ Initial scheduling of getting-close-to-vault:
 			
 digging-to-vault is a hidden-traveling test step. 
 
-Choosing a player action when testing digging-to-vault:
-	Generate the action of digging a single general direction from the location to Arcane Vault.
+regular scheduling of digging-to-vault:
+	compel the action of digging a single general direction from the location to Arcane Vault.
 		
 testing effects of digging-to-vault:
 	succeed based on whether or not the location is a secretly placed room within 20 attempts.
@@ -1343,8 +1343,8 @@ testing effects of digging-to-vault:
 	
 secret-room-remembering is a test step.   
 
-Choosing a player action when testing secret-room-remembering:
-	generate the action of remembering.
+regular scheduling of secret-room-remembering:
+	compel the action of remembering.
 
 testing effects of secret-room-remembering:
 	assert result "Based on the map you found.*a secret room in the dungeon, <a-z>";
@@ -1402,7 +1402,7 @@ To produce a grenade:
 Regular scheduling of throwing-blessed:
 	now the player carries the blessed grenade;
 	extract Drakul to the Alchemical Laboratory;
-	generate the action of throwing the blessed grenade;
+	compel the action of throwing the blessed grenade;
 	
 testing effects of throwing-blessed:
 	assert "Drakul should be dead" based on whether or not Drakul is dead;
@@ -1720,55 +1720,11 @@ Testing effects of first-maze-smiting: if we assert that the location of the pla
 Testing effects of maze-peace: if we assert that the combat status is peace, rule succeeds.
 
 [
-Section - Hiding Penalites
-
-hiding-penalties is a test set.
-
-scenario when testing hiding-penalties:
-	now bodmall is testobject;
-	
-bodmall-sneaking is a hidden-traveling extracting test step. the first move of hiding-penalties is bodmall-sneaking. The location-target of bodmall-sneaking is bodmall.
-
-Initial scheduling of bodmall-sneaking:
-	now the teleportation beacon is in the location of Malygris;
-	now the dimensional anchor is in the location of Malygris;
-	now teleportation-beacon-on is true;
-	
-Choosing a player action when testing bodmall-sneaking:
-	Let G be a random teleportation grenade;
-	now G is in the location of Bodmall;
-	generate the action of throwing G;
-	
-Testing effects of bodmall-sneaking:
-	assert result "first taking the teleportation grenade";
-	assert result "Malygris, perhaps the greatest of all living sorcerers, is standing here";
-	assert absence of result "picking stuff up";
-	
-malygris-robbing is a hidden-traveling test step.
-
-Initial scheduling of malygris-robbing:
-	repeat with guy running through people in the location:
-		assert "teleportation should be impossible for [guy]" based on whether or not teleportation is impossible for guy;
-
-Choosing a player action when testing malygris-robbing:
-	Let G be a random teleportation grenade;
-	now G is in the location;
-	generate the action of throwing G;
-	
-[if the player teleports away but reappears in the same room, their hiding penalty will be wiped out. This could be considered a bug, but I don't think it's worth fixing. Anyway, we can avoid it for testing purposes by using the dimensional anchor.]
-
-Testing effects of malygris-robbing:
-	assert that the teleportation beacon is located in the location;
-	assert that malygris is located in the location;
-	assert that bodmall is located in the location;
-	assert result "Something has stopped you from teleporting";
-	assert result "picking stuff up";
-
 Section - Imp Teleporting Into Dreams
 
 bug-280 is a test set.
 
-Scenario when testing bug-280:
+Scenario for bug-280:
 	now the reaper is testobject;
 	now the lair of the imp is testobject;
 	now the dimensional anchor is bannedobject;
@@ -1819,8 +1775,8 @@ Testing effects of imp-thieving:
 
 imp-vanishing is a test step.   
 
-Choosing a player action when testing imp-vanishing:
-	generate the action of attacking the imp;
+regular scheduling of imp-vanishing:
+	compel the action of attacking the imp;
 
 First every turn when testing imp-vanishing:
 	[before the imp has a chance to act independently]
@@ -1840,7 +1796,7 @@ bloodlust-279 is a test set.
 to assert that bloodlusting is (active - a truth state) when (condition - indexed text):
 	assert "the player should [if active is false]not [end if]be bloodlusting [condition], but you are [person condition of the player]" based on whether or not active is (whether or not the player is bloodlusting).
 	
-Scenario when testing bloodlust-279:
+Scenario for bloodlust-279:
 	now the swarm of daggers is testobject;
 	now the blood ape is testobject;
 	now the mindslug is testobject;
@@ -1856,16 +1812,16 @@ Initial scheduling of meeting-daggers:
 	
 hitting-daggers is a test step. 
 
-choosing a player action when testing hitting-daggers:
-	generate the action of attacking the swarm of daggers.
+regular scheduling of hitting-daggers:
+	compel the action of attacking the swarm of daggers.
 	
 Testing effects of hitting-daggers:
 	assert that bloodlusting is true when "after hitting";
 	
 smiting-daggers is a test step.
 
-choosing a player action when testing smiting-daggers:
-	generate the action of smiting the swarm of daggers.
+regular scheduling of smiting-daggers:
+	compel the action of smiting the swarm of daggers.
 	
 Testing effects of smiting-daggers:
 	assert that the combat status is peace with label "combat status";
@@ -1882,8 +1838,8 @@ Initial scheduling of meeting-ape:
 	
 hitting-ape is a test step.
 
-choosing a player action when testing hitting-ape:
-	generate the action of attacking the blood ape;
+regular scheduling of hitting-ape:
+	compel the action of attacking the blood ape;
 	
 testing effects of hitting-ape:
 	assert that bloodlusting is true when "after hitting the ape the first time";
@@ -1893,9 +1849,9 @@ fafhrd-killing-ape is a test step.
 initial scheduling of fafhrd-killing-ape:
 	now the melee of fafhrd is 100;
 
-choosing a player action when testing fafhrd-killing-ape:
+regular scheduling of fafhrd-killing-ape:
 	compel the action of fafhrd attacking the blood ape;
-	generate the action of attacking the blood ape;
+	compel the action of attacking the blood ape;
 
 before fafhrd hitting the blood ape when testing fafhrd-killing-ape:
 	transcribe "reducing the ape's health to 1";
@@ -1910,7 +1866,7 @@ Section - bug 291
 
 bug-291 is a test set.
 
-Scenario when testing bug-291:
+Scenario for bug-291:
 	now the healer of aite is testobject;
 	now the dream of tungausy shaman is current-test-dream;
 	now the reusable item is a random morphean grenade;
@@ -1932,12 +1888,12 @@ Testing effects of sleepy-throwing:
 	
 hut-entering is a test step.
 
-Choosing a player action when testing hut-entering:
-	generate the action of going inside.
+regular scheduling of hut-entering:
+	compel the action of going inside.
 	
 shaman-choosing is a test step.
 
-Choosing a player action when testing shaman-choosing:
+regular scheduling of shaman-choosing:
 	select menu question answer 1;
 	
 To assert that (guy - a person) is fully alert:
@@ -1964,9 +1920,9 @@ initial scheduling of teleport-waking:
 	now the teleportation beacon is in a random unoccupied placed room;
 	now teleportation-beacon-on is true;	
 	
-Choosing a player reaction when testing teleport-waking:
+Choosing a player reaction for teleport-waking:
 	now the player is just-woken;
-	generate the action of reading the reusable item.
+	compel the action of reading the reusable item.
 	
 Testing effects of teleport-waking:
 	if waiting for compelled action, make no decision;
@@ -1986,16 +1942,16 @@ Testing effects of sleepy-teleport:
 	
 sleepy-status is a test step.
 
-Choosing a player action when testing sleepy-status:
-	generate the action of asking status.
+regular scheduling of sleepy-status:
+	compel the action of asking status.
 	
 Testing effects of sleepy-status:
 	assert result "You are just-woken: The next attack against you gets a \+3 bonus and \+2 damage\.";
 	
 sleepy-slaying is a hidden-traveling test step.
 
-choosing a player action when testing sleepy-slaying:
-	generate the action of smiting the swarm of daggers;
+regular scheduling of sleepy-slaying:
+	compel the action of smiting the swarm of daggers;
 	
 testing effects of sleepy-slaying:
 	assert result "fog of sleep";
@@ -2007,7 +1963,7 @@ Section - Bug 301 Redux
 
 bug-301-aite is a test set.
 
-scenario when testing bug-301-aite:
+scenario for bug-301-aite:
 	now Temple of Sul is testobject;
 	now Bodmall is testobject;
 	now Hall of Gods is testobject;
@@ -2035,8 +1991,8 @@ healer-first-killing is a test step.
 Initial scheduling of healer-first-killing:
 	now the health of the player is the permanent health of the player - 1; 
 
-Choosing a player action when testing healer-first-killing:
-	generate the action of smiting the healer of aite.
+regular scheduling of healer-first-killing:
+	compel the action of smiting the healer of aite.
 	
 Testing effects of healer-first-killing:
 	assert "The healer should be dead" based on whether or not the healer of Aite is dead;
@@ -2069,7 +2025,7 @@ outcome	likelihood	minimum attempts	antecedent
 armadillo-wandering	0	1	restarting for tests
 armadillo-moved	1	0	--
 
-Scenario when testing armadillo-wandering: now the ravenous armadillo is testobject.
+Scenario for armadillo-wandering: now the ravenous armadillo is testobject.
 
 Armadillo-origin is a room that varies.
 
@@ -2134,7 +2090,7 @@ Section - bug 293 - Sensing Isra and Fell
 
 bug-293 is a test set
 
-scenario when testing bug-293:
+scenario for bug-293:
 	now the reusable item is a random teleportation grenade;
 	now israfel is testobject;
 	
@@ -2170,8 +2126,8 @@ initial scheduling of psycholocating-293:
 	
 sensing-293 is a hidden-traveling test step.
 
-Choosing a player action when testing sensing-293:
-	generate the action of sensing.
+regular scheduling of sensing-293:
+	compel the action of sensing.
 	
 Testing effects of sensing-293:
 	assert "Isra should be psycholocatable" based on whether or not Isra is psycholocation-revealed;
@@ -2203,7 +2159,7 @@ Section - Weapon aftereffects
 
 weapon aftereffects is a test set.
 
-Scenario when testing weapon aftereffects:
+Scenario for weapon aftereffects:
 	now the body score of fafhrd is 100;
 
 The sometimes feed armour of thorns rule does nothing when testing weapon aftereffects.
@@ -2423,7 +2379,7 @@ fragmentation damage text	1	1	--
 
 [TODO: test #384 - glass cannon weapon damage bonus]
 
-Scenario when testing damage-text:
+Scenario for damage-text:
 	now Vast Staircase is testobject;
 
 Initial scheduling of basic attack damage text:
@@ -2647,7 +2603,7 @@ general damage multiplier
 
 If you add any rules, please consider adding a test here]
 
-scenario when testing damage-modifiers:
+scenario for damage-modifiers:
 	Repeat with guy running through people:
 		now inherent damage modifier of the guy is 10;
 	now the tungausy totem is bannedobject;
@@ -2811,8 +2767,8 @@ Initial scheduling of Miranda-runner:
 	now Miranda is bloodlusting;
 	now the tension is 3;
 
-Choosing a player action when testing Miranda-runner:
-	generate the action of going the way-to-get-back.
+regular scheduling of Miranda-runner:
+	compel the action of going the way-to-get-back.
 	
 Testing effects of Miranda-runner:
 	check damage of the player with 1000 health after "Miranda deals";
@@ -3011,13 +2967,13 @@ Section - Sul's intervention
 
 sul-intervention-test is a test set [for issue #227].
 
-Scenario when testing sul-intervention-test:
+Scenario for sul-intervention-test:
 	now Temple of Sul is testobject;
 	now Bodmall is testobject;
 	now the swarm of daggers is testobject;
 	now the hall of mirrors is bannedobject; 
 	
-Test play when testing sul-intervention-test:
+Test play for sul-intervention-test:
 	extract the player to the location of bodmall;
 	have the player defeat Bodmall;
 	extract the player to the temple of sul;
@@ -3044,8 +3000,8 @@ Initial scheduling of slave-attacking:
 	now the health of the reaper is 1000;
 	now the reaper is player-enslaved;
 	
-Choosing a player action when testing slave-attacking:
-	generate the action of attacking the reaper;
+regular scheduling of slave-attacking:
+	compel the action of attacking the reaper;
 	
 Testing effects of slave-attacking:
 	check damage of the reaper with 1000 health after "You deal";
@@ -3322,7 +3278,7 @@ sleeping fallen	1	1
 dead-fallen	1	1
 awake-in-fallen-arena	1	1
 
-Scenario when testing Simple Tests: now Entrance to the Arena is testobject.
+Scenario for Simple Tests: now Entrance to the Arena is testobject.
 	
 initial scheduling of Sleeping Fallen:
 	now the player worships nothing;
@@ -3412,5 +3368,57 @@ Initial scheduling of healer-healing-defender:
 testing effects of healer-healing-defender: if the injury of defender of Aite is less than 4, rule succeeds.
 testing effects of healer-still-injured: if the injury of healer of Aite is at least 3, rule succeeds.
 testing effects of healer-healing-self: if the injury of healer of Aite is less than 3, rule succeeds.
-			
+
+Section - Hiding Penalites
+
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bodmall-sneaking	1	1	--
+anchored-to-malygris	1	1	bodmall-sneaking
+malygris-robbing	1	1	--
+still-with-beacon	1	1	malygris-robbing
+still-with-malygris	1	1	malygris-robbing
+still-with-bodmall	1	1	malygris-robbing
+not-teleported	1	1	malygris-robbing
+
+scenario for simple tests: now bodmall is testobject.
+
+the floor-item is an object that varies.
+
+Initial scheduling of bodmall-sneaking:
+	now the teleportation beacon is in the location of Malygris;
+	now the dimensional anchor is in the location of Malygris;
+	now teleportation-beacon-on is true;
+	now the floor-item is a random teleportation grenade;
+	extract the player to the location of Bodmall;
+	force the fuligin cloak to work;
+	
+regular scheduling of bodmall-sneaking:
+	now the floor-item is in the location;
+	compel the action of throwing the floor-item.
+	
+Testing effects of bodmall-sneaking:
+	assert result "first taking the teleportation grenade";
+	assert result "Malygris, perhaps the greatest of all living sorcerers, is standing here";
+	assert absence of result "picking stuff up";
+	rule succeeds.
+	
+Testing effects of anchored-to-malygris:
+	repeat with guy running through people in the location:
+		assert "teleportation should be impossible for [guy]" based on whether or not teleportation is impossible for guy;
+	rule succeeds.
+
+regular scheduling of malygris-robbing:
+	force the fuligin cloak to work;
+	now the floor-item is in the location;
+	compel the action of throwing the floor-item;
+	
+[if the player teleports away but reappears in the same room, their hiding penalty will be wiped out. This could be considered a bug, but I don't think it's worth fixing. Anyway, we can avoid it for testing purposes by using the dimensional anchor.]
+
+Testing effects of malygris-robbing: if we assert result "picking stuff up", rule succeeds.
+testing effects of still-with-beacon: if we assert that the location of the teleportation beacon is the location, rule succeeds.
+testing effects of still-with-malygris: if we assert that the location of malygris is the location, rule succeeds.
+testing effects of still-with-bodmall: if we assert that the location of Bodmall is the location, rule succeeds.
+testing effects of not-teleported: if we assert result "Something has stopped you from teleporting", rule succeeds.
+
 Test Sets ends here.
