@@ -350,7 +350,7 @@ A Standard AI rule for a person (called P) (this is the suppress actions rule):
 	if suppress npc action is true:
 		if P is scheduled to act freely:
 			transcribe "[act-outcome of P] allows [P] to act";
-		if P is at-react:
+		otherwise if P is at-react:
 			transcribe "allowing [P] to react";
 		otherwise:
 			transcribe "suppressed action for [P]";
