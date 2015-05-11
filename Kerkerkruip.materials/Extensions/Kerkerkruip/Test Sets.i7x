@@ -1719,10 +1719,18 @@ regular scheduling of first-maze-smiting:
 Testing effects of first-maze-smiting: if we assert that the location of the player is the maze, rule succeeds.
 Testing effects of maze-peace: if we assert that the combat status is peace, rule succeeds.
 
-[
 Section - Imp Teleporting Into Dreams
 
-bug-280 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-280	1	1	restarting for tests
+reaper-seeking	1	1	--
+rose-dreaming	20	20	--
+imp-out-of-dream	20	20	rose-dreaming
+imp-inactive	20	20	rose-dreaming
+woke-from-garden	20	20	imp-out-of-dream
+woke-with-reaper	20	20	woke-from-garden
+woke-in-combat	20	20	woke-from-garden
 
 Scenario for bug-280:
 	now the reaper is testobject;
@@ -1733,62 +1741,60 @@ Scenario for bug-280:
 	now the reusable item is a random morphean grenade;
 	now the vast staircase is bannedobject.
 	
-reaper-seeking is an extracting test step. The  first move of bug-280 is reaper-seeking. The location-target of reaper-seeking is the reaper.
+Testing effects of bug-280:
+	assert that the combat state of the player is at-inactive with label "combat state of the player";
+	if the lair of the imp is placed and the imp is denizen and the dimensional anchor is off-stage, rule succeeds.
 
 Initial scheduling of reaper-seeking:
-	assert "Lair of the imp should be placed" based on whether or not lair of the imp is placed;
-	assert "Imp should be denizen" based on whether or not the imp is denizen;
-	assert "Dimensional anchor is in [location of the dimensional anchor]" based on whether or not the dimensional anchor is off-stage;
+	extract the player to the location of the reaper;
 	now the health of the player is 1000.
+regular scheduling of reaper-seeking: compel the action of waiting.
+Testing effects of reaper-seeking: if we assert that the combat state of the player is at-act, rule succeeds.
+
+regular scheduling of rose-dreaming:
+	compel the action of throwing the reusable item;
+	now suppress npc action is false.
 	
-Testing effects of reaper-seeking:
-	assert "the combat status should not be peace" based on whether or not the combat status is not peace;
+Testing effects of rose-dreaming: if we assert that the location is garden of thorns, rule succeeds.
 
-imp-dreaming is an npc-enabling item-throwing test step.
+testing effects of imp-out-of-dream: unless the location of the imp is the location, rule succeeds.
+testing effects of imp-inactive: unless the imp is acting independently, rule succeeds.
 
-Testing effects of imp-dreaming:
-	assert that the location is garden of thorns;
-	fail based on whether or not the location of the imp is the location within 20 attempts;
+regular scheduling of woke-from-garden:
 	wake the player up;
-	update the combat status; [risky?]
-	assert "we should no longer be in garden of thorns" based on whether or not the location is not garden of thorns;
-	assert "we should be with the reaper in [location of the reaper] but we are in [the location]" based on whether or not the location is the location of the reaper;
-	assert "the combat status should not be peace" based on whether or not the combat status is not peace;
+	update the combat status. [risky?]
 	
-imp-appearing is an npc-enabling test step.
+testing effects of woke-from-garden: unless the location is garden of thorns, rule succeeds.
+testing effects of woke-with-reaper: if we assert that the location is the location of the reaper, rule succeeds.
+testing effects of woke-in-combat: unless the combat status is peace, rule succeeds.
 
-Testing effects of imp-appearing:
-	now the reusable item is nothing; [if the imp steals it, we don't want it coming back]
-	succeed based on whether or not the location of the imp is the location:
-		
-imp-thieving is a test step.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	maximum attempts
+imp-appearing	1	0	--
+imp-thieving	1	1	--
+imp-vanishing	1	0	--
+imp-stashing	1	0	2
 
-Initial scheduling of imp-thieving:
-	compel the action of the imp imp-grabbing.
-			
-The imp's loot is an object that varies;
+initial scheduling of imp-appearing: now the reusable item is nothing. [if the imp steals it, we don't want it coming back]
+regular scheduling of imp-appearing: compel the action of waiting.
+Testing effects of imp-appearing: if we assert that the location of the imp is the location, rule succeeds.
 
+The imp's loot is an object that varies. [TODO: combine this variable with floor-item from hiding penalties?]
+
+Regular scheduling of imp-thieving: compel the action of the imp imp-grabbing.
 Testing effects of imp-thieving:
-	if waiting for compelled action, make no decision;
 	Now the imp's loot is a random thing carried by the imp;
-	assert "the imp should have stolen something" based on whether or not the imp's loot is a thing;
+	if the imp's loot is a thing, rule succeeds.
 
-imp-vanishing is a test step.   
+first independent action rule when testing imp-vanishing: rule fails. [make sure the imp doesn't stash treasure or teleport back]
+regular scheduling of imp-vanishing: compel the action of attacking the imp.
+testing effects of imp-vanishing: if we assert that the location of the imp is lair of the imp, rule succeeds.
 
-regular scheduling of imp-vanishing:
-	compel the action of attacking the imp;
-
-First every turn when testing imp-vanishing:
-	[before the imp has a chance to act independently]
-	succeed based on whether or not the location of the imp is lair of the imp;
-		
-imp-stashing is an npc-enabling test step.
-
-Testing effects of imp-stashing:
-	succeed based on whether or not the imp's loot is in the lair of the imp within 2 attempts;
+regular scheduling of imp-stashing: compel the action of waiting.
+Testing effects of imp-stashing: if we assert that the holder of the imp's loot is the lair of the imp, rule succeeds.
 	
 
-	
+[
 Section - Bloodlust - issue 279
 
 bloodlust-279 is a test set.

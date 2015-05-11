@@ -225,9 +225,9 @@ compelling an attack	1	0
 compelling an action	1	0
 compelling a reaction	1	1
 free combat round	1	0
-free npc action	1	0
+free npc action	1	1
 
-Definition: an outcome is schedule-blocking if it is at least taking a turn and it is at most free npc action.
+Definition: an outcome is schedule-blocking if it is at least taking a turn and it is less than free npc action.
 
 Regular scheduling of a schedule-blocking outcome (called the event) (this is the regular block scheduling rule):
 	now the event is scheduled for later testing.
@@ -273,6 +273,7 @@ A person has an outcome called the act-outcome. The act-outcome of a person is u
 Definition: a person is scheduled to act freely:
 	Let the event be the act-outcome of it;
 	if the event is boring lack of results, no;
+	if the event is free npc action, yes;
 	decide on whether or not the event is scheduled for later testing;
 
 Suppress npc action is a truth state that varies.
@@ -296,6 +297,11 @@ To wait for (guy - a person) to act freely:
 		transcribe "waking [the guy] up so [they] can act freely";
 	now the act-outcome of the guy is the outcome described;
 	now the outcome described is scheduled for later testing;
+	
+To allow (guy - a person) to act freely: [TODO: make this work, or delete it (and delete free npc action)]
+	if guy is asleep:
+		transcribe "waking [the guy] up so [they] can act freely if they want";
+	now the act-outcome of the guy is free npc action;
 	
 Initial scheduling of taking a turn:
 	now suppress npc action is true;
@@ -342,7 +348,8 @@ A Standard AI rule for a person (called P) when testing compelling an action (th
 	
 A Standard AI rule for a person (called P) (this is the suppress actions rule):
 	if suppress npc action is true:
-		if P is scheduled to act freely, make no decision;
+		if P is scheduled to act freely:
+			transcribe "[act-outcome of P] allows [P] to act";
 		if P is at-react:
 			transcribe "allowing [P] to react";
 		otherwise:
@@ -587,7 +594,7 @@ Random-Seed (number)	Unresolved Count (number)
 0	0
 with 1 blank row
 
-To decide what number is the initial test random seed: decide on 57.
+To decide what number is the initial test random seed: decide on 59.
 
 To queue (T - an outcome):
 	make T testable;
@@ -993,7 +1000,7 @@ To reset (event - an outcome):
 	now state of event is outcome-untested;
 	now event is unscheduled;
 	Repeat with guy running through people:
-		if the act-outcome of guy is the event, now the act-outcome of guy is boring lack of results;
+		if the act-outcome of guy is the event, now the act-outcome of guy is boring lack of results; [TODO: always do this when resetting the scheduled event?]
 
 To prepare (event - an outcome) for rescheduling:
 	report an iteration because "rescheduling [event] -";
@@ -1121,7 +1128,7 @@ A first combat round rule (this is the test combat round of previous main actor 
 	if a person is scheduled to act freely:
 		clear event description;
 		Repeat with guy running through scheduled to act freely people:
-			if the location of guy is not the location:
+			unless the location of guy is the location:
 				assert "[act-outcome of guy] can't be tested because [guy] is not here" based on false;
 				now the act-outcome of guy is unscheduled;
 				now the state of act-outcome of guy is outcome-failed;
