@@ -1794,80 +1794,62 @@ regular scheduling of imp-stashing: compel the action of waiting.
 Testing effects of imp-stashing: if we assert that the holder of the imp's loot is the lair of the imp, rule succeeds.
 	
 
-[
 Section - Bloodlust - issue 279
 
-bloodlust-279 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bloodlust-279	0	1	restarting for tests
+hitting-daggers	1	1	--
+smiting-daggers	1	1	--
+smitten-daggers	1	1	--
+hitting-ape	1	1	--
+fafhrd-killing-ape	1	0	--
+fafhrd-killed-ape	1	1	--
 
-to assert that bloodlusting is (active - a truth state) when (condition - indexed text):
-	assert "the player should [if active is false]not [end if]be bloodlusting [condition], but you are [person condition of the player]" based on whether or not active is (whether or not the player is bloodlusting).
-	
-Scenario for bloodlust-279:
-	now the swarm of daggers is testobject;
-	now the blood ape is testobject;
-	now the mindslug is testobject;
-	now the hall of mirrors is bannedobject;
-	now lair of the imp is bannedobject;
-	
-meeting-daggers is an extracting test step. The first move of bloodlust-279 is meeting-daggers. The location-target of meeting-daggers is the swarm of daggers.
+[don't exit the arena - we want to make sure bloodlust stops even when we're not moved elsewhere]
+the check for completed arena battle rule does nothing when testing bloodlust-279.
 
-Initial scheduling of meeting-daggers:
+Initial scheduling of hitting-daggers:
+	prepare a test battle with the swarm of daggers;
 	now the melee of the player is 100;
 	now the defence of the player is 100;
 	now the health of the swarm of daggers is 50;
 	
-hitting-daggers is a test step. 
-
-regular scheduling of hitting-daggers:
-	compel the action of attacking the swarm of daggers.
+regular scheduling of hitting-daggers: compel the action of the swarm of daggers waiting as a reaction to the player.
+Testing effects of hitting-daggers: if the player is bloodlusting, rule succeeds.
 	
-Testing effects of hitting-daggers:
-	assert that bloodlusting is true when "after hitting";
+regular scheduling of smiting-daggers: compel the action of smiting the swarm of daggers.
 	
-smiting-daggers is a test step.
-
-regular scheduling of smiting-daggers:
-	compel the action of smiting the swarm of daggers.
-	
-Testing effects of smiting-daggers:
-	assert that the combat status is peace with label "combat status";
-	assert that bloodlusting is false when "after killing the daggers".
+Testing effects of smiting-daggers: if we assert that the combat status is peace, rule succeeds.
+Testing effects of smitten-daggers: if the player is notlusting, rule succeeds.
 	
 [If we can think of any tricky cases where the combat status changes during the every turn stage, we should test those]
 		
-meeting-ape is an extracting test step. The location-target of meeting-ape is the blood ape.
-
-Initial scheduling of meeting-ape:
+Initial scheduling of hitting-ape:
 	have the player defeat the mindslug;
-	extract fafhrd to the location of the blood ape;
+	revive the blood ape in the location;
+	revive fafhrd in the location;
 	now the health of the blood ape is 100;
 	
-hitting-ape is a test step.
-
-regular scheduling of hitting-ape:
-	compel the action of attacking the blood ape;
-	
-testing effects of hitting-ape:
-	assert that bloodlusting is true when "after hitting the ape the first time";
-	
-fafhrd-killing-ape is a test step.
-
-initial scheduling of fafhrd-killing-ape:
-	now the melee of fafhrd is 100;
+regular scheduling of hitting-ape: compel the action of the blood ape waiting as a reaction to the player.
+testing effects of hitting-ape: if the player is bloodlusting, rule succeeds.
 
 regular scheduling of fafhrd-killing-ape:
-	compel the action of fafhrd attacking the blood ape;
-	compel the action of attacking the blood ape;
+	now the health of the blood ape is 100;
+	compel the action of the blood ape waiting as a reaction to the player.
 
-before fafhrd hitting the blood ape when testing fafhrd-killing-ape:
+first standard AI rule for Fafhrd when testing fafhrd-killing-ape (this is the Fafhrd kills ape after player's hit rule):
 	transcribe "reducing the ape's health to 1";
 	now the health of the blood ape is 1;
+	try Fafhrd attacking the blood ape;
+	rule succeeds.
 	
-testing effects of fafhrd-killing-ape:
-	if the blood ape is alive:
-		make no decision;
-	assert that bloodlusting is false when "after Fafhrd kills the ape";
+The Fafhrd kills ape after player's hit rule is listed before the compel a reaction rule in the standard AI rulebook.
 
+testing effects of fafhrd-killing-ape: if the blood ape is not alive, rule succeeds.
+testing effects of fafhrd-killed-ape: if the player is notlusting, rule succeeds.
+
+[
 Section - bug 291
 
 bug-291 is a test set.
@@ -2027,13 +2009,17 @@ testing effects of other-fanatics-killing:
 Section - Armadillo wandering
 
 Table of Outcomes (continued)
-outcome	likelihood	minimum attempts	antecedent
-armadillo-wandering	0	1	restarting for tests
-armadillo-moved	1	0	--
+outcome	likelihood	minimum attempts	maximum attempts	antecedent
+armadillo-wandering	1	1	--	restarting for tests
+armadillo-can-move	1	1	--	--
+armadillo-moved	1	0	200	--
 
 Scenario for armadillo-wandering: now the ravenous armadillo is testobject.
 
 Armadillo-origin is a room that varies.
+
+Testing effects of armadillo-wandering: if the ravenous armadillo is acting independently, rule succeeds.
+Testing effects of armadillo-can-move: if the ravenous armadillo can move, rule succeeds.
 
 Initial scheduling of armadillo-moved: now armadillo-origin is the location of the ravenous armadillo.
 Regular scheduling of armadillo-moved: compel the action of waiting.
