@@ -1849,107 +1849,91 @@ The Fafhrd kills ape after player's hit rule is listed before the compel a react
 testing effects of fafhrd-killing-ape: if the blood ape is not alive, rule succeeds.
 testing effects of fafhrd-killed-ape: if the player is notlusting, rule succeeds.
 
-[
 Section - bug 291
 
-bug-291 is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-291	0	1	restarting for tests
+sleepy-throwing	1	1	--
+in-tungausy-dream	1	1	--
+hut-entering	0	1	--
+shaman-choosing	1	1	--
+player-alert	1	1	--
+teleport-waking	1	1	--
+sleepy-teleport	1	1	--
+sleepy-status	1	1	--
+sleepy-slaying	1	1	--
 
 Scenario for bug-291:
-	now the healer of aite is testobject;
 	now the dream of tungausy shaman is current-test-dream;
 	now the reusable item is a random morphean grenade;
+	now the healer of aite is testobject;
 	now the swarm of daggers is testobject;
 	now the hall of mirrors is bannedobject;
 	now the lair of the imp is bannedobject;
 	now the armadillo is bannedobject;
 	now the reaper is bannedobject;
 
-sleepy-throwing is an extracting item-throwing test step. The first move of bug-291 is sleepy-throwing. The location-target of sleepy-throwing is the healer of aite.
-
-Before taking a player action when testing sleepy-throwing:
+initial scheduling of sleepy-throwing: extract the player to the location of the healer of aite.
+regular scheduling of sleepy-throwing:
 	now the player is just-woken;
-	clear event description;
+	compel the action of throwing the reusable item.
 	
-Testing effects of sleepy-throwing:
-	assert that the player is tungausy warrior with label "identity of the player";
-	assert absence of result "fog of sleep";
+Testing effects of sleepy-throwing: if we assert absence of result "fog of sleep", rule succeeds.
+Testing effects of in-tungausy-dream: if we assert that the player is tungausy warrior, rule succeeds.
 	
-hut-entering is a test step.
-
-regular scheduling of hut-entering:
-	compel the action of going inside.
+regular scheduling of hut-entering: compel the action of going inside.
 	
-shaman-choosing is a test step.
-
-regular scheduling of shaman-choosing:
-	select menu question answer 1;
-	
-To assert that (guy - a person) is fully alert:
-	assert "[The guy] should not be just-woken" based on whether or not the guy is not just-woken.
-	
-To assert that (guy - a person) is just-woken:
-	assert "[The guy] should be just-woken" based on whether or not the guy is just-woken.
+regular scheduling of shaman-choosing: select menu question answer 1.
 	
 Testing effects of shaman-choosing:
 	Now opposition test subject is the player;
 	Repeat with guy running through opposer people in the location:
-		assert that guy is asleep;
+		assert "[guy] should be asleep" based on whether or not guy is asleep;
 	assert that the player is the true body of the player with label "true body of the player";
-	assert that the player is awake;
-	assert that the player is fully alert;
 	assert absence of result "fog of sleep";
+	if player is not asleep, rule succeeds.
 	
-teleport-waking is a test step.
-
+Testing effects of player-alert: unless the player is just-woken, rule succeeds.
+	
 initial scheduling of teleport-waking:
 	now the reusable item is a random scroll of teleportation;
 	now the healer of aite is not asleep;
-	compel the action of the healer of aite attacking the player;
 	now the teleportation beacon is in a random unoccupied placed room;
-	now teleportation-beacon-on is true;	
+	now teleportation-beacon-on is true.
 	
-Choosing a player reaction for teleport-waking:
+regular scheduling of teleport-waking: compel the action of reading the reusable item as a reaction to the healer of aite.
+Before reading when testing teleport-waking: now the player is just-woken.
+	
+Testing effects of teleport-waking:
+	assert result "fog of sleep";
+	unless the player is just-woken, rule succeeds.
+	
+Initial scheduling of sleepy-teleport: now the teleportation beacon is in the location of the swarm of daggers.
+regular scheduling of sleepy-teleport:
 	now the player is just-woken;
 	compel the action of reading the reusable item.
 	
-Testing effects of teleport-waking:
-	if waiting for compelled action, make no decision;
-	if the player is at-react, make no decision;
-	assert that the player is fully alert;
-	assert result "fog of sleep";
-	
-sleepy-teleport is a hidden-traveling item-reading test step.
-
-Initial scheduling of sleepy-teleport:
-	now the teleportation beacon is in the location of the swarm of daggers;
-	now the player is just-woken;
-	
 Testing effects of sleepy-teleport:
-	assert that the player is just-woken;
 	assert absence of result "fog of sleep";
-	
-sleepy-status is a test step.
+	if the player is just-woken, rule succeeds.
 
-regular scheduling of sleepy-status:
-	compel the action of asking status.
-	
-Testing effects of sleepy-status:
-	assert result "You are just-woken: The next attack against you gets a \+3 bonus and \+2 damage\.";
-	
-sleepy-slaying is a hidden-traveling test step.
+regular scheduling of sleepy-status: compel the action of asking status.
+Testing effects of sleepy-status: if we assert result "You are just-woken: The next attack against you gets a \+3 bonus and \+2 damage\.", rule succeeds.
 
-regular scheduling of sleepy-slaying:
-	compel the action of smiting the swarm of daggers;
+regular scheduling of sleepy-slaying: compel the action of smiting the swarm of daggers;
 	
 testing effects of sleepy-slaying:
 	assert result "fog of sleep";
-	assert that the player is fully alert.
-]
+	unless the player is just-woken, rule succeeds.
 
-[	
 Section - Bug 301 Redux
 
-bug-301-aite is a test set.
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-301-aite 	0	1	restarting for tests
+healer-first-killing	1	1	--
+other-fanatics-killing	1	1	--
 
 scenario for bug-301-aite:
 	now Temple of Sul is testobject;
@@ -1959,50 +1943,39 @@ scenario for bug-301-aite:
 	
 First intervention possible when testing bug-301-aite:
 	rule fails;
-	
-bug-301-setup is a test step. The first move of bug-301-aite is bug-301-setup.
-	
-Initial scheduling of bug-301-setup:
+		
+Initial scheduling of bug-301-aite:
 	Now every room is not rust-spored;
 	Now every thing is not rusted;
 	now the defence of the player is 100;
-	extract the player to the location of bodmall;
-	have the player defeat Bodmall;
-	extract the player to temple of Sul;
-	have the player sacrifice a random granted power;
-	assert that the favour of the player with Sul is 4;
+	now the player worships Sul;
+	raise the favour of the player by 4;
 	extract the player to Hall of Gods;
 	have the player and healer of Aite fight in Arena of the Gods;
 	
-healer-first-killing is a test step. 
-
-Initial scheduling of healer-first-killing:
-	now the health of the player is the permanent health of the player - 1; 
-
-regular scheduling of healer-first-killing:
-	compel the action of smiting the healer of aite.
+Initial scheduling of healer-first-killing: now the health of the player is the permanent health of the player - 1.
+regular scheduling of healer-first-killing: compel the action of smiting the healer of aite.
 	
 Testing effects of healer-first-killing:
 	assert "The healer should be dead" based on whether or not the healer of Aite is dead;
 	assert "The tormentor of Aite should be alive" based on whether or not the tormentor of Aite is alive;
 	assert "The defender should be alive" based on whether or not the defender of Aite is alive;
 	assert "The player should not be healed" based on whether or not the health of the player is less than the permanent health of the player;
-	assert absence of result "Sul receives .* and fully heals you";
+	if we assert absence of result "Sul receives .* and fully heals you", rule succeeds.
 	
-other-fanatics-killing is an item-throwing test step.
-
 Initial scheduling of other-fanatics-killing:
 	now the health of the tormentor of Aite is 1;
 	now the health of the defender of Aite is 1;
 
+regular scheduling of other-fanatics-killing: compel the action of throwing the reusable item.
 testing effects of other-fanatics-killing:
 	assert "The tormentor should be dead" based on whether or not the tormentor of Aite is dead;
 	assert "The defender should be dead" based on whether or not the defender of Aite is dead;
 	assert that the location is Hall of Gods with label "current location";
 	assert result "receives the soul";
-	assert absence of result "receives the soul.* receives the soul";
 	assert that the health of the player is the permanent health of the player with label "health of the player";
-]
+	if we assert absence of result "receives the soul.* receives the soul", rule succeeds.
+
 [TODO: test armadillo and reaper following]
 
 
