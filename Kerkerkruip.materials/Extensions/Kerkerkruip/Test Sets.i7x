@@ -1976,8 +1976,7 @@ testing effects of other-fanatics-killing:
 	assert that the health of the player is the permanent health of the player with label "health of the player";
 	if we assert absence of result "receives the soul.* receives the soul", rule succeeds.
 
-[TODO: test armadillo and reaper following]
-
+[TODO: test reaper following]
 
 Section - Armadillo wandering
 
@@ -2050,31 +2049,31 @@ Scenario for unlocking-behavior:
 	enable advanced content;
 	assert that placement possibility is true when "in apprentice level when advanced content is enabled with a preset dungeon generation seed";
 
-[
 Section - bug 293 - Sensing Isra and Fell
 
-bug-293 is a test set
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+bug-293	0	1	restarting for tests
+israfel-splitting-293	1	1	--
+isra-and-fell-scattering	1	1	--
+psycholocating-293	1	1	--
+isra-defeating-293	1	1	--
+fell-defeating-293	1	1	--
 
 scenario for bug-293:
 	now the reusable item is a random teleportation grenade;
 	now israfel is testobject;
+
+initial scheduling of israfel-splitting-293: extract the player to the location of israfel.
+regular scheduling of israfel-splitting-293: compel the action of israfel israfel-splitting.
+testing effects of israfel-splitting-293: if Israfel is off-stage, rule succeeds.
+
+regular scheduling of isra-and-fell-scattering: compel the action of throwing the reusable item.
+Testing effects of isra-and-fell-scattering: if isra is not off-stage and fell is not off-stage, rule succeeds.
 	
-israfel-meeting-293 is an extracting hidden-traveling test step. The first move of bug-293 is israfel-meeting-293. The location-target of israfel-meeting-293 is israfel.
-
-israfel-splitting-293 is a hiding-reveal test step. 
-
-initial scheduling of israfel-splitting-293:
-	assert "isra should be off-stage" based on whether or not isra is off-stage;
-	assert "fell should be off-stage" based on whether or not fell is off-stage;
-	compel the action of israfel israfel-splitting.
-		
-isra-and-fell-scattering is a hidden-traveling item-throwing test step.
-
-Testing effects of isra-and-fell-scattering:
-	assert "isra should be onstage" based on whether or not isra is not off-stage;
+initial scheduling of psycholocating-293:
 	if the location of Isra is the location:
 		extract Isra to a random unoccupied reachable room;
-	assert "fell should be onstage" based on whether or not fell is not off-stage;
 	if the location of Fell is the location:
 		extract Fell to the location of Isra;
 	repeat with guy running through people in the location of isra:
@@ -2083,43 +2082,32 @@ Testing effects of isra-and-fell-scattering:
 	repeat with guy running through people in the location of fell:
 		if guy is not fell and guy is not Isra:
 			extract guy to the location;
-	
-psycholocating-293 is a hidden-traveling item-reading test step.
-
-initial scheduling of psycholocating-293:
 	now the reusable item is a random scroll of psycholocation.
-	
-sensing-293 is a hidden-traveling test step.
 
-regular scheduling of sensing-293:
-	compel the action of sensing.
+regular scheduling of psycholocating-293:
+	try reading the reusable item;
+	try sensing.
 	
-Testing effects of sensing-293:
+Testing effects of psycholocating-293:
 	assert "Isra should be psycholocatable" based on whether or not Isra is psycholocation-revealed;
 	assert "Fell should be psycholocatable" based on whether or not fell is psycholocation-revealed;
 	assert result "frozen lightning";
 	assert result "molten thunder";
+	rule succeeds.
 	
-isra-defeating-293 is a test step.
-
-initial scheduling of isra-defeating-293:
-	have the player defeat isra;
+initial scheduling of isra-defeating-293: have the player defeat isra.
+Testing effects of isra-defeating-293: unless the power of israfel is granted, rule succeeds.
 	
-Testing effects of isra-defeating-293:
-	assert "power of israfel should not be granted" based on whether or not the power of israfel is not granted;
-	
-fell-defeating-293 is a test step.
-
-initial scheduling of fell-defeating-293:
-	have the player defeat fell;
+initial scheduling of fell-defeating-293: have the player defeat fell.
 	
 Testing effects of fell-defeating-293:
 	assert "isra should be dead" based on whether or not isra is dead;
 	assert "fell should be dead" based on whether or not fell is dead;
 	assert "israfel should be off-stage" based on whether or not israfel is off-stage;
 	[assert result "Israfel's dying cry shakes the foundations of the world";]
-	assert "power of israfel should be granted" based on whether or not the power of israfel is granted.
-
+	if the power of israfel is granted, rule succeeds.
+	
+[
 Section - Weapon aftereffects
 
 weapon aftereffects is a test set.
