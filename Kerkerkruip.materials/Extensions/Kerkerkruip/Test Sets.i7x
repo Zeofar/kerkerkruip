@@ -2966,22 +2966,37 @@ Testing effects of ment-damage:
 	have the ment kick in;
 	have the defender of Aite do no reaction to a 100 melee hit by the player with result "\+ 1 \(ment\) ", checking damage;
 	have the player do no reaction to a 100 melee hit by the defender of Aite with result "- 1 \(ment\) ", checking damage;
+]
 
-automatos-tests is a test set.
+Section - Automatos
 
-automatos-blow is a test step. The first move of automatos-tests is automatos-blow;
+Table of Outcomes (continued)
+outcome	likelihood	minimum attempts	antecedent
+automatos-tests	0	1	restarting for tests
+automatos-blow	1	1	--
+automatos-stab	1	1	--
 
-Initial scheduling of automatos-blow:
-	prepare a test battle with Automatos.
+Initial scheduling of automatos-tests:
+	prepare a test battle with Automatos;
+	equip the player with the executioner's axe.
 	
-Testing effects of automatos-blow:
+regular scheduling of automatos-blow:
 	equip the player with the executioner's axe;
 	now the tension is 12;
-	have Automatos do no reaction to a 100 melee hit by the player with result "The impact of the attack is so great that Automatos staggers backwards and shakes its head several times. Some small, almost delicate mechanical parts fall out of its ";
+	do the action of Automatos waiting for a 100 melee hit by the player.
+	
+testing effects of automatos-blow:
+	if we assert result "The impact of the attack is so great that Automatos staggers backwards and shakes its head several times. Some small, almost delicate mechanical parts fall out of its ", rule succeeds.
+	
+initial scheduling of automatos-stab:
 	equip the player with the gorgeous dagger;
 	set the size of the gorgeous dagger to medium;
+	
+regular scheduling of automatos-stab:
 	now the tension is 15;
-	have Automatos do no reaction to a 100 melee hit by the player with result "The dagger has struck deep between plates of steel and dislodged something inside Automatos. The behemoth staggers backwards and shakes its head several times. Some small, almost delicate mechanical parts fall out of its ";
+	do the action of Automatos waiting for a 100 melee hit by the player.
+	
+testing effects of automatos-stab: if we assert result "The dagger has struck deep between plates of steel and dislodged something inside Automatos. The behemoth staggers backwards and shakes its head several times. Some small, almost delicate mechanical parts fall out of its ", rule succeeds.
 	
 [
 ./Victor Gijsbers/Kerkerkruip Actions and UI.i7x - done
@@ -3012,7 +3027,7 @@ failing move is a test step.
 Testing effects of failing move:
 	assert "truth is false" based on false.
 
-]]
+]
 
 Section - Outcome Behavior
 
